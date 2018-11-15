@@ -68,6 +68,7 @@ MANIFEST-*
 *.vs/
 *.vscode/
 .vscode/
+.vscode*
 *x64/
 
 ######################### Images / Video #########################
@@ -105,6 +106,7 @@ html/
 
 # Images
 data/output/
+data/output*
 *.jpg
 *.png
 
