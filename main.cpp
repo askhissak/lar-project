@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
     std::string filename = argv[1];
 
-    calibrateCamera();//+
+    // calibrateCamera();//+
 
     std::string outputFilename = extractMap(filename);//+
 
