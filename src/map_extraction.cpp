@@ -10,6 +10,8 @@
 
 #include "map_extraction.hpp"
 
+cv::Mat result;
+
 //IMAGE UNWARPING
 bool compareX (cv::Point pt1, cv::Point pt2)
 {
@@ -34,7 +36,7 @@ void loadCoefficients(const std::string& filename,
 //Picking reference points automatically
 cv::Mat detectMapCorners(const cv::Mat& img)
 {
-    cv::Mat result = cv::Mat(4, 2, CV_32F);
+    result = cv::Mat(4, 2, CV_32F);
     cv::Mat bg_img = img.clone();
 
     // Convert color space from BGR to HSV
@@ -209,7 +211,7 @@ cv::Mat detectMapCorners(const cv::Mat& img)
 //Return destination matrix dimensions
 cv::Mat pickOrigin()
 {
-    cv::Mat result = cv::Mat(2, 2, CV_32F);
+    result = cv::Mat(2, 2, CV_32F);
 
     result.at<float>(0, 0) = 0;
     result.at<float>(0, 1) = 0;
@@ -287,9 +289,33 @@ cv::Mat findTransform(const std::string& calib_image_name,
 
     cv::Mat transf = cv::getPerspectiveTransform(corner_pixels, transf_pixels);
     cv::Mat unwarped_frame, rotated_frame;
-    warpPerspective(calib_image, unwarped_frame, transf, cv::Size(delta_x_mm,delta_y_mm));
 
-    rotated_frame = rotate(unwarped_frame, 90);
+    cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(delta_x,delta_y));
+
+    cv::Mat hsv_img;
+    cv::cvtColor(unwarped_frame, hsv_img, cv::COLOR_BGR2HSV);
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Point> approx_curve;
+    cv::Mat blue_mask;
+    cv::inRange(hsv_img, cv::Scalar(90, 55, 55), cv::Scalar(130, 255, 200), blue_mask);
+    cv::findContours(blue_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    for (int i=0; i<contours.size(); ++i)
+    {
+        if (cv::contourArea(contours[i])>100)
+        {        
+            approxPolyDP(contours[i], approx_curve, 10, true);
+        }
+    }
+
+    if(std::abs(result.at<float>(0, 1)-approx_curve[0].y)<500)
+    {
+        rotated_frame = rotate(unwarped_frame, 270);
+    }
+    else
+    {
+        rotated_frame = rotate(unwarped_frame, 90);
+    }
+
     cv::imwrite("data/output/corrected.jpg", rotated_frame);
 
     std::string wind2; 
