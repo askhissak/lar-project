@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -76,6 +77,10 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   drawContours(red_mask_temp, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);  //Draw the found contours 
   
   int obs_flag=0; //Temporal variable for controlling parameters inside the "for" loop
+ 
+  std::ofstream ofs; //new
+  ofs.open ("data/output/output.txt", std::ofstream::out | std::ofstream::app); //new
+
 
   for (int i=0; i<contours.size(); ++i) //Area filtering loop (controlled by the number of contours found in the approximation)
   {	
@@ -111,9 +116,16 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
      {
    
       std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; // Obstacle's Corners Labeler
+
+	if (i ==0){ ofs << "0 " << obs_flag-1  << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y; } //new
+
+	else{ofs << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
+
       cv::circle( red_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); // Circles Printer for the shape's corners
       
      }
+  
+     ofs << "\n" ; //new
 
      name = "Obstacle(s) Boundaries";
      cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
@@ -171,6 +183,10 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
    //circle( circles_img, center, radius, Scalar(0,0,255), 3, 8, 0 );
    
    std::cout << "  Region number " << (i+1) << " is at coordinates : [" <<  round(circles[i][0])  <<  ", " << round(circles[i][1]) << "] " <<std::endl;
+
+   ofs << "2 " << i  << " 2 " << round(circles[i][0]) << " " << round(circles[i][1]) <<  "\n" ; //new
+
+
 
    name = "Circles Detected";
    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
@@ -241,6 +257,10 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
      {
    
       std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; //Listing the coordinates of the corners 
+
+      if (i==0){ofs << "1 " << i << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
+      else {ofs << " " << approx_curve[i].x << " " << approx_curve[i].y;} //new
+
       cv::circle(blue_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); //Graphical Print of the Corners
       
      }
@@ -257,7 +277,9 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::imshow(name.c_str(), blue_mask_temp);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str());    
-
+  
+  ofs.close(); //new
+  
   return circles;
 
 }

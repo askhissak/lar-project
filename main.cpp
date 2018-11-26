@@ -8,6 +8,7 @@
 #include "shape_detection.hpp"
 #include "digit_recognition.hpp"
 #include "order_roi.hpp"
+#include "reader.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -30,6 +31,8 @@ int main(int argc, char* argv[])
     int *pointer = recognizeDigits(outputFilename, circles);
 
     orderROI(outputFilename, circles, pointer);//+
+
+    readData("data/output/output.txt");
 
     return 0;
 }
