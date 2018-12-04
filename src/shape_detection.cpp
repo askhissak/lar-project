@@ -79,7 +79,8 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   int obs_flag=0; //Temporal variable for controlling parameters inside the "for" loop
  
   std::ofstream ofs; //new
-  ofs.open ("data/output/output.txt", std::ofstream::out | std::ofstream::app); //new
+
+  ofs.open("data/output/output.txt"); //new
 
 
   for (int i=0; i<contours.size(); ++i) //Area filtering loop (controlled by the number of contours found in the approximation)

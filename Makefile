@@ -18,7 +18,7 @@ $(OBJ_DIR)/%.o: %.cpp
 
 $(APP_DIR)/$(TARGET): $(OBJS)
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(LDLIBS) -o $(APP_DIR)/$(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE)  -o $(APP_DIR)/$(TARGET) $(OBJS) -lopencv_core -lopencv_imgcodecs -lopencv_imgproc $(LDLIBS)
 
 .PHONY: all build clean debug release
 
