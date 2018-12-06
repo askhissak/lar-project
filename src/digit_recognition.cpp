@@ -69,6 +69,10 @@ int* recognizeDigits(const std::string filename, std::vector<cv::Vec3f> circles)
         cv::erode(processROI, processROI, kernel);
         cv::threshold( processROI, processROI, 60, 255, cv::THRESH_BINARY_INV ); // threshold and binarize the image, to suppress some noise
 
+        cv::erode(processROI, processROI, kernel);
+        cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
+        cv::erode(processROI, processROI, kernel);
+
         // Show the actual image passed to the ocr engine
         cv::imshow("ROI", processROI);
         rotatedProcessROI = processROI;
@@ -100,7 +104,7 @@ int* recognizeDigits(const std::string filename, std::vector<cv::Vec3f> circles)
 
         if(*recognizedDigits[maxIndex] == ' ') continue;
         std::cout << "Recognized digit: " << std::string(recognizedDigits[maxIndex]);
-        std::cout << "Confidence: " << maxConfidence << std::endl;
+        std::cout << "Confidence: " << maxConfidence << std::endl<<std::endl<<std::endl;
         orderedArray[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
         
         cv::waitKey(0);

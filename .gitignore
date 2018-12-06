@@ -67,7 +67,9 @@ MANIFEST-*
 ######################### Windows (Visual Studio) Folders and Compressed files #########################
 *.vs/
 *.vscode/
+.vscode/*
 .vscode/
+.vscode
 .vscode*
 *x64/
 
