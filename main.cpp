@@ -16,23 +16,23 @@ int main(int argc, char* argv[])
 {
     //MENU
     // std::cout << "Please choose an option: " << std::endl;
-    // if (argc != 2) 
-    // {
-    //     std::cout << "Usage: " << argv[0] << " <image>" << std::endl;
-    //     return 0;
-    // }
+    if (argc != 2) 
+    {
+        std::cout << "Usage: " << argv[0] << " <image>" << std::endl;
+        return 0;
+    }
 
-    // std::string filename = argv[1];
+    std::string filename = argv[1];
 
-    // calibrateCamera();//+
+    calibrateCamera();//+
 
-    // std::string outputFilename = extractMap(filename);//+
+    std::string outputFilename = extractMap(filename);//+
 
-    // std::vector<cv::Vec3f> circles = processImage(outputFilename);
+    std::vector<cv::Vec3f> circles = processImage(outputFilename);
 
-    // int *pointer = recognizeDigits(outputFilename, circles);
+    int *pointer = recognizeDigits(outputFilename, circles);
 
-    // orderROI(outputFilename, circles, pointer);//+
+    orderROI(outputFilename, circles, pointer);//+
 
     readData("data/output/output.txt");
 
