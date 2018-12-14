@@ -156,9 +156,9 @@ void scaleToStandard(double x0, double y0, double th0, double xf, double yf, dou
     sc_thf = mod2pi(thf-phi);
     sc_Kmax = Kmax*lambda;
 
-    std::cout<<"Scaled th0: "<<sc_th0<<std::endl;
-    std::cout<<"Scaled thf: "<<sc_thf<<std::endl;
-    std::cout<<"Scaled Kmax: "<<sc_Kmax<<std::endl;
+    // std::cout<<"Scaled th0: "<<sc_th0<<std::endl;
+    // std::cout<<"Scaled thf: "<<sc_thf<<std::endl;
+    // std::cout<<"Scaled Kmax: "<<sc_Kmax<<std::endl;
 }
 
 // % Scale the solution to the standard problem back to the original problem
@@ -358,10 +358,10 @@ DubinsCurve dubins_shortest_path(double x0, double y0, double th0, double xf, do
     }
     
 
-    std::cout << "New curve: " << L << std::endl;
-    std::cout << "Curve sc_s1: " << sc_s1 << std::endl;
-    std::cout << "Curve sc_s2: " << sc_s2 << std::endl;
-    std::cout << "Curve sc_s3: " << sc_s3 << std::endl;
+    // std::cout << "New curve: " << L << std::endl;
+    // std::cout << "Curve sc_s1: " << sc_s1 << std::endl;
+    // std::cout << "Curve sc_s2: " << sc_s2 << std::endl;
+    // std::cout << "Curve sc_s3: " << sc_s3 << std::endl;
 
 
     DubinsCurve curve;
@@ -372,15 +372,15 @@ DubinsCurve dubins_shortest_path(double x0, double y0, double th0, double xf, do
     //     % solution of the original problem (scale the lengths)  
         scaleFromStandard(lambda, sc_s1, sc_s2, sc_s3);
         
-        std::cout << "Curve s1: " << s1 << std::endl;
-        std::cout << "Curve s2: " << s2 << std::endl;
-        std::cout << "Curve s3: " << s3 << std::endl;
+        // std::cout << "Curve s1: " << s1 << std::endl;
+        // std::cout << "Curve s2: " << s2 << std::endl;
+        // std::cout << "Curve s3: " << s3 << std::endl;
 
     //     % Construct the Dubins curve object with the computed optimal parameters
-        curve = calculateDubinsCurve(x0, y0, th0, s1, s2, s3, ksigns[pidx][0]*Kmax, ksigns[pidx][1]*Kmax, ksigns[pidx][2]*Kmax);
+        curve = calculateDubinsCurve(x0, y0, th0, s1, s2, s3, (ksigns[pidx-1][0])*Kmax, (ksigns[pidx-1][1])*Kmax, (ksigns[pidx-1][2])*Kmax);
         
     //     % Check the correctness of the algorithm
-        // assert(check(s1, ksigns[pidx][0]*Kmax, s2, ksigns[pidx][1]*Kmax, s3, ksigns[pidx][2]*Kmax, th0, thf));
+        // assert(check(sc_s1, ksigns[pidx][0]*sc_Kmax, sc_s2, ksigns[pidx][1]*sc_Kmax, sc_s3, ksigns[pidx][2]*sc_Kmax, sc_th0, sc_thf));
     }   
 
     return curve;
