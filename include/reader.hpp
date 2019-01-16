@@ -11,6 +11,6 @@
 //
 
 //Function declarations
-void readData(const std::string filename);
+cv::Mat readData(const std::string filename);
 
 #endif

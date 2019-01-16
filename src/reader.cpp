@@ -3,9 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream> 
-
 #include <opencv2/opencv.hpp>
-
 #include "reader.hpp"
 
 
@@ -14,24 +12,24 @@ using namespace cv;
 
 std::vector<std::vector<cv::Point>> contours, contours_approx;
 
-void readData(const std::string filename)
+
+cv::Mat readData(const std::string filename)
 {
-	ifstream file;
-        file.open(filename);
 	
-        int type;
-	int id;
-        int corners;
+    ifstream file;
+    file.open(filename);
+	
+    int type;
+    int id;
+    int corners;
 
 
   cv::Mat out(1470, 970, CV_8UC3, Scalar(0,0,0));
   std::string outName = "Output Data";
   cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(outName.c_str(), 512, 640);
-//   cv::namedWindow("Output Data", CV_WINDOW_AUTOSIZE);
   cv::imshow(outName.c_str(), out);
   cv::waitKey(0);
-  cv::destroyWindow(outName.c_str());
 
   int stepSize = 35;
 
@@ -77,7 +75,7 @@ void readData(const std::string filename)
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 512, 640);
 			cv::imshow(name.c_str(), out); 
-                        cv::waitKey(0);
+            cv::waitKey(0);
  		break; 
 
 		case 4:  
@@ -423,7 +421,7 @@ void readData(const std::string filename)
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 512, 640);
 			cv::imshow(name.c_str(), out); 
-                        cv::waitKey(0);  		
+            cv::waitKey(0);  		
 		break;
 
     		
@@ -435,20 +433,22 @@ void readData(const std::string filename)
      else if (type == 2)
      {
       	file >> x0 >> y0 ;	
-	std::cout << x0 << y0 << endl; 
-	cv::circle( out , cv::Point(x0,y0), 8 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 );
-	// cv::imshow("Corners", out); 
-  	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  	cv::resizeWindow(name.c_str(), 512, 640);
-	cv::imshow(name.c_str(), out); 
-        cv::waitKey(0);   		
+		std::cout << x0 << y0 << endl; 
+		cv::circle( out , cv::Point(x0,y0), 8 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 );
+		// cv::imshow("Corners", out); 
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 512, 640);
+		cv::imshow(name.c_str(), out); 
+		cv::waitKey(0);   		
      }
 
 
      else {std::cout << " Error in the Switch " << endl;}
 
 
-}
+  }
+  
+  
+  return out;
 
 }
-
