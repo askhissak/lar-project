@@ -27,7 +27,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), img);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Convert color space from BGR to HSV
@@ -38,7 +38,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), hsv_img);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());
 
   // Find contours
@@ -67,7 +67,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), red_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());        
 
   // Process red mask (Obstacles)
@@ -132,7 +132,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
      cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
      cv::resizeWindow(name.c_str(), 512, 640);
      cv::imshow(name.c_str(), red_mask_temp);
-     cv::waitKey(0);
+     //cv::waitKey(0);
      cv::destroyWindow(name.c_str());   
 
     }
@@ -158,7 +158,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), green_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());     
  
   HoughCircles( green_mask , circles, cv::HOUGH_GRADIENT, 1, green_mask.rows/10, 40, 20 );
@@ -193,7 +193,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
    cv::resizeWindow(name.c_str(), 512, 640);
    cv::imshow(name.c_str(), circles_img);
-   cv::waitKey(0);
+   //cv::waitKey(0);
    cv::destroyWindow(name.c_str());   
 
   }
@@ -214,7 +214,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), blue_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Process blue mask (Gates)
@@ -276,7 +276,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), blue_mask_temp);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());    
   
   ofs.close(); //new

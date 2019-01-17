@@ -11,7 +11,6 @@
 //
 
 //Function declarations
-float collision_detection(cv::Point p);
-void line_colliding( cv::Mat img , cv::Point ini_p , cv::Point fin_p , int &line_collision , int &x_out , int &y_out );
-
+cv::Mat print_contours(cv::Mat inputmap);
+bool collision_detection(cv::Mat inputmap , cv::Point target);
 #endif

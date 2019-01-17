@@ -29,18 +29,19 @@ cv::Mat readData(const std::string filename)
   cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(outName.c_str(), 512, 640);
   cv::imshow(outName.c_str(), out);
-  cv::waitKey(0);
+  //cv::waitKey(0);
+  cv::destroyWindow(outName.c_str());
 
-  int stepSize = 35;
+  //int stepSize = 35;
 
-  int width = out.size().width;
-  int height = out.size().height;
+  //int width = out.size().width;
+  //int height = out.size().height;
 
-   for (int i = 0; i<height; i += stepSize)
-    cv::line(out, Point(0, i), Point(width, i), cv::Scalar( 100 , 100 , 100 ));
+   //for (int i = 0; i<height; i += stepSize)
+    //cv::line(out, Point(0, i), Point(width, i), cv::Scalar( 100 , 100 , 100 ));
 
-   for (int i = 0; i<width; i += stepSize)
-    cv::line(out , Point(i, 0), Point(i, height), cv::Scalar( 100 , 100 , 100 ));
+   //for (int i = 0; i<width; i += stepSize)
+    //cv::line(out , Point(i, 0), Point(i, height), cv::Scalar( 100 , 100 , 100 ));
 
    std::string name = "Corners";
 
@@ -430,6 +431,7 @@ cv::Mat readData(const std::string filename)
 
      }//if
        
+     /*
      else if (type == 2)
      {
       	file >> x0 >> y0 ;	
@@ -439,8 +441,9 @@ cv::Mat readData(const std::string filename)
 		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 512, 640);
 		cv::imshow(name.c_str(), out); 
-		cv::waitKey(0);   		
+		////////////cv::waitKey(0);   		
      }
+     */
 
 
      else {std::cout << " Error in the Switch " << endl;}
