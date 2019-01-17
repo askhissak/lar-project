@@ -31,17 +31,17 @@ int main(int argc, char* argv[])
 
     std::string filename = argv[1];
 
-    //calibrateCamera();
+    calibrateCamera();
 
     std::string outputFilename = extractMap(filename);
 
     std::vector<cv::Vec3f> circles = processImage(outputFilename);
 
-    //int *pointer = recognizeDigits(outputFilename, circles);
+    int *pointer = recognizeDigits(outputFilename, circles);
     
     int collision_trigger = 0 ;
 
-    //orderROI(outputFilename, circles, pointer);
+    orderROI(outputFilename, circles, pointer);
     
     cv::Mat map = readData("data/output/output.txt");
 
