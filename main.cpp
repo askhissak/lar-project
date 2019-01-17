@@ -16,6 +16,8 @@
 
 int main(int argc, char* argv[])
 {
+   
+    bool stop_after_collision = false; //developer mode (false -> Don't stop after collisions
 
 	
     //MENU
@@ -85,7 +87,7 @@ int main(int argc, char* argv[])
     
     bool marker = false;
     
-    //if (collision_trigger == false)
+    if (collision_trigger == false || stop_after_collision == false)
     {
 		//COLLISION DETECTION
 		
@@ -113,20 +115,26 @@ int main(int argc, char* argv[])
 				else if(collision_trigger == true)
 				{  
 					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
-					//marker=true; //To flag the first intersection
+					if (marker == false) marker=true; //To flag the first intersection
+					if (stop_after_collision == true) break;
 				}
 				
 				old_x = new_x ;
 			    old_y = new_y ;
 					
 			}
-			//else if (collision_trigger == true ) break; //Comment this to check all the collisions
+			else if (collision_trigger == true && stop_after_collision == true ) break;
 		}
 		
-		if (collision_trigger == false) std::cout << "No Collisions detected in the First Arc" << std::endl;
+		if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the First Arc" << std::endl;
+		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the First Arc !!! \n\n" << std::endl;
+		
+		
 		
 		
 		//LINE
+		
+		marker = false;
 		
 		for(int j=0; j<npts;++j)
 		{
@@ -149,20 +157,23 @@ int main(int argc, char* argv[])
 				else if(collision_trigger == true)
 				{  
 					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
-					//marker=true; //To flag the first intersection
+					if (marker == false) marker=true; //To flag the first intersection
+					if (stop_after_collision == true) break;
 				}
 				
 				old_x = new_x ;
 			    old_y = new_y ;
 					
 			}
-			//else if (collision_trigger == true ) break; //Comment this to check all the collisions
+			else if (collision_trigger == true && stop_after_collision == true ) break;
 		}
 		
-		if (collision_trigger == false) std::cout << "No Collisions detected in the Line" << std::endl;
+		if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the Line" << std::endl;
+		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the Line !!! \n\n" << std::endl;
 		
+		//SECOND ARC'
 		
-		//SECOND ARC
+		marker = false;
 		
 		for(int j=0; j<npts;++j)
 		{
@@ -185,18 +196,20 @@ int main(int argc, char* argv[])
 				else if(collision_trigger == true)
 				{  
 					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
-					//marker=true; //To flag the first intersection
+					if (marker == false) marker=true; //To flag the first intersection
+					if (stop_after_collision == true) break;
 				}
 				
 				old_x = new_x ;
 			    old_y = new_y ;
 					
 			}
-			//else if (collision_trigger == true ) break; //Comment this to check all the collisions
+			else if (collision_trigger == true && stop_after_collision == true ) break;
 		}
 		
-		//if (collision_trigger == false) std::cout << "No Collisions detected in the Second Arc" << std::endl;
-	
+	    if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the Second Arc" << std::endl;
+		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the Second Arc !!! \n\n" << std::endl;
+		
 	}
 
 	std::string name = "Corners";
