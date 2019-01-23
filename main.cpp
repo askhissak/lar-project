@@ -363,16 +363,11 @@ int main(int argc, char* argv[])
 					remapper++;
 					break;
 				}	
-			
-	
 		}
-		
-		
-		
 	}
 	
-	
 	return 0;
+
 }
 
 //Test for an individual point

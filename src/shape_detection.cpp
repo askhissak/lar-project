@@ -27,7 +27,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), img);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Convert color space from BGR to HSV
@@ -38,7 +38,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), hsv_img);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str());
 
   // Find contours
@@ -61,20 +61,29 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::inRange(hsv_img, cv::Scalar(0, 0, 0), cv::Scalar(18, 255, 255), red_mask_low);
                                // 150  30 30             180         
   cv::inRange(hsv_img, cv::Scalar(150, 0, 0), cv::Scalar(200, 255, 255), red_mask_high);
+  
   cv::addWeighted(red_mask_low, 1.0, red_mask_high, 1.0, 0.0, red_mask); // combine together the two binary masks
+  
+  cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
+  
+  cv::erode(red_mask , red_mask , kernel, cv::Point(-1, -1), 2);
   
   name = "Obstacles";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), red_mask);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str());        
 
   // Process red mask (Obstacles)
-  cv::Mat red_mask_temp;
-  red_mask_temp = img.clone();
+  cv::Mat red_mask_temp = img.clone();
   cv::findContours(red_mask, contours,  cv::RETR_EXTERNAL , cv::CHAIN_APPROX_SIMPLE); //Find closed contours on the image via the defined approximation
+  
   drawContours(red_mask_temp, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);  //Draw the found contours 
+  
+   
+  
+  
   
   int obs_flag=0; //Temporal variable for controlling parameters inside the "for" loop
  
@@ -92,7 +101,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
      
      obs_flag++ ; // Parameter to control the format of the output in the Terminal and the file
      
-     if (obs_flag == 1) {std::cout << "Obstacles Detected! " << std::endl;} //Triggering the detection alert in the first event 
+     if (obs_flag == 1) {std::cout << " "  << contours.size() << "Obstacles Detected! " << std::endl;} //Triggering the detection alert in the first event 
      if (obs_flag >= 1 ) {std::cout << std::endl;}
      
      approxPolyDP(contours[i], approx_curve, 18 , true); //How Strict the Filter is to Aproximate the contour to a Polygon
@@ -109,7 +118,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
        case 7:  std::cout << " The Obstacle number " << obs_flag << " has 7 sides so it's an heptagon ! "     << std::endl; break;  // for Obstacle Id tag     
        case 8:  std::cout << " The Obstacle number " << obs_flag << " has 8 sides so it's an octagon ! "      << std::endl; break;  // and sides number
        case 9:  std::cout << " The Obstacle number " << obs_flag << " has 9 sides so it's an nonagon ! "      << std::endl; break;  // 
-       default: std::cout << " The Obstacle number " << obs_flag << " has " << approx_curve.size() << "sides" << std::endl; break;  //   
+       default: std::cout << " The Obstacle number " << obs_flag << " has " << approx_curve.size() << " sides" << std::endl; break;  //   
      }
   
      
@@ -132,7 +141,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
      cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
      cv::resizeWindow(name.c_str(), 512, 640);
      cv::imshow(name.c_str(), red_mask_temp);
-     //cv::waitKey(0);
+     cv::waitKey(0);
      cv::destroyWindow(name.c_str());   
 
     }
@@ -158,7 +167,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), green_mask);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str());     
  
   HoughCircles( green_mask , circles, cv::HOUGH_GRADIENT, 1, green_mask.rows/10, 40, 20 );
@@ -193,7 +202,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
    cv::resizeWindow(name.c_str(), 512, 640);
    cv::imshow(name.c_str(), circles_img);
-   //cv::waitKey(0);
+   cv::waitKey(0);
    cv::destroyWindow(name.c_str());   
 
   }
@@ -214,7 +223,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), blue_mask);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Process blue mask (Gates)
@@ -276,7 +285,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 512, 640);
   cv::imshow(name.c_str(), blue_mask_temp);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str());    
   
   ofs.close(); //new

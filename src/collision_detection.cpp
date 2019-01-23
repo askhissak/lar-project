@@ -161,8 +161,6 @@ cv::Mat rounder(cv::Mat input)
         
     }
     */
-    
-    
 	return rounded;
 	
 }
@@ -205,6 +203,4 @@ cv::Mat crop_contour( cv::Mat isolated_contour , cv::Point ini_collision , cv::P
 	return cropped_contour;
 	
 }
-
-
 
