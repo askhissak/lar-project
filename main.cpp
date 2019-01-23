@@ -17,9 +17,8 @@
 int main(int argc, char* argv[])
 {
    
-    bool stop_after_collision = false; //developer mode (false -> Don't stop after collisions
+    
 
-	
     //MENU
     // std::cout << "Please choose an option: " << std::endl;
     
@@ -31,20 +30,22 @@ int main(int argc, char* argv[])
 
     std::string filename = argv[1];
 
-    calibrateCamera();
+    //calibrateCamera();
 
     std::string outputFilename = extractMap(filename);
 
     std::vector<cv::Vec3f> circles = processImage(outputFilename);
 
-    int *pointer = recognizeDigits(outputFilename, circles);
+    //int *pointer = recognizeDigits(outputFilename, circles);
     
-    int collision_trigger = 0 ;
-
-    orderROI(outputFilename, circles, pointer);
     
-    cv::Mat map = readData("data/output/output.txt");
 
+    //orderROI(outputFilename, circles, pointer);
+    
+    cv::Mat map = readData("data/output/output.txt"); //First map acquisition
+	
+	cv::Mat original_map = map ; 
+	
     double x0 = 171, y0 = 292, xf = 790, yf = 298; 
     double th0 = -(2*M_PI/3), thf = M_PI/3, Kmax = 0.01;
     double radius = 50;
@@ -85,149 +86,296 @@ int main(int argc, char* argv[])
     int old_y=0;
     int new_y=0;
     
-    bool marker = false;
+    int marker = 000;
     
-    if (collision_trigger == false || stop_after_collision == false)
+    int remapper = 0;
+    
+    int collision_trigger = 0 ;
+    
+    bool stop_after_collision = false; // Developer mode .... false -> Don't stop after collisions
+    
+    int thres_safe = 40 ; //Safe value for first approximation
+
+	int thres_limit = 0;
+	
+	int thres = thres_safe ;
+	
+	int contour_index = 0;
+    
+    int new_contour_index = 0;
+    
+    cv::Point ini_collision;
+    
+    cv::Point fin_collision ;
+    
+    cv::Point contour_center(0,0) ; 
+		
+    int contour_radius = 0 ; 
+    
+    
+    while(remapper < 4 )
     {
+		marker = 000;
+		
+		collision_trigger = false;
+		
+		if 		(remapper == 0) thres = thres_safe;  
+		
+		else if (remapper == 1) {thres = thres_limit; remapper++;}
+    
+		else if (remapper == 2) remapper++;
+		
 		//COLLISION DETECTION
 		
-		//FIRST ARC
-    
-		for(int j=0; j<npts;++j)
+		if (stop_after_collision == false)
 		{
-			double s = curve.arc1.L/npts*j;
-			circline(s,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
 			
-			new_x = (int)cline[0];
-			new_y = (int)cline[1];
-			
-			if ((new_x != old_x || new_y != old_y ))
+			//FIRST ARC
+		
+			for(int j=0; j<npts;++j)
 			{
+				double s = curve.arc1.L/npts*j;
+				circline(s,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
 				
-				collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]});
+				new_x = (int)cline[0];
+				new_y = (int)cline[1];
 				
-					
-				if (collision_trigger == false) 
+				if ((new_x != old_x || new_y != old_y ))
 				{
-					cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
-				} 
-				
-				else if(collision_trigger == true)
-				{  
-					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
-					if (marker == false) marker=true; //To flag the first intersection
-					if (stop_after_collision == true) break;
-				}
-				
-				old_x = new_x ;
-			    old_y = new_y ;
 					
+					collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]} , thres , remapper , contour_index);
+					
+					if (thres==thres_limit && contour_index > new_contour_index) new_contour_index = contour_index;
+						
+					if (collision_trigger == false) 
+					{
+						cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
+					} 
+					
+					else if(collision_trigger == true)
+					{  
+						if (remapper == 0) remapper++;
+						
+						else if (remapper != 3) {cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); } //Collision
+						else if (remapper == 3 && new_contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //Red Points
+						else if (remapper == 3 && new_contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );*/ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Blue Points
+						else if (remapper == 3 && new_contour_index != 100  && new_contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
+						
+						
+						marker=100; //To flag the first intersection
+						if (stop_after_collision == true) break;
+					}
+					
+					old_x = new_x ;
+					old_y = new_y ;
+						
+				}
+				else if (collision_trigger == true && stop_after_collision == true ) break;
 			}
-			else if (collision_trigger == true && stop_after_collision == true ) break;
+			
+			if (collision_trigger == false && marker == 000) std::cout << "\n\n Inspection Finished , no collisions detected in the First Arc" << std::endl;
+			else if(marker == 100) std::cout << "\n\n Inspection Finished , some collisions detected in the First Arc !!! \n\n" << std::endl;
+			
+			//LINE
+			
+			for(int j=0; j<npts;++j)
+			{
+				double s = curve.arc2.L/npts*j;
+				circline(s,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
+				
+				new_x = (int)cline[0];
+				new_y = (int)cline[1];
+				
+				if ((new_x != old_x || new_y != old_y ))
+				{
+					collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]} , thres , remapper , contour_index);
+					
+					//if (thres==thres_limit && contour_index > new_contour_index) new_contour_index = contour_index;
+					
+						
+					if (collision_trigger == false) 
+					{
+						cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
+					} 
+					
+					else if(collision_trigger == true)
+					{  
+						if (remapper == 0) remapper++;
+						
+						else if (remapper != 3) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
+						else if (remapper == 3 && contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 10 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //First Point
+						else if (remapper == 3 && contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 10 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Last Point
+						else if (remapper == 3 && contour_index != 100 && contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
+						
+						if (marker == 100) marker = 110;
+						if (marker != 100) marker = 010; //To flag the first intersection
+						
+						if (stop_after_collision == true) break;
+					}
+					
+					old_x = new_x ;
+					old_y = new_y ;
+						
+				}
+				else if (collision_trigger == true && stop_after_collision == true ) break;
+			}
+			
+			if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the Line" << std::endl;
+			else if(marker==010 || marker == 110 ) std::cout << "\n\n Inspection Finished , some collisions detected in the Line !!! \n\n" << std::endl;
+			
+			//SECOND ARC'
+			
+			for(int j=0; j<npts;++j)
+			{
+				double s = curve.arc3.L/npts*j;
+				circline(s,curve.arc3.x0,curve.arc3.y0,curve.arc3.th0,curve.arc3.k);
+				
+				new_x = (int)cline[0];
+				new_y = (int)cline[1];
+				
+				if ((new_x != old_x || new_y != old_y ))
+				{
+					collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]} , thres , remapper , contour_index);
+					
+					if (thres==thres_limit && contour_index > new_contour_index) new_contour_index = contour_index;
+						
+					if (collision_trigger == false) 
+					{
+						cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
+					} 
+					
+					else if(collision_trigger == true)
+					{  
+						if (remapper == 0) remapper++;
+						
+						else if (remapper != 3) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
+						else if (remapper == 3 && new_contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //Red Points
+						else if (remapper == 3 && new_contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); */ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Blue Points
+						else if (remapper == 3 && new_contour_index != 100  && new_contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
+						
+						if (marker == 100) marker = 101;
+						if (marker == 110) marker = 111;
+						if (marker == 000) marker = 001;
+						if (stop_after_collision == true) break;
+					}
+					
+					old_x = new_x ;
+					old_y = new_y ;
+						
+				}
+				else if (collision_trigger == true && stop_after_collision == true ) break;
+			}
+			
+			if ( collision_trigger == false && (marker == 110 || marker == 010 || marker == 000) ) {std::cout << "\n\n Inspection Finished , no collisions detected in the Second Arc" << std::endl;}
+			else if((marker == 001 || marker == 011 || marker == 111 ) && stop_after_collision == false) std::cout << "\n\n Inspection Finished , some collisions detected in the Second Arc !!! \n\n" << std::endl;
+			
 		}
 		
-		if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the First Arc" << std::endl;
-		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the First Arc !!! \n\n" << std::endl;
+		switch(marker)
 		
-		
-		
-		
-		//LINE
-		
-		marker = false;
-		
-		for(int j=0; j<npts;++j)
-		{
-			double s = curve.arc2.L/npts*j;
-			circline(s,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
+		{	
+			case 000 : std::cout << "\n\n Inspection Finished , NO COLLLISIONS DETECTED !!! \n\n" << std::endl; break;
 			
-			new_x = (int)cline[0];
-			new_y = (int)cline[1];
+			case 001 : std::cout << "\n\n Inspection Finished , COLLISION JUST IN THE FINAL ARC !!! \n\n" << std::endl; break;
 			
-			if ((new_x != old_x || new_y != old_y ))
-			{
-				collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]});
-				
-					
-				if (collision_trigger == false) 
-				{
-					cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
-				} 
-				
-				else if(collision_trigger == true)
-				{  
-					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
-					if (marker == false) marker=true; //To flag the first intersection
-					if (stop_after_collision == true) break;
-				}
-				
-				old_x = new_x ;
-			    old_y = new_y ;
-					
-			}
-			else if (collision_trigger == true && stop_after_collision == true ) break;
+			case 010 : std::cout << "\n\n Inspection Finished , COLLISION JUST IN THE LINE !!! \n\n" << std::endl; break;
+			
+			case 011 : std::cout << "\n\n Inspection Finished , COLLISION IN THE LINE AND FINAL ARC !!! \n\n" << std::endl; break;
+			
+			case 100 : std::cout << "\n\n Inspection Finished , COLLISION JUST IN THE FIRST ARC !!! \n\n" << std::endl; break;
+			
+			case 101 : std::cout << "\n\n Inspection Finished , COLLISIONS IN THE FIRST AND LAST ARCS !!! \n\n" << std::endl; break;
+			
+			case 110 : std::cout << "\n\n Inspection Finished , COLLISIONS IN THE FIRST ARC AND THE LINE !!! \n\n" << std::endl; break;
+			
+			case 111 : std::cout << "\n\n Inspection Finished , COLLISION IN ALL SEGMENTS !!! \n\n" << std::endl; break;
 		}
 		
-		if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the Line" << std::endl;
-		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the Line !!! \n\n" << std::endl;
+		//cv::Mat plan; //TRAJECTORY + OBSTACLES
 		
-		//SECOND ARC'
+		//cv::add(out,map,plan);
+	
+		std::string name = "TRAJECTORY + OBSTACLES" ;
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 512, 640);    
+		cv::imshow(name.c_str(), out+map ); 
+		cv::waitKey(0);
+		cv::destroyWindow(name.c_str());
 		
-		marker = false;
 		
-		for(int j=0; j<npts;++j)
+		
+		cv::Mat rounded = map;
+		
+		//Aqui poner la nueva func para el new path
+		
+		//remapper == 1 Print rounded limits and run the collision detector with thres = 0  
+		//remapper == 2 Run the new trajectory creator after the collision detection to build new path
+		//remapper == 3 Build the new trajectory
+		
+		cv::Mat isolated_contour = out ;
+		
+		switch (remapper)
 		{
-			double s = curve.arc3.L/npts*j;
-			circline(s,curve.arc3.x0,curve.arc3.y0,curve.arc3.th0,curve.arc3.k);
 			
-			new_x = (int)cline[0];
-			new_y = (int)cline[1];
-			
-			if ((new_x != old_x || new_y != old_y ))
-			{
-				collision_trigger = collision_detection(map, {(int)cline[0],(int)cline[1]});
-				
-					
-				if (collision_trigger == false) 
+			case 1 :  //To find the collision with the obstacle
 				{
-					cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 ); //No collision
-				} 
-				
-				else if(collision_trigger == true)
-				{  
-					cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
-					if (marker == false) marker=true; //To flag the first intersection
-					if (stop_after_collision == true) break;
-				}
-				
-				old_x = new_x ;
-			    old_y = new_y ;
+					rounded = rounder(map);
 					
-			}
-			else if (collision_trigger == true && stop_after_collision == true ) break;
+					std::cout << "\n\n REMAPPING ___ FIRST ITERATION \n\n" << std::endl;
+			        map = rounded;
+				
+					name = " ROUNDED LIMITS " ;
+					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::resizeWindow(name.c_str(), 512, 640);   		
+					cv::imshow(name.c_str(), rounded ); 
+					cv::waitKey(0);
+					cv::destroyWindow(name.c_str());
+					break;
+			
+				}
+			case 2 : //Remapping for the found contour
+					
+				{	
+					isolated_contour = print_desired_contour(rounded , new_contour_index , contour_center , contour_radius );
+					
+					name = " ISOLATED CONTOUR " ;
+					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::resizeWindow(name.c_str(), 512, 640);   		
+					cv::imshow(name.c_str(), isolated_contour );
+					cv::waitKey(0);
+					cv::destroyWindow(name.c_str());
+					
+					break;
+					
+				}	
+			case 3 : //To Draw the final trajectory
+				{
+					std::cout << "\n\n First Point : " << ini_collision << " ,  Last Point :  "  << fin_collision << "  Center : " << contour_center << " ,  Radius :  "  << contour_radius <<  "\n\n"  << std::endl;
+					
+					cv::Mat cropped_contour = crop_contour( isolated_contour ,  ini_collision , fin_collision , contour_center , contour_radius );
+					
+					name = " Final Intended Trajectory" ;
+					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::resizeWindow(name.c_str(), 512, 640);   		
+					cv::imshow(name.c_str(), cropped_contour + original_map); 
+					cv::waitKey(0);
+					cv::destroyWindow(name.c_str());
+					remapper++;
+					break;
+				}	
+			
+	
 		}
 		
-	    if (collision_trigger == false && marker == false) std::cout << "\n\n Inspection Finished , no collisions detected in the Second Arc" << std::endl;
-		else if(marker > 0) std::cout << "\n\n Inspection Finished , some collisions detected in the Second Arc !!! \n\n" << std::endl;
+		
 		
 	}
-
-	std::string name = "Corners";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 512, 640);    
-    
-    //cv::Mat BW_Map = print_contours(map);
-    
-    cv::Mat plan;
-    cv::add(out,map,plan);
-    
-    cv::imshow(name.c_str(), plan ); 
-    cv::waitKey(0);
-    
-    //Test for an individual point
-    //cv::Point p{430,456}; 
-    //collision_detection(map , p);
-    
-    
-    return 0;
+	
+	
+	return 0;
 }
+
+//Test for an individual point
+		//cv::Point p{430,456}; 
+		//collision_detection(map , p);
+	
