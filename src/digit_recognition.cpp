@@ -93,7 +93,7 @@ int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
         //Find the digit with the highest confidence
         for(int k=0;k<recognizedDigits.size();++k)
         {
-            if(*recognizedDigits[k] == ' ') continue;
+            if(*recognizedDigits[k] == ' ' || !isdigit(*recognizedDigits[k])) continue;
 
             if(confidences[k]>maxConfidence)
             {
@@ -102,7 +102,7 @@ int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
             }
         }
 
-        if(*recognizedDigits[maxIndex] == ' ') continue;
+        if(*recognizedDigits[maxIndex] == ' ' || !isdigit(*recognizedDigits[maxIndex])) continue;
         std::cout << "Recognized digit: " << std::string(recognizedDigits[maxIndex]);
         std::cout << "Confidence: " << maxConfidence << std::endl<<std::endl<<std::endl;
         orderedArray[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
