@@ -108,6 +108,8 @@ int main(int argc, char* argv[])
     
     cv::Point fin_collision ;
     
+    cv::Point collision_point;
+    
     cv::Point contour_center(0,0) ; 
 		
     int contour_radius = 0 ; 
@@ -156,7 +158,7 @@ int main(int argc, char* argv[])
 					{  
 						if (remapper == 0) remapper++;
 						
-						else if (remapper != 3) {cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); } //Collision
+						else if (remapper != 3) {cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); collision_point = cv::Point((int)cline[0],(int)cline[1]);}//Collision
 						else if (remapper == 3 && new_contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //Red Points
 						else if (remapper == 3 && new_contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );*/ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Blue Points
 						else if (remapper == 3 && new_contour_index != 100  && new_contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
@@ -202,7 +204,7 @@ int main(int argc, char* argv[])
 					{  
 						if (remapper == 0) remapper++;
 						
-						else if (remapper != 3) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
+						else if (remapper != 3) {cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); collision_point = cv::Point((int)cline[0],(int)cline[1]);} //collision
 						else if (remapper == 3 && contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 10 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //First Point
 						else if (remapper == 3 && contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 10 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Last Point
 						else if (remapper == 3 && contour_index != 100 && contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
@@ -248,10 +250,10 @@ int main(int argc, char* argv[])
 					{  
 						if (remapper == 0) remapper++;
 						
-						else if (remapper != 3) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); //Collision
+						else if (remapper != 3) {cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); collision_point = cv::Point((int)cline[0],(int)cline[1]);} //Collision}
 						else if (remapper == 3 && new_contour_index == 100 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 200 ), 5, 8, 0 );*/ ini_collision = cv::Point((int)cline[0],(int)cline[1]); } //Red Points
 						else if (remapper == 3 && new_contour_index == 200 ) { /*cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 ); */ fin_collision = cv::Point((int)cline[0],(int)cline[1]); } //Blue Points
-						else if (remapper == 3 && new_contour_index != 100  && new_contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]), 5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
+						else if (remapper == 3 && new_contour_index != 100  && new_contour_index != 200 ) cv::circle(out, cv::Point((int)cline[0],(int)cline[1]),5 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 ); //Delete Points
 						
 						if (marker == 100) marker = 101;
 						if (marker == 110) marker = 111;
@@ -336,7 +338,7 @@ int main(int argc, char* argv[])
 			case 2 : //Remapping for the found contour
 					
 				{	
-					isolated_contour = print_desired_contour(rounded , new_contour_index , contour_center , contour_radius );
+					isolated_contour = print_desired_contour(rounded , new_contour_index , contour_center , contour_radius  , collision_point );
 					
 					name = " ISOLATED CONTOUR " ;
 					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);

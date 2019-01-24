@@ -16,7 +16,7 @@ int polyflag = 0;
 int output_trigger =0;
 
 
-cv::Mat print_desired_contour(cv::Mat inputmap, int contour_idx , cv::Point &contour_center , int &contour_radius )
+cv::Mat print_desired_contour(cv::Mat inputmap, int &contour_idx , cv::Point &contour_center , int &contour_radius , cv::Point colliding_point )
 {
 	cv::Mat BW_Map ;
 	
@@ -27,6 +27,31 @@ cv::Mat print_desired_contour(cv::Mat inputmap, int contour_idx , cv::Point &con
 	vector<Vec4i> hierarchy;
 	
 	findContours(BW_Map , contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	
+	int old_dist = 1000;
+	
+	for( int i = 0 ; i < contours.size() ; i++ ) // iterate through each contour. 
+    {
+		
+		int new_dist = (int)((cv::pointPolygonTest(contours[i] , colliding_point , true))*(-1));
+		
+		if (new_dist < old_dist ) { old_dist = new_dist ; contour_idx = i  ; } 	
+		
+	}
+	
+	/*
+	cv::circle(inputmap , colliding_point , 10, cv::Scalar(200 , 200 , 200 ), 5, 8, 0 );
+	
+	std::string name = "I WANT TO ATTACK HERE AND THIS IS THE POINT " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);    
+	cv::imshow(name.c_str(), inputmap ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+		
+	*/
+	
+	
 	
 	//For getting the desired circle's information
 	vector<vector<Point> > contours_poly( contours.size() );
@@ -98,7 +123,7 @@ bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int 
 	if (dist <= thres) 
 	{
 		std::cout << " Distance from Contour " << i <<  " : "  << dist <<  "   <---- THRESHOLD REACHED !!!!!! \n\n   "  << std::endl;
-		if      (dist == 0 && remapper != 3 ) {contour_index = i; }
+		if      (dist == 0 && remapper != 3 ) {/*contour_index = i*/; }
 		else if (dist == 0 && remapper == 3 && output_trigger == 0 )   {contour_index = 100; output_trigger = 100;  } //Initial Value
 		else if (dist <  0 && remapper == 3 && output_trigger == 100 ) {contour_index =0 ; } 
 		else if (dist == 0 && remapper == 3 && output_trigger == 100)  {contour_index = 200; output_trigger = 200;  } //Final Value
@@ -149,7 +174,9 @@ cv::Mat rounder(cv::Mat input)
 		 {
 		   //drawContours( rounded, contours_poly, i, cv::Scalar(255,0,0), 1, 8, vector<Vec4i>(), 0, Point() );
 		   //rectangle( rounded, boundRect[i].tl(), boundRect[i].br(),cv::Scalar(255,255,255), 2, 8, 0 );
-		   circle( rounded , center[i], (int)radius[i]*scale , cv::Scalar(255,255,255), 2, 8, 0 );
+		   //circle( rounded , center[i], (int)radius[i]*scale , cv::Scalar(255,255,255), 2, 8, 0 );
+		   circle( rounded , center[i], (int)radius[i]*scale , cv::Scalar(100,100,100), CV_FILLED , 8, 0 );
+		   
 		 }
 
 	/*
