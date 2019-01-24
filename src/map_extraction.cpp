@@ -19,19 +19,19 @@ bool compareX (cv::Point pt1, cv::Point pt2)
 }
 
 //Load camera matrix and distortion coefficients values from intrinsic_calibration.xml
-void loadCoefficients(const std::string& filename,
-                      cv::Mat& camera_matrix,
-                      cv::Mat& dist_coeffs)
-{
-    cv::FileStorage fs( filename, cv::FileStorage::READ );
-    if (!fs.isOpened())
-    {
-        throw std::runtime_error("Could not open file " + filename);
-    }
-    fs["camera_matrix"] >> camera_matrix;
-    fs["distortion_coefficients"] >> dist_coeffs;
-    fs.release();
-}
+// void loadCoefficients(const std::string& filename,
+//                       cv::Mat& camera_matrix,
+//                       cv::Mat& dist_coeffs)
+// {
+//     cv::FileStorage fs( filename, cv::FileStorage::READ );
+//     if (!fs.isOpened())
+//     {
+//         throw std::runtime_error("Could not open file " + filename);
+//     }
+//     fs["camera_matrix"] >> camera_matrix;
+//     fs["distortion_coefficients"] >> dist_coeffs;
+//     fs.release();
+// }
 
 //Picking reference points automatically
 cv::Mat detectMapCorners(const cv::Mat& img)
@@ -40,20 +40,26 @@ cv::Mat detectMapCorners(const cv::Mat& img)
     cv::Mat bg_img = img.clone();
 
     // Convert color space from BGR to HSV
-    cv::Mat hsv_img;
-    cv::cvtColor(bg_img, hsv_img, cv::COLOR_BGR2HSV);
+    // cv::Mat hsv_img;
+    // cv::cvtColor(bg_img, hsv_img, cv::COLOR_BGR2HSV);
+    
+    // Convert color space from BGR to HSV
+    cv::Mat gray_img;
+    cv::cvtColor(bg_img, gray_img, cv::COLOR_BGR2GRAY);
 
     // Find black regions (filter on saturation and value)
     cv::Mat black_mask;
-    cv::inRange(hsv_img, cv::Scalar(0, 5, 5), cv::Scalar(180, 255, 40), black_mask);
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
-    cv::dilate(black_mask, black_mask, kernel);	
-    cv::erode(black_mask, black_mask, kernel);
+    // cv::inRange(hsv_img, cv::Scalar(0, 5, 5), cv::Scalar(180, 255, 40), black_mask);
+    // cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+    // cv::dilate(black_mask, black_mask, kernel);	
+    // cv::erode(black_mask, black_mask, kernel);
+
+    cv::adaptiveThreshold(gray_img, black_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 31, 0);
 
     //Show detected black regions
     std::string name = "Boundary";
     cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 512, 640);
+    cv::resizeWindow(name.c_str(), 640, 512);
     cv::imshow(name.c_str(), black_mask);
     cv::waitKey(0);
     cv::destroyWindow(name.c_str());
@@ -83,7 +89,7 @@ cv::Mat detectMapCorners(const cv::Mat& img)
         drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 5, cv::LINE_AA);
         name = "Main Perimeter (Black Boundary)";
         cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-        cv::resizeWindow(name.c_str(), 512, 640);
+        cv::resizeWindow(name.c_str(), 640, 512);
         cv::imshow(name.c_str(), contours_img);
         cv::waitKey(0);
         cv::destroyWindow(name.c_str());
@@ -215,8 +221,8 @@ cv::Mat pickOrigin()
 
     result.at<float>(0, 0) = 0;
     result.at<float>(0, 1) = 0;
-    result.at<float>(1, 0) = 1470;
-    result.at<float>(1, 1) = 970;
+    result.at<float>(1, 0) = 1510; //Check dimensions!
+    result.at<float>(1, 1) = 1050; //Check dimensions!
     
     return result;
 }
@@ -239,23 +245,21 @@ cv::Mat rotate(cv::Mat src, double angle)
 }
 
 //Calculate and return perspective transformation matrix
-cv::Mat findTransform(const std::string& calib_image_name,
-                  const cv::Mat& camera_matrix,
-                  const cv::Mat& dist_coeffs,
+cv::Mat findTransform(cv::Mat const & calib_image,
                   double& pixel_scale)
 {
-    cv::Mat calib_image, original_image = cv::imread(calib_image_name);
+    // cv::Mat calib_image, original_image = cv::imread(calib_image_name);
 
-    if (original_image.empty())
-    {
-        throw std::runtime_error("Could not open image " + calib_image_name);
-    }
+    // if (original_image.empty())
+    // {
+    //     throw std::runtime_error("Could not open image " + calib_image_name);
+    // }
 
-    undistort(original_image, calib_image, camera_matrix, dist_coeffs);
+    // undistort(original_image, calib_image, camera_matrix, dist_coeffs);
 
     std::string name = "Undistorted image";
     cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 512, 640);
+    cv::resizeWindow(name.c_str(), 640, 512);
     cv::imshow(name.c_str(), calib_image);
     cv::waitKey(0);
     cv::destroyWindow(name.c_str());
@@ -271,8 +275,8 @@ cv::Mat findTransform(const std::string& calib_image_name,
     float delta_x = dst_pixels.at<float>(1, 0)-dst_pixels.at<float>(0, 0);
     float delta_y = dst_pixels.at<float>(1, 1)-dst_pixels.at<float>(0, 1);
 
-    float delta_x_mm = 1470;
-    float delta_y_mm = 970;
+    float delta_x_mm = 1510; //Check dimensions!
+    float delta_y_mm = 1050; //Check dimensions!
 
     float scale_x = delta_x/delta_x_mm;
     float scale_y = delta_y/delta_y_mm;
@@ -288,74 +292,74 @@ cv::Mat findTransform(const std::string& calib_image_name,
                                                     origin_x, origin_y+delta_y);
 
     cv::Mat transf = cv::getPerspectiveTransform(corner_pixels, transf_pixels);
-    cv::Mat unwarped_frame, rotated_frame;
+    cv::Mat unwarped_frame;
 
     cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(delta_x,delta_y));
 
-    cv::Mat hsv_img;
-    cv::cvtColor(unwarped_frame, hsv_img, cv::COLOR_BGR2HSV);
-    std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Point> approx_curve;
-    cv::Mat blue_mask;
-    cv::inRange(hsv_img, cv::Scalar(90, 55, 55), cv::Scalar(130, 255, 200), blue_mask);
-    cv::findContours(blue_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-    for (int i=0; i<contours.size(); ++i)
-    {
-        if (cv::contourArea(contours[i])>100)
-        {        
-            approxPolyDP(contours[i], approx_curve, 10, true);
-        }
-    }
+    // cv::Mat hsv_img;
+    // cv::cvtColor(unwarped_frame, hsv_img, cv::COLOR_BGR2HSV);
+    // std::vector<std::vector<cv::Point>> contours;
+    // std::vector<cv::Point> approx_curve;
+    // cv::Mat blue_mask;
+    // cv::inRange(hsv_img, cv::Scalar(90, 55, 55), cv::Scalar(130, 255, 200), blue_mask);
+    // cv::findContours(blue_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    // for (int i=0; i<contours.size(); ++i)
+    // {
+    //     if (cv::contourArea(contours[i])>100)
+    //     {        
+    //         approxPolyDP(contours[i], approx_curve, 10, true);
+    //     }
+    // }
 
-    if(std::abs(result.at<float>(0, 1)-approx_curve[0].y)<500)
-    {
-        rotated_frame = rotate(unwarped_frame, 270);
-    }
-    else
-    {
-        rotated_frame = rotate(unwarped_frame, 90);
-    }
+    // if(std::abs(result.at<float>(0, 1)-approx_curve[0].y)<500)
+    // {
+    //     rotated_frame = rotate(unwarped_frame, 270);
+    // }
+    // else
+    // {
+    //     rotated_frame = rotate(unwarped_frame, 90);
+    // }
 
-    cv::imwrite("data/output/corrected.jpg", rotated_frame);
+    // cv::imwrite("data/output/corrected.jpg", rotated_frame);
 
     std::string wind2; 
 
     wind2 = "Unwarping";
     cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(wind2.c_str(), 512, 640);
-    imshow(wind2.c_str(), rotated_frame);
+    cv::resizeWindow(wind2.c_str(), 640, 512);
+    imshow(wind2.c_str(), unwarped_frame);
     cv::waitKey(0);
     cv::destroyWindow(wind2);
 
-    return transf;
+    return unwarped_frame;
 }
 
 //Store all parameters
-void storeAllParameters(const std::string& filename,
-                        const cv::Mat& camera_matrix,
-                        const cv::Mat& dist_coeffs,
-                        double pixel_scale,
-                        const cv::Mat& persp_transf)
-{
-    cv::FileStorage fs( filename, cv::FileStorage::WRITE );
-    fs << "camera_matrix" << camera_matrix
-        << "dist_coeffs" << dist_coeffs
-        << "pixel_scale" << pixel_scale
-        << "persp_transf" << persp_transf;
-    fs.release();
-}
+// void storeAllParameters(const std::string& filename,
+//                         const cv::Mat& camera_matrix,
+//                         const cv::Mat& dist_coeffs,
+//                         double pixel_scale,
+//                         const cv::Mat& persp_transf)
+// {
+//     cv::FileStorage fs( filename, cv::FileStorage::WRITE );
+//     fs << "camera_matrix" << camera_matrix
+//         << "dist_coeffs" << dist_coeffs
+//         << "pixel_scale" << pixel_scale
+//         << "persp_transf" << persp_transf;
+//     fs.release();
+// }
 
 //Unwarp the image using saved distortion coefficients and store all parameters (plus perspective transformation matrix)
-std::string extractMap(const std::string filename) 
+cv::Mat extractMap(cv::Mat const & img) 
 {
-    cv::Mat camera_matrix, dist_coeffs, persp_transf;
-    loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
+    cv::Mat persp_transf;
+    // loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
 
     double pixel_scale;
-    persp_transf = findTransform(filename, camera_matrix, dist_coeffs, pixel_scale);
+    persp_transf = findTransform(img, pixel_scale);
     std::cout << "Pixel Scale: " << pixel_scale << "mm" << std::endl;
 
-    storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
+    // storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
     
-    return "data/output/corrected.jpg";
+    return persp_transf;
 }

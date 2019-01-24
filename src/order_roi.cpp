@@ -12,13 +12,13 @@
 // using namespace std;
 
 //ROI ORDERING
-void orderROI(const std::string filename, std::vector<cv::Vec3f> circles, int* pointer)
+void orderROI(cv::Mat const & img, std::vector<cv::Vec3f> circles, int* pointer)
 {
     // Load image from file
-    cv::Mat img = cv::imread(filename.c_str());
-    if(img.empty()) {
-        throw std::runtime_error("Failed to open the file " + filename);
-    }
+    // cv::Mat img = cv::imread(filename.c_str());
+    // if(img.empty()) {
+    //     throw std::runtime_error("Failed to open the file " + filename);
+    // }
     
     cv::Mat circles_img = img.clone();
 
@@ -36,7 +36,7 @@ void orderROI(const std::string filename, std::vector<cv::Vec3f> circles, int* p
                 std::cout << "  Point number " << (next) << " is at coordinates : [" <<  round(circles[j][0])  <<  ", " << round(circles[j][1]) << "] " <<std::endl;
                 std::string name = "Ordered Circles";
                 cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-                cv::resizeWindow(name.c_str(), 512, 640);
+                cv::resizeWindow(name.c_str(), 640, 512);
                 cv::imshow(name.c_str(), circles_img);
 
                 cv::waitKey(0);

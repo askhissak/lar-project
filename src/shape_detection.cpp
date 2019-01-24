@@ -11,21 +11,21 @@
 #include "shape_detection.hpp"
 
 //SHAPE DETECTION
-std::vector<cv::Vec3f> processImage(const std::string filename)
+std::vector<cv::Vec3f> processImage(cv::Mat const & img)
 {
   std::vector<cv::Vec3f> circles;
 
   // Load image from file
-  cv::Mat img = cv::imread(filename.c_str());
-  if(img.empty()) 
-  {
-    throw std::runtime_error("Failed to open the file " + filename);
-  }
+  // cv::Mat img = cv::imread(filename.c_str());
+  // if(img.empty()) 
+  // {
+  //   throw std::runtime_error("Failed to open the file " + filename);
+  // }
   
   // Display original image
   std::string name = "Original";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), img);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
@@ -36,7 +36,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   // Display HSV image
   name = "HSV Transformation";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), hsv_img);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str());
@@ -70,7 +70,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   
   name = "Obstacles";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), red_mask);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str());        
@@ -139,7 +139,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
 
      name = "Obstacle(s) Boundaries";
      cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-     cv::resizeWindow(name.c_str(), 512, 640);
+     cv::resizeWindow(name.c_str(), 640, 512);
      cv::imshow(name.c_str(), red_mask_temp);
      cv::waitKey(0);
      cv::destroyWindow(name.c_str());   
@@ -161,11 +161,11 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
 
   // Find green regions
   cv::Mat green_mask;
-  cv::inRange(hsv_img, cv::Scalar(35, 70, 75), cv::Scalar(80, 255, 255), green_mask);
+  cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(75, 255, 255), green_mask);
   
   name = "Regions of interest";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), green_mask);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str());     
@@ -200,7 +200,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
 
    name = "Circles Detected";
    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-   cv::resizeWindow(name.c_str(), 512, 640);
+   cv::resizeWindow(name.c_str(), 640, 512);
    cv::imshow(name.c_str(), circles_img);
    cv::waitKey(0);
    cv::destroyWindow(name.c_str());   
@@ -217,11 +217,11 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   std::cout << std::endl;
   // Find blue regions
   cv::Mat blue_mask;
-  cv::inRange(hsv_img, cv::Scalar(90, 55, 55), cv::Scalar(130, 255, 200), blue_mask);
+  cv::inRange(hsv_img, cv::Scalar(100, 150, 150), cv::Scalar(130, 255, 200), blue_mask);
 
   name = "Gate";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), blue_mask);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
@@ -283,7 +283,7 @@ std::vector<cv::Vec3f> processImage(const std::string filename)
   
   name = "Gate(s) Boundaries";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), blue_mask_temp);
   cv::waitKey(0);
   cv::destroyWindow(name.c_str());    

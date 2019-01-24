@@ -13,21 +13,19 @@ const double MIN_MAP_AREA_SIZE = 100000;
 
 //Function declarations
 bool compareX (cv::Point pt1, cv::Point pt2);
-void loadCoefficients(const std::string& filename,
-                      cv::Mat& camera_matrix,
-                      cv::Mat& dist_coeffs);
+// void loadCoefficients(const std::string& filename,
+//                       cv::Mat& camera_matrix,
+//                       cv::Mat& dist_coeffs);
 cv::Mat detectMapCorners(const cv::Mat& img);
 cv::Mat pickOrigin();
 cv::Mat rotate(cv::Mat src, double angle);
-cv::Mat findTransform(const std::string& calib_image_name,
-                  const cv::Mat& camera_matrix,
-                  const cv::Mat& dist_coeffs,
+cv::Mat findTransform(cv::Mat const & calib_image,
                   double& pixel_scale);
-void storeAllParameters(const std::string& filename,
-                        const cv::Mat& camera_matrix,
-                        const cv::Mat& dist_coeffs,
-                        double pixel_scale,
-                        const cv::Mat& persp_transf);
-std::string extractMap(const std::string filename);
+// void storeAllParameters(const std::string& filename,
+//                         const cv::Mat& camera_matrix,
+//                         const cv::Mat& dist_coeffs,
+//                         double pixel_scale,
+//                         const cv::Mat& persp_transf);
+cv::Mat extractMap(cv::Mat const & img);
 
 #endif

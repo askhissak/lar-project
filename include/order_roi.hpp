@@ -11,6 +11,6 @@
 //
 
 //Function declarations
-void orderROI(const std::string filename, std::vector<cv::Vec3f> circles, int* pointer);
+void orderROI(cv::Mat const & img, std::vector<cv::Vec3f> circles, int* pointer);
 
 #endif

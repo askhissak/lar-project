@@ -11,6 +11,6 @@
 //
 
 //Function declarations
-std::vector<cv::Vec3f> processImage(const std::string filename);
+std::vector<cv::Vec3f> processImage(cv::Mat const & img);
 
 #endif

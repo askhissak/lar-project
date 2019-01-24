@@ -14,23 +14,23 @@
 #include "map_extraction.hpp"
 
 //DIGIT RECOGNITION
-int* recognizeDigits(const std::string filename, std::vector<cv::Vec3f> circles)
+int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
 {
 
     // int orderedArray[4] = {0};//hardcoded
 
     // Load image from file
-    cv::Mat img = cv::imread(filename.c_str());
-    if(img.empty()) {
-        throw std::runtime_error("Failed to open the file " + filename);
-    }
+    // cv::Mat img = cv::imread(filename.c_str());
+    // if(img.empty()) {
+    //     throw std::runtime_error("Failed to open the file " + filename);
+    // }
     
     // Convert color space from BGR to HSV
     cv::Mat hsv_img;
     cv::cvtColor(img, hsv_img, cv::COLOR_BGR2HSV);
     // Find green regions
     cv::Mat green_mask;
-    cv::inRange(hsv_img, cv::Scalar(35, 70, 75), cv::Scalar(80, 255, 255), green_mask); //75
+    cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(75, 255, 255), green_mask); //75
     // Apply some filtering
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
     cv::dilate(green_mask, green_mask, kernel);	
@@ -41,7 +41,7 @@ int* recognizeDigits(const std::string filename, std::vector<cv::Vec3f> circles)
     
     img.copyTo(filtered, green_mask_inv);   // create copy of image without green shapes
     kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((2*2) + 1, (2*2)+1));
-    
+
     // Create Tesseract object
     tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
     // Initialize tesseract to use English (eng) 

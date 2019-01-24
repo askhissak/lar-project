@@ -24,11 +24,11 @@ cv::Mat readData(const std::string filename)
     int corners;
 
 
-  cv::Mat out(1470, 970, CV_8UC3, Scalar(0,0,0));
-  cv::Mat complete_map (1470, 970, CV_8UC3, Scalar(0,0,0));
+  cv::Mat out(1050, 1510, CV_8UC3, Scalar(0,0,0));
+  cv::Mat complete_map (1050, 1510, CV_8UC3, Scalar(0,0,0));
   std::string outName = "Output Data";
   cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(outName.c_str(), 512, 640);
+  cv::resizeWindow(outName.c_str(), 640, 512);
   cv::imshow(outName.c_str(), complete_map);
   cv::waitKey(0);
   cv::destroyWindow(outName.c_str());
@@ -77,7 +77,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x2,y2) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);
  		break; 
@@ -99,7 +99,7 @@ while (!file.eof())
 
                         
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);
  		break; 
@@ -122,7 +122,7 @@ while (!file.eof())
             cv::line(out, cv::Point(x4,y4) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
                         cv::waitKey(0); 
  		break; 
@@ -147,7 +147,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x5,y5) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0); 
 		
@@ -175,7 +175,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x6,y6) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0); 
 		break;
@@ -204,7 +204,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x7,y7) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0); 
 		break;
@@ -235,7 +235,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);				
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		break;
@@ -270,7 +270,7 @@ while (!file.eof())
   			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -308,7 +308,7 @@ while (!file.eof())
   			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -347,7 +347,7 @@ while (!file.eof())
 			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -389,7 +389,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x12,y12) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -432,7 +432,7 @@ while (!file.eof())
 				
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -477,7 +477,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x14,y14) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -524,7 +524,7 @@ while (!file.eof())
 			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -574,7 +574,7 @@ while (!file.eof())
   			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -624,7 +624,7 @@ while (!file.eof())
 			cv::line(out, cv::Point(x17,y17) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -678,7 +678,7 @@ while (!file.eof())
   			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -735,7 +735,7 @@ while (!file.eof())
   			
   			
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
             cv::waitKey(0);   		
 		
@@ -766,7 +766,7 @@ while (!file.eof())
 			cv::line( complete_map, cv::Point(x2,y2) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out +  complete_map); 
             cv::waitKey(0);
  		break; 
@@ -788,7 +788,7 @@ while (!file.eof())
 
                         
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
              cv::waitKey(0);
  		break; 
@@ -811,7 +811,7 @@ while (!file.eof())
             cv::line( complete_map, cv::Point(x4,y4) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out +  complete_map); 
             cv::waitKey(0); 
  		break; 
@@ -836,7 +836,7 @@ while (!file.eof())
 			cv::line( complete_map, cv::Point(x5,y5) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
             cv::waitKey(0); 
 		
@@ -864,7 +864,7 @@ while (!file.eof())
 			cv::line(complete_map  , cv::Point(x6,y6) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
             cv::waitKey(0); 
 		break;
@@ -893,15 +893,10 @@ while (!file.eof())
 			cv::line(complete_map, cv::Point(x7,y7) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
             cv::waitKey(0); 
 		break;
-
-		case 9:  
-			std::cout << " Nonagon Gate" << endl; 
-			file >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4 >> x5 >> y5 >> x6 >> y6 >> x7 >> y7 >> x8 >> y8 ;	
-			std::cout << x0 << y0 << x1 << y1 << x2 << y2 << x3 << y3 << x4 << y4 << x5 << y5 << x6 << y6 << x7 << y7 << x8 <<  y8 << endl;
 
 			cv::circle( complete_map , cv::Point(x0,y0), 0.5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
 			cv::circle( complete_map , cv::Point(x1,y1), 0.5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
@@ -924,7 +919,7 @@ while (!file.eof())
 			cv::line(complete_map, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);				
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out+complete_map); 
             cv::waitKey(0);  		
 		break;
@@ -957,7 +952,7 @@ while (!file.eof())
 			cv::line( complete_map, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);				
 
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 512, 640);
+  			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map ); 
             cv::waitKey(0);  		
 		break;
@@ -977,7 +972,7 @@ while (!file.eof())
 		cv::circle( complete_map , cv::Point(x0,y0), 8 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 );
 		cv::imshow("Corners", out); 
 		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-		cv::resizeWindow(name.c_str(), 512, 640);
+		cv::resizeWindow(name.c_str(), 640, 512);
 		cv::imshow(name.c_str(), out + complete_map); 
 		cv::waitKey(0);   		
      }
@@ -991,13 +986,13 @@ while (!file.eof())
    
   name = "Just Obstacles" ;
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), out); 
   cv::waitKey(0);
   
   name = "Complete Map " ;
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 512, 640);
+  cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), out + complete_map ); 
   cv::waitKey(0);   		   		
   

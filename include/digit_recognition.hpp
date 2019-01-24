@@ -11,6 +11,6 @@ static int orderedArray[4] = {0};//hardcoded
 //
 
 //Function declarations
-int* recognizeDigits(const std::string filename, std::vector<cv::Vec3f> circles);
+int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles);
 
 #endif
