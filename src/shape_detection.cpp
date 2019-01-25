@@ -27,7 +27,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), img);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Convert color space from BGR to HSV
@@ -38,7 +38,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), hsv_img);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());
 
   // Find contours
@@ -64,7 +64,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   
   cv::addWeighted(red_mask_low, 1.0, red_mask_high, 1.0, 0.0, red_mask); // combine together the two binary masks
   
-  cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
+  cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(10, 10)); //5,5
   
   cv::erode(red_mask , red_mask , kernel, cv::Point(-1, -1), 2);
   
@@ -72,7 +72,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), red_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());        
 
   // Process red mask (Obstacles)
@@ -141,7 +141,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
      cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
      cv::resizeWindow(name.c_str(), 640, 512);
      cv::imshow(name.c_str(), red_mask_temp);
-     cv::waitKey(0);
+     //cv::waitKey(0);
      cv::destroyWindow(name.c_str());   
 
     }
@@ -167,7 +167,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), green_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());     
  
   HoughCircles( green_mask , circles, cv::HOUGH_GRADIENT, 1, green_mask.rows/10, 40, 20 );
@@ -202,7 +202,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
    cv::resizeWindow(name.c_str(), 640, 512);
    cv::imshow(name.c_str(), circles_img);
-   cv::waitKey(0);
+   //cv::waitKey(0);
    cv::destroyWindow(name.c_str());   
 
   }
@@ -223,7 +223,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), blue_mask);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str()); 
 
   // Process blue mask (Gates)
@@ -231,6 +231,8 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   blue_mask_temp = img.clone();
   cv::findContours(blue_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
   drawContours(blue_mask_temp, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
+  
+  
   
   int gate_flag =0;
   int gate_count=0;
@@ -285,7 +287,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), blue_mask_temp);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(name.c_str());    
   
   ofs.close(); //new

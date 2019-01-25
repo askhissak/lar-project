@@ -285,7 +285,7 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 		switch(marker)
 		
 		{	
-			case 000 : std::cout << "\n\n Inspection Finished , NO COLLLISIONS DETECTED !!! \n\n" << std::endl; break;
+			case 000 : std::cout << "\n\n Inspection Finished , NO COLLLISIONS DETECTED !!! \n\n" << std::endl; remapper = 100; break;
 			
 			case 001 : std::cout << "\n\n Inspection Finished , COLLISION JUST IN THE FINAL ARC !!! \n\n" << std::endl; break;
 			
@@ -371,9 +371,56 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 					cv::imshow(name.c_str(), cropped_contour + original_map); 
 					cv::waitKey(0);
 					cv::destroyWindow(name.c_str());
-					remapper++;
+					
+					
+					//////////////////////////////////////////////////        NEW
+					
+					//cv::circle(inputmap , colliding_point , 10, cv::Scalar(200 , 200 , 200 ), 5, 8, 0 );
+					
+					//Deleting initial position and orientation  
+					
+					//DELETING INITIAL POSITION AND CONFIGURATION
+					cv::circle(cropped_contour, cv::Point(171,292), 10 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 );
+					cv::line(cropped_contour, cv::Point(x0,y0) , cv::Point(x0+radius*cos(th0), y0+radius*sin(th0)) , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0);
+    
+					//DELETING FINAL POSITION AND CONFIGURATION
+					cv::circle(out, cv::Point(xf,yf), 10 , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0 );
+					cv::line(out, cv::Point(xf,yf) , cv::Point(xf+radius*cos(thf), yf+radius*sin(thf)) , cv::Scalar( 0 , 0 , 0 ), 5, 8, 0);
+					
+					
+					name = " Printing just the Path " ;
+					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::resizeWindow(name.c_str(), 512, 640);   		
+					cv::imshow(name.c_str(), cropped_contour); 
+					cv::waitKey(0);
+					cv::destroyWindow(name.c_str());
+					
+					
+					remapper++; //Remap it Flag = 4  and check if it has finally no collisions
+					
+					
+					/////////////////////////////////////////////////////     NEW
+					
 					break;
-				}	
+				}
+				
+				case 4 : //Check new path 	//new
+				{
+					//Here implement Line iterator and check the trajectory , if it's good to go give the final correct path 
+					
+					
+					
+					break;	
+					
+				}
+				
+				case 100 : //Ideal Path reached .... Recheck , confirm and give the desired path 	
+				
+				{	
+					std::cout << "\n\n Ideal Path reached .... Rechecking , confirming and giving the desired path ... (Under Development ...)" << std::endl;
+					
+					break;			
+				}
 		}
 	}
 

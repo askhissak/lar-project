@@ -195,14 +195,12 @@ cv::Mat rounder(cv::Mat input)
 cv::Mat crop_contour( cv::Mat isolated_contour , cv::Point ini_collision , cv::Point fin_collision , cv::Point contour_center , int contour_radius )
 {
 	cv::Mat cropped_contour = isolated_contour;
-	
-	
+
 	//Calculating the Angle
 	
 	//For the initial collision
 	//Line1 :
-	
-	
+		
 	cv::circle(cropped_contour , contour_center, contour_radius, cv::Scalar(0,0,0) , 1 , 8, 0);
 	
 	
@@ -220,9 +218,6 @@ cv::Mat crop_contour( cv::Mat isolated_contour , cv::Point ini_collision , cv::P
 	cv::ellipse(cropped_contour ,contour_center,cv::Size(contour_radius,contour_radius),0,Initial_Angle,Final_Angle,cv::Scalar(0,255,0),8,0);
 	
 	//The DownRight Red Halfcircle takes from 0 to 180;
-	
-	
-	
 	
 	double startAngleDownright = 0;
 	//cv::ellipse(cropped_contour,contour_center,cv::Size(contour_radius,contour_radius),0,startAngleDownright,startAngleDownright+180,cv::Scalar(0,255,0),8,0);

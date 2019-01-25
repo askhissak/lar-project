@@ -30,7 +30,7 @@ cv::Mat readData(const std::string filename)
   cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(outName.c_str(), 640, 512);
   cv::imshow(outName.c_str(), complete_map);
-  cv::waitKey(0);
+  //cv::waitKey(0);
   cv::destroyWindow(outName.c_str());
 	
   	
@@ -79,7 +79,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());
  		break; 
 
 		case 4:  
@@ -101,7 +102,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());
  		break; 
 
 		case 5:  
@@ -124,7 +126,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-                        cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
  		break; 
 
 		case 6:  
@@ -149,7 +152,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
 		
 		break; 
 
@@ -177,7 +181,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
 		break;
 
 		case 8:  
@@ -206,7 +211,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
 		break;
 
 		case 9:  
@@ -237,7 +243,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		break;
 		
 		
@@ -272,7 +279,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());  		
 		
 		break;
 		
@@ -310,7 +318,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		
 		break;
 		
@@ -349,7 +358,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		
 		break;
 		
@@ -391,7 +401,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		
 		break;
 		
@@ -434,7 +445,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);  
+            cv::destroyWindow(name.c_str()); 		
 		
 		break;
 		
@@ -479,7 +491,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		
 		break;
 		
@@ -526,7 +539,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());  		
 		
 		break;
 		
@@ -576,7 +590,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);   
+            cv::destroyWindow(name.c_str());		
 		
 		break;
 		
@@ -626,7 +641,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());   		
 		
 		break;
 		
@@ -680,7 +696,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());  		
 		
 		break;
 		
@@ -737,7 +754,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out); 
-            cv::waitKey(0);   		
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());  		
 		
 		break;
 		
@@ -768,7 +786,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out +  complete_map); 
-            cv::waitKey(0);
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str());
  		break; 
 
 		case 4:  
@@ -790,7 +809,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
-             cv::waitKey(0);
+             //cv::waitKey(0);
+             cv::destroyWindow(name.c_str());
  		break; 
 
 		case 5:  
@@ -813,7 +833,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out +  complete_map); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
  		break; 
 
 		case 6:  
@@ -838,7 +859,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
-            cv::waitKey(0); 
+            //cv::waitKey(0);
+            cv::destroyWindow(name.c_str()); 
 		
 		break; 
 
@@ -866,7 +888,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
 		break;
 
 		case 8:  
@@ -895,7 +918,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
-            cv::waitKey(0); 
+            //cv::waitKey(0); 
+            cv::destroyWindow(name.c_str());
 		break;
 
 			cv::circle( complete_map , cv::Point(x0,y0), 0.5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
@@ -921,7 +945,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out+complete_map); 
-            cv::waitKey(0);  		
+            ////cv::waitKey(0);
+            cv::destroyWindow(name.c_str());  		
 		break;
 		
 		case 10:  
@@ -954,7 +979,8 @@ while (!file.eof())
   			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map ); 
-            cv::waitKey(0);  		
+            //cv::waitKey(0);  
+            cv::destroyWindow(name.c_str());		
 		break;
 
     		
@@ -968,13 +994,17 @@ while (!file.eof())
      else if (type == 2)
      {
       	file >> x0 >> y0 ;	
+		std::cout << " ROI" << endl; 
 		std::cout << x0 << y0 << endl; 
 		cv::circle( complete_map , cv::Point(x0,y0), 8 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 );
+		
+		
 		cv::imshow("Corners", out); 
 		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 640, 512);
 		cv::imshow(name.c_str(), out + complete_map); 
-		cv::waitKey(0);   		
+		////cv::waitKey(0);  
+		cv::destroyWindow(name.c_str()); 		
      }
      
 
@@ -983,19 +1013,20 @@ while (!file.eof())
 
 
   }
+  
    
   name = "Just Obstacles" ;
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), out); 
   cv::waitKey(0);
+  cv::destroyWindow(name.c_str());
   
   name = "Complete Map " ;
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), out + complete_map ); 
   cv::waitKey(0);   		   		
-  
   cv::destroyWindow(name.c_str());
   
   return out;
