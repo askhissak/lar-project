@@ -23,11 +23,20 @@ RobotProject::RobotProject(int argc, char * argv[])
 // Method invoked to preprocess the map (extrinsic calibration + reconstruction of layout)
 bool RobotProject::preprocessMap(cv::Mat const & img)
 {
+	cv::Mat robotPlane;
 
-    cv::Mat map = extractMap(img);//+
+	// calibrateCamera();
 
+	//Image -> Map (borders only)
+    cv::Mat map = extractMap(img, robotPlane);//+
+
+	// std::cout<<"Map Plane "<<map<<std::endl;
+	// std::cout<<"Robot Plane "<<robotPlane<<std::endl;
+
+	//Shapes
     std::vector<cv::Vec3f> circles = processImage(map);
 
+	//Digits
     int *pointer = recognizeDigits(map, circles);
 
     std::cout<<"Pointer "<<pointer[0]<<std::endl;
