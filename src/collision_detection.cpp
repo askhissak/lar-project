@@ -7,6 +7,7 @@
 #include "reader.hpp"
 #include <math.h> 
 
+
 using namespace std;
 using namespace cv;
 
@@ -16,12 +17,15 @@ int polyflag = 0;
 int output_trigger =0;
 
 
-cv::Mat print_desired_contour(cv::Mat inputmap, int &contour_idx , cv::Point &contour_center , int &contour_radius , cv::Point colliding_point )
+
+//NEW ADDED THE DESIRED_CONTOUR AREA
+cv::Mat print_desired_contour(cv::Mat inputmap, int &contour_idx , cv::Point colliding_point  , double &desired_contour_area)
 {
 	cv::Mat BW_Map ;
 	
 	cv::cvtColor(inputmap, BW_Map, CV_BGR2GRAY);
 	
+	cv::Mat isolated_map = Mat::zeros( BW_Map.size(), BW_Map.type() );  ;
 	
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
@@ -31,64 +35,36 @@ cv::Mat print_desired_contour(cv::Mat inputmap, int &contour_idx , cv::Point &co
 	int old_dist = 1000;
 	
 	for( int i = 0 ; i < contours.size() ; i++ ) // iterate through each contour. 
-    {
-		
+    {	
 		int new_dist = (int)((cv::pointPolygonTest(contours[i] , colliding_point , true))*(-1));
 		
-		if (new_dist < old_dist ) { old_dist = new_dist ; contour_idx = i  ; } 	
+		if (new_dist < old_dist ) { old_dist = new_dist ; contour_idx = i  ; } 
 		
+		std::cout << "   Area of Inflated Contour Nr." << i << " : " <<  cv::contourArea(contours[i]) << " \n  " << std::endl;
 	}
 	
-	/*
-	cv::circle(inputmap , colliding_point , 10, cv::Scalar(200 , 200 , 200 ), 5, 8, 0 );
 	
-	std::string name = "I WANT TO ATTACK HERE AND THIS IS THE POINT " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-	cv::resizeWindow(name.c_str(), 512, 640);    
-	cv::imshow(name.c_str(), inputmap ); 
-	cv::waitKey(0);
-	cv::destroyWindow(name.c_str());
-		
-	*/
-	
-	
-	
-	//For getting the desired circle's information
-	vector<vector<Point> > contours_poly( contours.size() );
-    vector<Point2f>center_aux( contours.size() );
-    vector<float>radius_aux( contours.size() );
-
-	for( int i = 0; i < contours.size(); i++ )
-	
-	{ 
-		approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
-		minEnclosingCircle( (Mat)contours_poly[i], center_aux[i], radius_aux[i] );
-	}
-	
-	contour_center = center_aux[contour_idx];
-		   
-	contour_radius = (int)radius_aux[contour_idx];
+	desired_contour_area = cv::contourArea(contours[contour_idx]);
 	
 	std::cout << "\n\n Detected " << contours.size() << " Contours ! \n  " << std::endl;
 	
-	//Writing the useful Contour and Deleting the useless ones
+	
+	//Writing the Intended Contour
+	
 	
 	int idx = 0;
     
     for( ; idx >= 0; idx = hierarchy[idx][0] )
     { 
-        if (idx == contour_idx) drawContours( BW_Map, contours, idx , cv::Scalar(255,255 ,255) , 1 , 8, hierarchy);
-        
-        else drawContours( BW_Map, contours, idx , cv::Scalar( 0 , 0 ,0) , CV_FILLED, 8, hierarchy);
+        if (idx == contour_idx) drawContours( isolated_map, contours, idx , cv::Scalar(255,255 ,255) , 1 , 8, hierarchy);
            
     } 
-    
    
-	return BW_Map;
+	return isolated_map;
 }
 
 
-bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int remapper , int &contour_index )
+bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int remapper , int &collision_status )
 {
 	
 	cv::Mat BW_Map ;
@@ -100,14 +76,13 @@ bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int 
 	
 	float dist;
 	
-	int i=0;
-	
 	findContours(BW_Map , contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	
 	
 	if (polyflag==0) {std::cout << "\n\n Detected " << contours.size() << " Contours ! \n  " << std::endl; polyflag++;}
 	
 	//std::cout << "\n For the Point : " << target << std::endl;
+	int i = 0;
 	
 	for( i = 0 ; i < contours.size() ; i++ ) // iterate through each contour. 
     {
@@ -123,11 +98,10 @@ bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int 
 	if (dist <= thres) 
 	{
 		std::cout << " Distance from Contour " << i <<  " : "  << dist <<  "   <---- THRESHOLD REACHED !!!!!! \n\n   "  << std::endl;
-		if      (dist == 0 && remapper != 3 ) {/*contour_index = i*/; }
-		else if (dist == 0 && remapper == 3 && output_trigger == 0 )   {contour_index = 100; output_trigger = 100;  } //Initial Value
-		else if (dist <  0 && remapper == 3 && output_trigger == 100 ) {contour_index =0 ; } 
-		else if (dist == 0 && remapper == 3 && output_trigger == 100)  {contour_index = 200; output_trigger = 200;  } //Final Value
-		else if (dist == 0 && remapper == 3 && output_trigger == 200)  {contour_index = 0;} 
+	         if (dist == 0 && remapper == 3 && output_trigger == 0 ) {collision_status = 1; output_trigger = 1;  } //Initial Value
+		else if (dist <  0 && remapper == 3 && output_trigger == 1 ) {collision_status = 1;                      } 
+		else if (dist == 0 && remapper == 3 && output_trigger == 1)  {collision_status = 2; output_trigger = 2;  } //Final Value
+		else if (dist >  0 && remapper == 3 && output_trigger == 2)  {collision_status = 0;                      } 
 		return true;
 	}
 	
@@ -136,7 +110,7 @@ bool collision_detection( cv::Mat inputmap , cv::Point target , int thres , int 
 }
 
 
-cv::Mat rounder(cv::Mat input)
+cv::Mat expander(cv::Mat input)
 {
 	cv::Mat BW_Map ;
 	
@@ -145,84 +119,248 @@ cv::Mat rounder(cv::Mat input)
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
 	
+	cv::Mat expanded = Mat::zeros( BW_Map.size(), CV_8UC3 );
+	
+	
+	float pixels = 30; // Number of pixels expanded in respect to the original contour
+	
+	
 	findContours(BW_Map , contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	
-	float scale = 1.5; //50% bigger than the original bounding circle containing them
+	for( int i = 0; i< contours.size(); i++ ) drawContours(expanded, contours, i, Scalar(255,255,255), pixels * 2);
 	
-	int thresh = 100;
-	int max_thresh = 255;
-	RNG rng(12345);
+	findContours(BW_Map , contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	
+	for( int i = 0; i< contours.size(); i++ ) drawContours(expanded, contours, i, Scalar(255,255,255), CV_FILLED );
 	
-	// Approximate contours to polygons + get bounding rects and circles
-    vector<vector<Point> > contours_poly( contours.size() );
-    vector<Rect> boundRect( contours.size() );
-    vector<Point2f>center( contours.size() );
-    vector<float>radius( contours.size() );
 
-	  for( int i = 0; i < contours.size(); i++ )
-		 { approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
-		   boundRect[i] = boundingRect( Mat(contours_poly[i]) );
-		   minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
-		 }
-
-
-	  // Draw polygonal contour + bonding rects + circles
-	  cv::Mat rounded = Mat::zeros( BW_Map.size(), CV_8UC3 );
-	  for( int i = 0; i< contours.size(); i++ )
-		 
-		 {
-		   //drawContours( rounded, contours_poly, i, cv::Scalar(255,0,0), 1, 8, vector<Vec4i>(), 0, Point() );
-		   //rectangle( rounded, boundRect[i].tl(), boundRect[i].br(),cv::Scalar(255,255,255), 2, 8, 0 );
-		   //circle( rounded , center[i], (int)radius[i]*scale , cv::Scalar(255,255,255), 2, 8, 0 );
-		   circle( rounded , center[i], (int)radius[i]*scale , cv::Scalar(100,100,100), CV_FILLED , 8, 0 );
-		   
-		 }
-
-	/*
-	int idx = 0;
-    for( ; idx >= 0; idx = hierarchy[idx][0] )
-    {
-        Scalar color( rand()&255, rand()&255, rand()&255 );
-        drawContours( BW_Map, contours, idx, color, CV_FILLED, 8, hierarchy );
-        
-    }
-    */
-	return rounded;
+	return expanded;
 	
 }
 
-cv::Mat crop_contour( cv::Mat isolated_contour , cv::Point ini_collision , cv::Point fin_collision , cv::Point contour_center , int contour_radius )
+//NEW Implementation in this function 
+
+int distance( cv::Point P1 , cv::Point P2)
+
 {
-	cv::Mat cropped_contour = isolated_contour;
-
-	//Calculating the Angle
+	int dist = sqrt(((P1.x- P2.x) * (P1.x-P2.x)) + ((P1.y - P2.y ) * (P1.y - P2.y)));
 	
-	//For the initial collision
-	//Line1 :
-		
-	cv::circle(cropped_contour , contour_center, contour_radius, cv::Scalar(0,0,0) , 1 , 8, 0);
-	
-	
-	double Initial_Angle ( atan2 ( ini_collision.y-contour_center.y , ini_collision.x - contour_center.x ) * 180 / M_PI ) ;
-	
-	double Final_Angle ( atan2 ( fin_collision.y-contour_center.y , fin_collision.x - contour_center.x ) * 180 / M_PI ) ;
-	
-	
-	std::cout << "   Initial_ Angle " << Initial_Angle << " \n  " << "   Final_ Angle " << Final_Angle << " \n  " << std::endl;
-	
-	
-	//The first one (up) goes from 180 to 0;
-	
-	
-	cv::ellipse(cropped_contour ,contour_center,cv::Size(contour_radius,contour_radius),0,Initial_Angle,Final_Angle,cv::Scalar(0,255,0),8,0);
-	
-	//The DownRight Red Halfcircle takes from 0 to 180;
-	
-	double startAngleDownright = 0;
-	//cv::ellipse(cropped_contour,contour_center,cv::Size(contour_radius,contour_radius),0,startAngleDownright,startAngleDownright+180,cv::Scalar(0,255,0),8,0);
-	
-	return cropped_contour;
+	return dist;
 	
 }
+
+cv::Mat create_new_path( cv::Mat original_dubins , cv::Mat new_desired_contour  , cv::Point ini_collision , cv::Point fin_collision  )
+{	
+	vector<vector<Point>> contours;
+	
+	vector<Point> first_region ;
+	
+	vector<Point> second_region ;
+	
+	
+	findContours(new_desired_contour , contours, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	
+	
+	new_desired_contour = cv::Mat::zeros(new_desired_contour.size() , new_desired_contour.type());
+    
+    
+    drawContours(new_desired_contour, contours, -1, cv::Scalar(255,255,255), 5 , cv::LINE_AA);  //Draw the found contours 
+    
+    string name = " Printing Simple Contour " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);   		
+    cv::imshow(name.c_str(), new_desired_contour ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	 name = "DUBINS  " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);   		
+    cv::imshow(name.c_str(), original_dubins ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	
+	
+	cv::Mat test = cv::Mat::zeros(original_dubins.size() , original_dubins.type());
+	
+	cv::Point test_point = {0,0}; 
+	
+	
+	
+	int total_lenght = 0 ;
+	
+	int first_partial_lenght =0 ;
+	
+	int second_partial_lenght = 0;
+
+	int counter = 0 ;
+	
+	
+	int region = 0 ;
+	
+	//Region 0 : Any extreme point has been reached
+	//Region 1 : One point has been reached
+	//Region 2 : We touched the secon point so the path 2 and 0 must be added to form the second region
+	
+ 	//we include a counter to discard false positives.
+	
+	//LATER FROM HERE WE CAN COMPUTE THE TWO APPROACHES AND GET ACTUALLY BOTH CHANCES < MEASERRE THE DISTANCES AND CHECK FOR COLLISIONS AND WE CAN CHOOSE THE BEST APPROACH
+	
+	//FOR JUST ONE APPROACH :
+	
+	for(int i= 0; i < contours.size(); i++)
+	{
+		
+		for(int j= 0; j < contours[i].size();j++) 
+		{	
+			total_lenght++;
+			
+			test_point = {contours[i][j].x , contours[i][j].y};
+			
+			std::cout << " Distance From INI -> TEST : " << distance( ini_collision , test_point ) <<  " ,   Distance FINAL -> TEST : "  << distance (fin_collision , test_point ) << std::endl;
+
+			if ( distance(test_point , ini_collision ) < 2 && counter == 0 ) {region ++ ; counter ++ ; }  
+			
+			if ( distance(test_point , fin_collision ) < 2 && counter == 0 ) {region ++ ; counter ++ ; }  
+
+			
+			if (counter > 0 && counter < 4) counter ++; 
+			else  counter = 0 ; 
+								 
+				
+			if (region == 0 || region == 2 ) {  first_region.push_back(test_point);  first_partial_lenght ++ ; }
+	
+			else if (region == 1 ) 			 { second_region.push_back(test_point); second_partial_lenght ++ ; }
+		}
+	}
+	
+	std::cout << " Contour's Total Points : " << total_lenght <<  " ,   First Partial Lenght : "  << first_region.size()  <<  " ,   Second Partial Lenght : "  << second_region.size() << std::endl;
+	 
+	if (first_region.size() <= second_region.size())
+		{
+			for ( int i=0 ; i < first_region.size() ; i++)
+			{
+				cv::circle(test , first_region[i] , 2 , cv::Scalar( 200 , 200 , 200 ), 5, 8, 0 ); //Printing First Region
+			}
+		}
+	else if (first_region.size() > second_region.size())
+		{
+			for ( int i=0 ; i < second_region.size() ; i++)
+			{
+				cv::circle(test , second_region[i] , 2 , cv::Scalar( 200 , 200 , 200 ), 5, 8, 0 ); //Printing Second Region
+			}
+		}	
+		
+	
+	
+	
+	name = "Test " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);   		
+    
+    cv::imshow(name.c_str(), test ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	
+	cv::Mat complete_path = test + original_dubins;
+	
+	name = "Complete Test (RAW) " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640); 
+    cv::imshow(name.c_str(), complete_path ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	//CHANGING TO BINARY
+	cv::cvtColor(complete_path, complete_path , CV_BGR2GRAY); 				
+	
+	//For Closing////////////////////////////////////
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(10, 10));				 
+	cv::morphologyEx(complete_path , complete_path , cv::MORPH_CLOSE, kernel);
+	
+	name = "CLOSING " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640); 
+    cv::imshow(name.c_str(), complete_path ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	//Applying Gaussian to Smooth Edges.
+	
+	GaussianBlur(complete_path , complete_path , Size(5, 5), 0);
+	
+	
+	//Finding Contours again to Store the new Trajectory	
+	
+	
+	
+	vector<vector<Point>> final_trajectory_points;
+	
+	findContours(complete_path , final_trajectory_points , RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	
+	cv::Mat new_trajectory_map = cv::Mat::zeros(complete_path.size() , complete_path.type());
+    
+    drawContours(new_trajectory_map , final_trajectory_points , -1, cv::Scalar(255,255,255), CV_FILLED );  //Draw the found contours 
+    		
+					
+	name = " Printing Fin Contours Result " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);   		
+	cv::imshow(name.c_str(), new_trajectory_map ); 
+	cv::waitKey(0);
+	cv::destroyWindow(name.c_str());
+	
+	cv::Mat smoothed_contour_map = cv::Mat::zeros(new_trajectory_map.size() , new_trajectory_map.type());
+	
+	
+	
+	
+	
+	
+	//Approximating to a better shape through ApproxPolyDP
+
+	
+	std::vector<cv::Point> approx_curve;
+
+	std::vector<std::vector<cv::Point>> smoothed_final_contour;
+	
+	
+	for (int i=0; i<final_trajectory_points.size(); ++i)
+	
+	{
+		approxPolyDP(final_trajectory_points[i], approx_curve , 8 , true); //How Strict the Filter is to Aproximate the contour to a Polygon
+		
+		smoothed_final_contour = {approx_curve}; 
+		
+		drawContours(smoothed_contour_map, smoothed_final_contour , -1 , cv::Scalar(255,255,255), cv::FILLED); //draw Polygon approximations 
+
+	}
+	
+		
+	name = " SMOOTHING Contours Result " ;
+	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::resizeWindow(name.c_str(), 512, 640);   		
+	cv::imshow(name.c_str(), smoothed_contour_map); 
+	cv::waitKey(0);
+	//cv::destroyWindow(name.c_str());
+	
+	//EXPERIMENTAL:
+	
+	
+	//filter2D(smoothed_contour_map ,smoothed_contour_map , -1, kernel, Point(-1,-1), 2.0, BORDER_REPLICATE);
+	
+	
+	//AFTER CHECKING THAT IS THE SHORTEST PATH AND THERE IS NO COLLISIONS AND THAT WE ARE NOT GETTING OUT OF THE PIXELS ON THE BORDER WE ARE GOOD TO GO
+		
+	return smoothed_contour_map;
+	
+}
+
+
+ 
+
+
+
 

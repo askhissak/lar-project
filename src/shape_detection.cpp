@@ -11,7 +11,7 @@
 #include "shape_detection.hpp"
 
 //SHAPE DETECTION
-std::vector<cv::Vec3f> processImage(cv::Mat const & img)
+std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_center)
 {
   std::vector<cv::Vec3f> circles;
 
@@ -232,6 +232,8 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
   cv::findContours(blue_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
   drawContours(blue_mask_temp, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
   
+  cv::Mat blue_mask_2;
+  blue_mask_2 = blue_mask.clone(); 
   
   
   int gate_flag =0;
@@ -241,39 +243,45 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
     int blue_area = cv::contourArea(contours[i]); //Area variable for current selection
       
     if (blue_area >100) //Area Threshold
-    {
-       
-     gate_flag++;//Local variable for controlling the "Gates detected trigger"
-     
-     if(gate_flag==1) {std::cout << std::endl; std::cout << "Gates Detected !" << std::endl;std::cout << std::endl;} //Terminal Printing
-
-     //std::cout << (i+1) << ") Contour size: " << contours[i].size() << std::endl;
-     approxPolyDP(contours[i], approx_curve, 10, true); //Polygonal Approach for the detected contour
-     contours_approx = {approx_curve};
-     drawContours(blue_mask_temp, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA); //Gate Shape Output to viewer
-     
-
-     switch (approx_curve.size())  
-      {
-    	case 3:  std::cout << " The Gate number " << gate_flag << " has 3 sides so it's a triangle ! "      << std::endl; break; //
-    	case 4:  std::cout << " The Gate number " << gate_flag << " has 4 sides so it's a rectangle ! "     << std::endl; break; //
-    	case 5:  std::cout << " The Gate number " << gate_flag << " has 5 sides so it's a pentagon ! "      << std::endl; break; // Categorizing shape by it's 
-    	case 6:  std::cout << " The Gate number " << gate_flag << " has 6 sides so it's an hexagon ! "      << std::endl; break; // sides number
-    	case 7:  std::cout << " The Gate number " << gate_flag << " has 7 sides so it's an heptagon ! "     << std::endl; break; //     
-    	case 8:  std::cout << " The Gate number " << gate_flag << " has 8 sides so it's an octagon ! "      << std::endl; break; //
-    	case 9:  std::cout << " The Gate has 9 sides so it's an nonagon ! "      << std::endl; break;
-    	default: std::cout << " Number of Sides of the Gate " << i+1 << " : "<< approx_curve.size() << std::endl; break;     
-      }     
-     
-     for ( int i = 0 ; i < approx_curve.size() ; ++i ) //Loop for listing the Gate's properties
-     {
-   
-      std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; //Listing the coordinates of the corners 
-
-      if (i==0){ofs << "1 " << i << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
-      else {ofs << " " << approx_curve[i].x << " " << approx_curve[i].y;} //new
-
-      cv::circle(blue_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); //Graphical Print of the Corners
+    {  
+	    gate_flag++;//Local variable for controlling the "Gates detected trigger"
+	     
+	    if(gate_flag==1) {std::cout << std::endl; std::cout << "Gates Detected !" << std::endl;std::cout << std::endl;} //Terminal Printing
+	
+	    //std::cout << (i+1) << ") Contour size: " << contours[i].size() << std::endl;
+	    approxPolyDP(contours[i], approx_curve, 10, true); //Polygonal Approach for the detected contour
+	    contours_approx = {approx_curve};
+	    drawContours(blue_mask_temp, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA); //Gate Shape Output to viewer
+		
+		cv::Moments mo = cv::moments(contours[i]);
+	    
+	    gate_center = cv::Point(mo.m10/mo.m00 , mo.m01/mo.m00);
+		
+		cv::circle(blue_mask_temp , gate_center , 10 , cv::Scalar(40,190,40) , 5, 8, 0 ); 
+	     
+		//Guardar Gate 
+	    
+	    switch (approx_curve.size())  
+	      {
+	    	case 3:  std::cout << " The Gate number " << gate_flag << " has 3 sides so it's a triangle ! "      << std::endl; break; //
+	    	case 4:  std::cout << " The Gate number " << gate_flag << " has 4 sides so it's a rectangle ! "     << std::endl; break; //
+	    	case 5:  std::cout << " The Gate number " << gate_flag << " has 5 sides so it's a pentagon ! "      << std::endl; break; // Categorizing shape by it's 
+	    	case 6:  std::cout << " The Gate number " << gate_flag << " has 6 sides so it's an hexagon ! "      << std::endl; break; // sides number
+	    	case 7:  std::cout << " The Gate number " << gate_flag << " has 7 sides so it's an heptagon ! "     << std::endl; break; //     
+	    	case 8:  std::cout << " The Gate number " << gate_flag << " has 8 sides so it's an octagon ! "      << std::endl; break; //
+	    	case 9:  std::cout << " The Gate has 9 sides so it's an nonagon ! "      << std::endl; break;
+	    	default: std::cout << " Number of Sides of the Gate " << i+1 << " : "<< approx_curve.size() << std::endl; break;     
+	      }     
+	     
+	     for ( int i = 0 ; i < approx_curve.size() ; ++i ) //Loop for listing the Gate's properties
+	     {
+	   
+	      std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; //Listing the coordinates of the corners 
+	
+	      if (i==0){ofs << "1 " << i << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
+	      else {ofs << " " << approx_curve[i].x << " " << approx_curve[i].y;} //new
+	
+	      cv::circle(blue_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); //Graphical Print of the Corners
       
      }
 
