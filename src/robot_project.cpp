@@ -53,75 +53,112 @@ bool RobotProject::preprocessMap(cv::Mat const & img)
 // Method invoked when a new path must be planned (detect initial robot position from img)
 bool RobotProject::planPath(cv::Mat const & img, Path & path)
 {
-    cv::Mat map = readData("data/output/output.txt"); //First map acquisition
+    std::vector<cv::Point> pointPath;
+	cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
+	
+	cv::Mat map = readData("data/output/output.txt"); //First map acquisition
 	
 	cv::Mat original_map = map; 
 
-    double x0, y0, xf, yf; 
-    double th0 = -(2*M_PI/3), thf = M_PI/3, Kmax = 0.01;
+    double robotX0 = 150, robotY0 = 450, robotTH0 = -M_PI/4, gateXf = 1440, gateYf = 225, gateTHf = 0; 
+    double x0, y0, th0, xf, yf, thf; 
+    double Kmax = 0.01;
     double radius = 50;
+	int npts = 1000;
+	double s1,s2,s3;
 
 	DubinsCurve curve;
 
-	for(int i=0;i<circles.size();++i)
+	for(int i=0;i<orderedROI.size();++i)
 	{
-		x0 = circles[i][0];
-		y0 = circles[i][1];
-
-		if(i+1<circles.size())
+		if(i==0)
 		{
-			xf = circles[i+1][0];
-			yf = circles[i+1][1];
-		}else
-		{
-			xf = circles[0][0];
-			yf = circles[0][1];
+			x0 = robotX0;
+			y0 = robotY0;
+			th0 = robotTH0;
+			xf = orderedROI[i].x;
+			yf = orderedROI[i].y;
+			thf = atan2(orderedROI[i].y-robotY0,orderedROI[i].x-robotX0);
 		}
-		
+		else
+		{
+			x0 = orderedROI[i-1].x;
+			y0 = orderedROI[i-1].y;
+			th0 = thf;
+			xf = orderedROI[i].x;
+			yf = orderedROI[i].y;
+			thf = atan2(orderedROI[i].y-orderedROI[i-1].y,orderedROI[i].x-orderedROI[i-1].x);
+		}
+
     	curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, Kmax); 
 
-		std::cout<<"Arc1: "<<std::endl;
-		std::cout<<"x0: "<<curve.arc1.x0<<std::endl<<"y0: "<<curve.arc1.y0<<std::endl<<"th0: "<<curve.arc1.th0<<std::endl;				
-		std::cout<<"k: "<<curve.arc1.k<<std::endl<<"L: "<<curve.arc1.L<<std::endl;			
-		std::cout<<"xf: "<<curve.arc1.xf<<std::endl<<"yf: "<<curve.arc1.yf<<std::endl<<"thf: "<<curve.arc1.thf<<std::endl;	
-		std::cout<<"Arc2: "<<std::endl;
-		std::cout<<"x0: "<<curve.arc2.x0<<std::endl<<"y0: "<<curve.arc2.y0<<std::endl<<"th0: "<<curve.arc2.th0<<std::endl;				
-		std::cout<<"k: "<<curve.arc2.k<<std::endl<<"L: "<<curve.arc2.L<<std::endl;			
-		std::cout<<"xf: "<<curve.arc2.xf<<std::endl<<"yf: "<<curve.arc2.yf<<std::endl<<"thf: "<<curve.arc2.thf<<std::endl;
-		std::cout<<"Arc3: "<<std::endl;
-		std::cout<<"x0: "<<curve.arc3.x0<<std::endl<<"y0: "<<curve.arc3.y0<<std::endl<<"th0: "<<curve.arc3.th0<<std::endl;				
-		std::cout<<"k: "<<curve.arc3.k<<std::endl<<"L: "<<curve.arc3.L<<std::endl;			
-		std::cout<<"xf: "<<curve.arc3.xf<<std::endl<<"yf: "<<curve.arc3.yf<<std::endl<<"thf: "<<curve.arc3.thf<<std::endl;			
-		std::cout<<"Length: "<<curve.L<<std::endl;
-	}
 
-    // std::cout<<"Arc1: "<<std::endl;
-    // std::cout<<"x0: "<<curve.arc1.x0<<std::endl<<"y0: "<<curve.arc1.y0<<std::endl<<"th0: "<<curve.arc1.th0<<std::endl;				
-    // std::cout<<"k: "<<curve.arc1.k<<std::endl<<"L: "<<curve.arc1.L<<std::endl;			
-    // std::cout<<"xf: "<<curve.arc1.xf<<std::endl<<"yf: "<<curve.arc1.yf<<std::endl<<"thf: "<<curve.arc1.thf<<std::endl;	
-    // std::cout<<"Arc2: "<<std::endl;
-    // std::cout<<"x0: "<<curve.arc2.x0<<std::endl<<"y0: "<<curve.arc2.y0<<std::endl<<"th0: "<<curve.arc2.th0<<std::endl;				
-    // std::cout<<"k: "<<curve.arc2.k<<std::endl<<"L: "<<curve.arc2.L<<std::endl;			
-    // std::cout<<"xf: "<<curve.arc2.xf<<std::endl<<"yf: "<<curve.arc2.yf<<std::endl<<"thf: "<<curve.arc2.thf<<std::endl;
-    // std::cout<<"Arc3: "<<std::endl;
-    // std::cout<<"x0: "<<curve.arc3.x0<<std::endl<<"y0: "<<curve.arc3.y0<<std::endl<<"th0: "<<curve.arc3.th0<<std::endl;				
-    // std::cout<<"k: "<<curve.arc3.k<<std::endl<<"L: "<<curve.arc3.L<<std::endl;			
-    // std::cout<<"xf: "<<curve.arc3.xf<<std::endl<<"yf: "<<curve.arc3.yf<<std::endl<<"thf: "<<curve.arc3.thf<<std::endl;			
-    // std::cout<<"Length: "<<curve.L<<std::endl;    
-    
-    cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
-    
+		for(int j=0; j<npts;++j)
+		{
+			s1 = curve.arc1.L/npts*j;
+			circline(s1,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
+			pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+			cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+		}
+		for(int j=0; j<npts;++j)
+		{
+			s2 = curve.arc2.L/npts*j;
+			circline(s2,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
+			pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+			cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+		}
+		for(int j=0; j<npts;++j)
+		{	
+			s3 = curve.arc3.L/npts*j;
+			circline(s3,curve.arc3.x0,curve.arc3.y0,curve.arc3.th0,curve.arc3.k);
+			pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+			cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+		}
+	} 
+
+	x0 = orderedROI[orderedROI.size()-1].x;
+	y0 = orderedROI[orderedROI.size()-1].y;
+	th0 = thf;
+	xf = gateXf;
+	yf = gateYf;
+	thf = gateTHf;
+
+	curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, Kmax); 
+
+	for(int j=0; j<npts;++j)
+	{
+		s1 = curve.arc1.L/npts*j;
+		circline(s1,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
+		pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+	}
+	for(int j=0; j<npts;++j)
+	{
+		s2 = curve.arc2.L/npts*j;
+		circline(s2,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
+		pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+	}
+	for(int j=0; j<npts;++j)
+	{	
+		s3 = curve.arc3.L/npts*j;
+		circline(s3,curve.arc3.x0,curve.arc3.y0,curve.arc3.th0,curve.arc3.k);
+		pointPath.push_back(cv::Point((int)cline[0],(int)cline[1]));
+		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
+	}
+        
     //INITIAL POSITION AND CONFIGURATION
-    cv::circle(out, cv::Point(x0,y0), 10 , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0 );
-    cv::line(out, cv::Point(x0,y0) , cv::Point(x0+radius*cos(th0), y0+radius*sin(th0)) , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0);
+    cv::circle(out, cv::Point(robotX0,robotY0), 10 , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0 );
+    cv::line(out, cv::Point(robotX0,robotY0) , cv::Point(robotX0+radius*cos(robotTH0), robotY0+radius*sin(robotTH0)) , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0);
     
     //FINAL POSITION AND CONFIGURATION
-    cv::circle(out, cv::Point(xf,yf), 10 , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0 );
-    cv::line(out, cv::Point(xf,yf) , cv::Point(xf+radius*cos(thf), yf+radius*sin(thf)) , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0);
+    cv::circle(out, cv::Point(gateXf,gateYf), 10 , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0 );
+    cv::line(out, cv::Point(gateXf,gateYf) , cv::Point(gateXf+radius*cos(gateTHf), gateYf+radius*sin(gateTHf)) , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0);
     
+	showImage("Dubins path", out+map);
     //-----------------------------------------------------------------------------------------------------------------------------
      
-    int npts = 10000;
+    // int npts = 10000;
     
     int old_x=0; 
     int new_x=0;
