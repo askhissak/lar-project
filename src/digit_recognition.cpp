@@ -1,4 +1,4 @@
-// digit_recognition.cpp:
+// digit_recognition.cpp: DIGIT RECOGNITION
 #include <string>
 #include <vector>
 
@@ -13,33 +13,48 @@
 #include "digit_recognition.hpp"
 #include "map_extraction.hpp"
 
-//DIGIT RECOGNITION
-int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
+//Properly rotate an image
+cv::Mat rotate(cv::Mat src, double angle)
 {
-
-    // int orderedArray[4] = {0};//hardcoded
-
-    // Load image from file
-    // cv::Mat img = cv::imread(filename.c_str());
-    // if(img.empty()) {
-    //     throw std::runtime_error("Failed to open the file " + filename);
-    // }
+    cv::Mat dst;
+    cv::Point pt(src.cols/2., src.rows/2.);  
+ 
+    cv::Mat r = cv::getRotationMatrix2D(pt, -angle, 1.0);
     
+    cv::Rect2f bbox = cv::RotatedRect(cv::Point(), src.size(), angle).boundingRect2f();
+
+    r.at<double>(0,2) += bbox.width/2.0 - src.cols/2.0;
+    r.at<double>(1,2) += bbox.height/2.0 - src.rows/2.0;
+       
+    warpAffine(src, dst, r, bbox.size());
+    return dst;
+}
+
+// void printAngle(cv::RotatedRect calculatedRect){
+//     if(calculatedRect.size.width < calculatedRect.size.height){
+//         printf("Angle along longer side: %7.2f\n", calculatedRect.angle+180);
+//     }else{
+//         printf("Angle along longer side: %7.2f\n", calculatedRect.angle+90);
+//     }
+// }
+
+bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index)
+{
     // Convert color space from BGR to HSV
     cv::Mat hsv_img;
-    cv::cvtColor(img, hsv_img, cv::COLOR_BGR2HSV);
+    cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
     // Find green regions
     cv::Mat green_mask;
-    cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(75, 255, 255), green_mask); //75
+    cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(80, 255, 255), green_mask); //75
     // Apply some filtering
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
     cv::dilate(green_mask, green_mask, kernel);	
     cv::erode(green_mask, green_mask, kernel);
     // cv::erode(green_mask, green_mask, kernel);
-    cv::Mat green_mask_inv, filtered(img.rows, img.cols, CV_8UC3, cv::Scalar(255,255,255));
+    cv::Mat green_mask_inv, filtered(map.rows, map.cols, CV_8UC3, cv::Scalar(255,255,255));
     cv::bitwise_not(green_mask, green_mask_inv); // generate binary mask with inverted pixels w.r.t. green mask -> black numbers are part of this mask  
     
-    img.copyTo(filtered, green_mask_inv);   // create copy of image without green shapes
+    map.copyTo(filtered, green_mask_inv);   // create copy of image without green shapes
     kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((2*2) + 1, (2*2)+1));
 
     // Create Tesseract object
@@ -50,7 +65,8 @@ int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
     ocr->SetPageSegMode(tesseract::PSM_SINGLE_CHAR);
     // Only digits are valid output characters
     ocr->SetVariable("tessedit_char_whitelist", "0123456789");
-    
+    std::cout << "Size: " << circles.size() << std::endl<<std::endl<<std::endl;
+
     // For each green blob in the original image containing a digit
     for (int i=0; i<circles.size(); ++i)
     {
@@ -70,8 +86,8 @@ int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
         cv::threshold( processROI, processROI, 60, 255, cv::THRESH_BINARY_INV ); // threshold and binarize the image, to suppress some noise
 
         cv::erode(processROI, processROI, kernel);
-        cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
-        cv::erode(processROI, processROI, kernel);
+        // cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
+        // cv::erode(processROI, processROI, kernel);
 
         // Show the actual image passed to the ocr engine
         cv::imshow("ROI", processROI);
@@ -105,13 +121,220 @@ int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles)
         if(*recognizedDigits[maxIndex] == ' ' || !isdigit(*recognizedDigits[maxIndex])) continue;
         std::cout << "Recognized digit: " << std::string(recognizedDigits[maxIndex]);
         std::cout << "Confidence: " << maxConfidence << std::endl<<std::endl<<std::endl;
-        orderedArray[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
+        index[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
+
+        // if(maxConfidence<75) return false;
         
         cv::waitKey(0);
     }
 
     ocr->End(); // destroy the ocr object (release resources)
 
-    return orderedArray;
+    return true;
+}
+
+bool useTemplateMatching(cv::Mat const & map)
+{
+    // Display original image
+    showImage("Original", map);
+  
+    // Convert color space from BGR to HSV
+    cv::Mat hsv_img;
+    cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
+    
+    
+    // Find green regions
+    cv::Mat green_mask;
+    cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(80, 255, 255), green_mask);
+    
+    // Apply some filtering
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+    cv::dilate(green_mask, green_mask, kernel);
+    cv::erode(green_mask, green_mask, kernel);
+    
+    // Display image
+    showImage("GREEN_filter", green_mask);  
+    
+    // Find contours
+    std::vector<std::vector<cv::Point>> contours, contours_approx;
+    std::vector<cv::Point> approx_curve;
+    cv::Mat contours_img;
+
+    contours_img = map.clone();
+    cv::findContours(green_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);  
+        
+    std::vector<cv::Rect> boundRect(contours.size());
+    std::vector<cv::RotatedRect> boundRotRect(contours.size()); 
+    for (int i=0; i<contours.size(); ++i)
+    {
+        double area = cv::contourArea(contours[i]);
+        if (area < MIN_AREA_SIZE) continue; // filter too small contours to remove false positives
+        approxPolyDP(contours[i], approx_curve, 2, true);
+        contours_approx = {approx_curve};
+        drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA);
+        boundRect[i] = boundingRect(cv::Mat(approx_curve)); // find bounding box for each green blob
+        boundRotRect[i] = minAreaRect(approx_curve);
+    }
+    showImage("Original", contours_img);        
+    
+    cv::Mat green_mask_inv, filtered(map.rows, map.cols, CV_8UC3, cv::Scalar(255,255,255));
+    cv::bitwise_not(green_mask, green_mask_inv); // generate binary mask with inverted pixels w.r.t. green mask -> black numbers are part of this mask
+    
+    showImage("Numbers", green_mask_inv);
+    
+    // Load digits template images
+    std::vector<cv::Mat> templROIs;
+    for (int i=0; i<=9; ++i) {
+        templROIs.emplace_back(cv::imread("data/template/" + std::to_string(i) + ".png"));
+    }  
+    
+    map.copyTo(filtered, green_mask_inv);   // create copy of image without green shapes
+    
+    kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((2*2) + 1, (2*2)+1));
+    
+    // For each green blob in the original image containing a digit
+    for (int i=0; i<boundRect.size(); ++i)
+    {
+        cv::Mat processROI(filtered, boundRect[i]); // extract the ROI containing the digit
+        cv::Mat rotatedROI;
+
+        if (processROI.empty()) continue;
+        
+        cv::resize(processROI, processROI, cv::Size(200, 200)); // resize the ROI
+        cv::threshold( processROI, processROI, 60, 255, 0 ); // threshold and binarize the image, to suppress some noise
+        
+        // Apply some additional smoothing and filtering
+        cv::erode(processROI, processROI, kernel);
+        cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
+        cv::erode(processROI, processROI, kernel);
+        
+        // Show the actual image used for the template matching
+        showImage("ROI", processROI);
+
+        // Convert color space from BGR to grayscale
+        cv::Mat grayROI, grayTemplROI;
+        cv::cvtColor(processROI, grayROI, cv::COLOR_BGR2GRAY);
+
+        double maxScore = 1;
+        int maxIdx = -1;
+
+        for (int j=0; j<templROIs.size(); ++j) 
+        {
+            cv::cvtColor(templROIs[j], grayTemplROI, cv::COLOR_BGR2GRAY);
+            double score = cv::matchShapes(grayROI,grayTemplROI,2,0.0);
+            // cv::matchTemplate(rotatedROI, templROIs[j], result, cv::TM_CCOEFF);
+            // double score;
+            // cv::minMaxLoc(result, nullptr, &score); 
+            std::cout<<"Score "<<score<<std::endl;
+            if (score < maxScore) {
+                maxScore = score;
+                maxIdx = j;
+            }
+        }
+
+        //Tests
+        // std::vector<cv::Point> box;
+
+        // //Loop over each pixel and create a point
+        // for (int x = 0; x < processROI.cols; x++)
+        //     for (int y = 0; y < processROI.rows; y++)
+        //         points.push_back(cv::Point(x, y));
+
+        // 5 ret,thresh = cv2.threshold(img,127,255,0)
+        // 6 contours,hierarchy = cv2.findContours(thresh, 1, 2)
+        // 7 
+        // 8 cnt = contours[0]
+
+        // cv::RotatedRect rect = cv::minAreaRect(points);
+        // cv::boxPoints(boundRotRect[i], box);
+
+        // printAngle(boundRotRect[i]);
+        // showImage("Rotated ROI", rotate(processROI, boundRotRect[i].angle));
+
+        // std::cout<<"Rotated rectangle "<<boundRotRect[i].center<<" "<<boundRotRect[i].size<<" "<<boundRotRect[i].angle<<std::endl;
+        // std::cout<<"Rotated rectangle bounding rect2f"<<boundRotRect[i].boundingRect2f()<<std::endl;
+        // std::cout<<"Rotated rectangle bounding rect"<<boundRotRect[i].boundingRect()<<std::endl;
+
+        // std::cout<<"Box points "<<box<<std::endl;
+
+        // showImage("Fit rotated rectangle", processROI);
+
+        // std::vector<cv::Point> points;
+
+        // //Loop over each pixel and create a point
+        // for (int x = 0; x < processROI.cols; x++)
+        //     for (int y = 0; y < processROI.rows; y++)
+        //         points.push_back(cv::Point(x, y));
+
+        // cv::Vec4f line;
+        // cv::fitLine(points, line, cv::DIST_HUBER, 0, 0.01, 0.01);
+
+        // cv::line( processROI, cv::Point(line[2],line[3]), cv::Point(line[2]+line[0]*400,line[3]+line[1]*400), cv::Scalar(255, 0, 0), 2, cv::LINE_AA, 0);
+
+        // showImage("Fit line", processROI);
+       
+        // Find the template digit with the best matching
+        // double maxScore = 0;
+        // int maxIdx = -1;
+
+        //Rotate the ROI to recognize a digit
+        for(int j=0;j<36;++j)
+        {
+            rotatedROI = rotate(processROI, 10*j);
+            showImage("Rotated ROI", rotatedROI);
+
+            for (int j=0; j<templROIs.size(); ++j) {
+                cv::Mat result;
+                cv::matchTemplate(rotatedROI, templROIs[j], result, cv::TM_CCOEFF);
+                double score;
+                cv::minMaxLoc(result, nullptr, &score); 
+                if (score > maxScore) {
+                    maxScore = score;
+                    maxIdx = j;
+                }
+            }
+        }
+   
+        std::cout << "Best fitting template: " << maxIdx << std::endl;
+        if(maxScore>0.01) return false;
+        
+    }
+
+    return true;
+}
+
+bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::vector<cv::Point> &orderedROI)
+{
+    int index[circles.size()] = {0};
+
+    if(!useTesseract(map, circles, index))
+    {
+        std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
+        return false;
+    }
+
+    // if(!useTemplateMatching(map))
+    // {
+    //     std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
+    //     return false;
+    // }
+
+    int next = 1;
+
+    for(int i=0;i<circles.size();++i)
+    {
+         for(int j=0;j<circles.size();++j)
+        {
+            if(index[j]==next)
+            {
+                orderedROI.push_back(cv::Point(circles[j][0],circles[j][1]));
+            }
+        }
+
+        next++;
+    }
+
+
+    return true;
                 
 }

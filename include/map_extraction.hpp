@@ -17,8 +17,8 @@ const int MAP_WIDTH = 1050;  //Check dimensions!
 void loadCoefficients(const std::string& filename,
                       cv::Mat& camera_matrix,
                       cv::Mat& dist_coeffs);
+void showImage(const std::string& windowName, cv::Mat const & img);                      
 bool compareX (cv::Point pt1, cv::Point pt2);
-cv::Mat rotate(cv::Mat src, double angle);
 cv::Mat assignCorners(std::vector<cv::Point> sortX);
 cv::Mat calculateTransform(cv::Mat calib_image, int length,int width,double& pixel_scale);
 
@@ -33,6 +33,6 @@ void storeAllParameters(const std::string& filename,
                         double pixel_scale,
                         const cv::Mat& persp_transf);
 
-cv::Mat extractMap(cv::Mat const & img, cv::Mat &robotPlane);
+bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robotPlane);
 
 #endif

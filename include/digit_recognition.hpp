@@ -2,7 +2,7 @@
 #define LAR_DIGITRECOGNITION_HPP
 
 //Forward declared dependencies
-static int orderedArray[4] = {0};//hardcoded
+const double MIN_AREA_SIZE = 300;
 
 //Included dependencies
 //
@@ -11,6 +11,10 @@ static int orderedArray[4] = {0};//hardcoded
 //
 
 //Function declarations
-int* recognizeDigits(cv::Mat const & img, std::vector<cv::Vec3f> circles);
+cv::Mat rotate(cv::Mat src, double angle);
+// void printAngle(cv::RotatedRect calculatedRect);
+bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index);
+bool useTemplateMatching(cv::Mat const & map);
+bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::vector<cv::Point> &orderedROI);
 
 #endif

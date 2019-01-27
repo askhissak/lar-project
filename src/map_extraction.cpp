@@ -28,27 +28,21 @@ void loadCoefficients(const std::string& filename,
     fs.release();
 }
 
+//Show an image in proper window
+void showImage(const std::string& windowName, cv::Mat const & img)
+{
+    std::string name = windowName;
+    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+    cv::resizeWindow(name.c_str(), 640, 512);
+    cv::imshow(name.c_str(), img);
+    cv::waitKey(0);
+    cv::destroyWindow(name.c_str());
+}
+
 //Compare x coordinate of 2 points
 bool compareX (cv::Point pt1, cv::Point pt2)
 {
     return (pt1.x < pt2.x); 
-}
-
-//Properly rotate an image
-cv::Mat rotate(cv::Mat src, double angle)
-{
-    cv::Mat dst;
-    cv::Point pt(src.cols/2., src.rows/2.);  
- 
-    cv::Mat r = cv::getRotationMatrix2D(pt, -angle, 1.0);
-    
-    cv::Rect2f bbox = cv::RotatedRect(cv::Point(), src.size(), angle).boundingRect2f();
-
-    r.at<double>(0,2) += bbox.width/2.0 - src.cols/2.0;
-    r.at<double>(1,2) += bbox.height/2.0 - src.rows/2.0;
-       
-    warpAffine(src, dst, r, bbox.size());
-    return dst;
 }
 
 cv::Mat assignCorners(std::vector<cv::Point> sortX)
@@ -126,8 +120,8 @@ cv::Mat calculateTransform(cv::Mat calib_image, int length,int width,double& pix
     float scale = std::min(scale_x, scale_y);
 
     pixel_scale = 1./scale;
-    std::cout<<"Delta x: "<<delta_x<<std::endl;
-    std::cout<<"Delta y: "<<delta_y<<std::endl;
+    // std::cout<<"Delta x: "<<delta_x<<std::endl;
+    // std::cout<<"Delta y: "<<delta_y<<std::endl;
 
     cv::Mat transf_pixels = (cv::Mat_<float>(4,2) << origin_x, origin_y,
                                                     origin_x+delta_x, origin_y,
@@ -153,13 +147,10 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
     cv::dilate(adaptive_mask, adaptive_mask, kernel);
 
+    //Try out black filter because adaptive fails when robot close to the border. Maybe make it an option
+
     //Show filtered image
-    std::string name = "Boundary";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 640, 512);
-    cv::imshow(name.c_str(), adaptive_mask);
-    cv::waitKey(0);
-    cv::destroyWindow(name.c_str());
+    showImage("Adaptive mask", adaptive_mask);
 
     // Find contours
     std::vector<std::vector<cv::Point>> contours, contours_approx;
@@ -168,9 +159,7 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
 
     // Process black mask
     cv::findContours(adaptive_mask, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE); // find external contours of each blob
-    std::cout<<"Countours: "<<contours[0]<<std::endl;
-    std::cout<<"Countours: "<<contours[1]<<std::endl;
-    std::cout<<"Countours: "<<contours[2]<<std::endl;
+
     contours_img = img.clone();
     drawContours(contours_img, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
     for (int i=0; i<contours.size(); ++i)
@@ -187,12 +176,8 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
 
         contours_approx = {approx_curve};
         drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 5, cv::LINE_AA);
-        name = "Main Perimeter (Black Boundary)";
-        cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-        cv::resizeWindow(name.c_str(), 640, 512);
-        cv::imshow(name.c_str(), contours_img);
-        cv::waitKey(0);
-        cv::destroyWindow(name.c_str());
+
+        showImage("Map Boundary", contours_img);
 
     }
 
@@ -213,12 +198,7 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
     cv::Mat white_mask;
     cv::inRange(hsv_img, cv::Scalar(60, 10, 180), cv::Scalar(160, 100, 255), white_mask);
 
-    std::string name = "White circles";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 640, 512);
-    cv::imshow(name.c_str(), white_mask);
-    cv::waitKey(0);
-    cv::destroyWindow(name.c_str());     
+    showImage("White mask", white_mask);   
     
     std::vector<cv::Point> sortHighX;
     std::vector<cv::Vec3f> cornerCircles;
@@ -232,17 +212,12 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
         {
             
             cv::Point center(cvRound(cornerCircles[i][0]), cvRound(cornerCircles[i][1]));
-            std::cout<<"Circle Center point: "<<center<<" and radius "<<cornerCircles[i][2]<<std::endl;
+            // std::cout<<"Circle Center point: "<<center<<" and radius "<<cornerCircles[i][2]<<std::endl;
                     
             // circle center
             circle( circles_img, center, cornerCircles[i][2], cv::Scalar(0, 250 ,255), -1, 8, 0 );        
 
-            name = "Circles Detected";
-            cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-            cv::resizeWindow(name.c_str(), 640, 512);
-            cv::imshow(name.c_str(), circles_img);
-            cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   
+            // showImage("Circles Detected", circles_img);
 
             sortHighX.push_back(center);
 
@@ -254,14 +229,9 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
                 cv::line(circles_img, cv::Point(cornerCircles[i][0],cornerCircles[i][1]) , cv::Point(cornerCircles[i+1][0],cornerCircles[i+1][1]) , cv::Scalar( 0 , 250 , 255 ), 5, 8, 0);
             }
             
-            name = "Higher plane";
-            cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-            cv::resizeWindow(name.c_str(), 640, 512);
-            cv::imshow(name.c_str(), circles_img);
-            cv::waitKey(0);
-            cv::destroyWindow(name.c_str());
-
         }
+
+        showImage("Higher plane", circles_img);
 
     }
     else
@@ -279,12 +249,8 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
 cv::Mat findTransform(cv::Mat const & calib_image,
                   double& pixel_scale)
 {
-    std::string name = "Undistorted image";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 640, 512);
-    cv::imshow(name.c_str(), calib_image);
-    cv::waitKey(0);
-    cv::destroyWindow(name.c_str());
+   
+    showImage("Undistorted image", calib_image);
 
 
     std::vector<cv::Point> sortHighX = detectRobotPlaneCorners(calib_image);
@@ -320,7 +286,7 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     cv::warpPerspective(calib_image, unwarped_rb_frame, transf_rb, cv::Size(MAP_LENGTH,MAP_WIDTH));
     cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(MAP_LENGTH,MAP_WIDTH));
 
-    std::string wind2; 
+    std::string name, wind2; 
 
     name = "Unwarped robot plane";
     cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
@@ -357,7 +323,7 @@ void storeAllParameters(const std::string& filename,
 }
 
 //Process the image using perspective transformation matrix
-cv::Mat extractMap(cv::Mat const & img, cv::Mat &robotPlane) 
+bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robotPlane) 
 {
     cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
     loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
@@ -365,11 +331,11 @@ cv::Mat extractMap(cv::Mat const & img, cv::Mat &robotPlane)
     undistort(img, calib_image, camera_matrix, dist_coeffs);
 
     double pixel_scale;
-    persp_transf = findTransform(calib_image, pixel_scale);
+    map = findTransform(calib_image, pixel_scale);
 
     storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
 
     robotPlane = rbPlane;
     
-    return persp_transf;
+    return true;
 }

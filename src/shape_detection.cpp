@@ -161,7 +161,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img)
 
   // Find green regions
   cv::Mat green_mask;
-  cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(75, 255, 255), green_mask);
+  cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(80, 255, 255), green_mask);
   
   name = "Regions of interest";
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);

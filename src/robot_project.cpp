@@ -6,13 +6,15 @@
 #include "map_extraction.hpp"
 #include "shape_detection.hpp"
 #include "digit_recognition.hpp"
-#include "order_roi.hpp"
 #include "reader.hpp"
 #include "dubins.hpp"
 #include "collision_detection.hpp"
 
 #include "path.h"
 #include "robot_project.h"
+
+std::vector<cv::Vec3f> circles;
+std::vector<cv::Point> orderedROI;
 
 // Constructor taking as argument the command line parameters
 RobotProject::RobotProject(int argc, char * argv[])
@@ -23,28 +25,28 @@ RobotProject::RobotProject(int argc, char * argv[])
 // Method invoked to preprocess the map (extrinsic calibration + reconstruction of layout)
 bool RobotProject::preprocessMap(cv::Mat const & img)
 {
-	cv::Mat robotPlane;
+	cv::Mat robotPlane, map;
 
 	// calibrateCamera();
 
 	//Image -> Map (borders only)
-    cv::Mat map = extractMap(img, robotPlane);//+
-
-	// std::cout<<"Map Plane "<<map<<std::endl;
-	// std::cout<<"Robot Plane "<<robotPlane<<std::endl;
+    if(!extractMap(img, map, robotPlane))
+	{
+		std::cerr << "(Critical) Failed to extract the map!" << std::endl;
+		return false;
+	}
 
 	//Shapes
-    std::vector<cv::Vec3f> circles = processImage(map);
+    circles = processImage(map);
 
 	//Digits
-    int *pointer = recognizeDigits(map, circles);
-
-    std::cout<<"Pointer "<<pointer[0]<<std::endl;
-
-    orderROI(map, circles, pointer);//+
+    if(!recognizeDigits(map, circles, orderedROI))
+	{
+		std::cerr << "(Critical) Failed to recognize the digits!" << std::endl;
+		return false;
+	}
 
     return true;
-
 
 }
 
@@ -53,27 +55,59 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 {
     cv::Mat map = readData("data/output/output.txt"); //First map acquisition
 	
-	cv::Mat original_map = map ; 
-	
-    double x0 = 1012, y0 = 335, xf = 294, yf = 289; 
+	cv::Mat original_map = map; 
+
+    double x0, y0, xf, yf; 
     double th0 = -(2*M_PI/3), thf = M_PI/3, Kmax = 0.01;
     double radius = 50;
 
-    DubinsCurve curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, Kmax);
+	DubinsCurve curve;
 
-    std::cout<<"Arc1: "<<std::endl;
-    std::cout<<"x0: "<<curve.arc1.x0<<std::endl<<"y0: "<<curve.arc1.y0<<std::endl<<"th0: "<<curve.arc1.th0<<std::endl;				
-    std::cout<<"k: "<<curve.arc1.k<<std::endl<<"L: "<<curve.arc1.L<<std::endl;			
-    std::cout<<"xf: "<<curve.arc1.xf<<std::endl<<"yf: "<<curve.arc1.yf<<std::endl<<"thf: "<<curve.arc1.thf<<std::endl;	
-    std::cout<<"Arc2: "<<std::endl;
-    std::cout<<"x0: "<<curve.arc2.x0<<std::endl<<"y0: "<<curve.arc2.y0<<std::endl<<"th0: "<<curve.arc2.th0<<std::endl;				
-    std::cout<<"k: "<<curve.arc2.k<<std::endl<<"L: "<<curve.arc2.L<<std::endl;			
-    std::cout<<"xf: "<<curve.arc2.xf<<std::endl<<"yf: "<<curve.arc2.yf<<std::endl<<"thf: "<<curve.arc2.thf<<std::endl;
-    std::cout<<"Arc3: "<<std::endl;
-    std::cout<<"x0: "<<curve.arc3.x0<<std::endl<<"y0: "<<curve.arc3.y0<<std::endl<<"th0: "<<curve.arc3.th0<<std::endl;				
-    std::cout<<"k: "<<curve.arc3.k<<std::endl<<"L: "<<curve.arc3.L<<std::endl;			
-    std::cout<<"xf: "<<curve.arc3.xf<<std::endl<<"yf: "<<curve.arc3.yf<<std::endl<<"thf: "<<curve.arc3.thf<<std::endl;			
-    std::cout<<"Length: "<<curve.L<<std::endl;    
+	for(int i=0;i<circles.size();++i)
+	{
+		x0 = circles[i][0];
+		y0 = circles[i][1];
+
+		if(i+1<circles.size())
+		{
+			xf = circles[i+1][0];
+			yf = circles[i+1][1];
+		}else
+		{
+			xf = circles[0][0];
+			yf = circles[0][1];
+		}
+		
+    	curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, Kmax); 
+
+		std::cout<<"Arc1: "<<std::endl;
+		std::cout<<"x0: "<<curve.arc1.x0<<std::endl<<"y0: "<<curve.arc1.y0<<std::endl<<"th0: "<<curve.arc1.th0<<std::endl;				
+		std::cout<<"k: "<<curve.arc1.k<<std::endl<<"L: "<<curve.arc1.L<<std::endl;			
+		std::cout<<"xf: "<<curve.arc1.xf<<std::endl<<"yf: "<<curve.arc1.yf<<std::endl<<"thf: "<<curve.arc1.thf<<std::endl;	
+		std::cout<<"Arc2: "<<std::endl;
+		std::cout<<"x0: "<<curve.arc2.x0<<std::endl<<"y0: "<<curve.arc2.y0<<std::endl<<"th0: "<<curve.arc2.th0<<std::endl;				
+		std::cout<<"k: "<<curve.arc2.k<<std::endl<<"L: "<<curve.arc2.L<<std::endl;			
+		std::cout<<"xf: "<<curve.arc2.xf<<std::endl<<"yf: "<<curve.arc2.yf<<std::endl<<"thf: "<<curve.arc2.thf<<std::endl;
+		std::cout<<"Arc3: "<<std::endl;
+		std::cout<<"x0: "<<curve.arc3.x0<<std::endl<<"y0: "<<curve.arc3.y0<<std::endl<<"th0: "<<curve.arc3.th0<<std::endl;				
+		std::cout<<"k: "<<curve.arc3.k<<std::endl<<"L: "<<curve.arc3.L<<std::endl;			
+		std::cout<<"xf: "<<curve.arc3.xf<<std::endl<<"yf: "<<curve.arc3.yf<<std::endl<<"thf: "<<curve.arc3.thf<<std::endl;			
+		std::cout<<"Length: "<<curve.L<<std::endl;
+	}
+
+    // std::cout<<"Arc1: "<<std::endl;
+    // std::cout<<"x0: "<<curve.arc1.x0<<std::endl<<"y0: "<<curve.arc1.y0<<std::endl<<"th0: "<<curve.arc1.th0<<std::endl;				
+    // std::cout<<"k: "<<curve.arc1.k<<std::endl<<"L: "<<curve.arc1.L<<std::endl;			
+    // std::cout<<"xf: "<<curve.arc1.xf<<std::endl<<"yf: "<<curve.arc1.yf<<std::endl<<"thf: "<<curve.arc1.thf<<std::endl;	
+    // std::cout<<"Arc2: "<<std::endl;
+    // std::cout<<"x0: "<<curve.arc2.x0<<std::endl<<"y0: "<<curve.arc2.y0<<std::endl<<"th0: "<<curve.arc2.th0<<std::endl;				
+    // std::cout<<"k: "<<curve.arc2.k<<std::endl<<"L: "<<curve.arc2.L<<std::endl;			
+    // std::cout<<"xf: "<<curve.arc2.xf<<std::endl<<"yf: "<<curve.arc2.yf<<std::endl<<"thf: "<<curve.arc2.thf<<std::endl;
+    // std::cout<<"Arc3: "<<std::endl;
+    // std::cout<<"x0: "<<curve.arc3.x0<<std::endl<<"y0: "<<curve.arc3.y0<<std::endl<<"th0: "<<curve.arc3.th0<<std::endl;				
+    // std::cout<<"k: "<<curve.arc3.k<<std::endl<<"L: "<<curve.arc3.L<<std::endl;			
+    // std::cout<<"xf: "<<curve.arc3.xf<<std::endl<<"yf: "<<curve.arc3.yf<<std::endl<<"thf: "<<curve.arc3.thf<<std::endl;			
+    // std::cout<<"Length: "<<curve.L<<std::endl;    
     
     cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
     
