@@ -133,7 +133,7 @@ bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* inde
     return true;
 }
 
-bool useTemplateMatching(cv::Mat const & map)
+bool useTemplateMatching(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index)
 {
     // Display original image
     showImage("Original", map);
@@ -164,7 +164,7 @@ bool useTemplateMatching(cv::Mat const & map)
     cv::findContours(green_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);  
         
     std::vector<cv::Rect> boundRect(contours.size());
-    std::vector<cv::RotatedRect> boundRotRect(contours.size()); 
+    // std::vector<cv::RotatedRect> boundRotRect(contours.size()); 
     for (int i=0; i<contours.size(); ++i)
     {
         double area = cv::contourArea(contours[i]);
@@ -173,7 +173,7 @@ bool useTemplateMatching(cv::Mat const & map)
         contours_approx = {approx_curve};
         drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA);
         boundRect[i] = boundingRect(cv::Mat(approx_curve)); // find bounding box for each green blob
-        boundRotRect[i] = minAreaRect(approx_curve);
+        // boundRotRect[i] = minAreaRect(approx_curve);
     }
     showImage("Original", contours_img);        
     
@@ -193,10 +193,17 @@ bool useTemplateMatching(cv::Mat const & map)
     kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((2*2) + 1, (2*2)+1));
     
     // For each green blob in the original image containing a digit
-    for (int i=0; i<boundRect.size(); ++i)
+    for (int i=0; i<circles.size(); ++i)
     {
-        cv::Mat processROI(filtered, boundRect[i]); // extract the ROI containing the digit
-        cv::Mat rotatedROI;
+        //Find bounding box for a ROI
+        cv::Rect bbox(circles[i][0]-circles[i][2],circles[i][1]-circles[i][2],2*circles[i][2],2*circles[i][2]);
+    
+        // extract the ROI containing the digit 
+        cv::Mat processROI(filtered, bbox); 
+        cv::Mat rotatedROI(filtered, bbox);
+        
+        // cv::Mat processROI(filtered, boundRect[i]); // extract the ROI containing the digit
+        // cv::Mat rotatedROI(filtered, boundRect[i]);
 
         if (processROI.empty()) continue;
         
@@ -222,6 +229,7 @@ bool useTemplateMatching(cv::Mat const & map)
         {
             cv::cvtColor(templROIs[j], grayTemplROI, cv::COLOR_BGR2GRAY);
             double score = cv::matchShapes(grayROI,grayTemplROI,2,0.0);
+            // cv::Mat result;
             // cv::matchTemplate(rotatedROI, templROIs[j], result, cv::TM_CCOEFF);
             // double score;
             // cv::minMaxLoc(result, nullptr, &score); 
@@ -231,51 +239,6 @@ bool useTemplateMatching(cv::Mat const & map)
                 maxIdx = j;
             }
         }
-
-        //Tests
-        // std::vector<cv::Point> box;
-
-        // //Loop over each pixel and create a point
-        // for (int x = 0; x < processROI.cols; x++)
-        //     for (int y = 0; y < processROI.rows; y++)
-        //         points.push_back(cv::Point(x, y));
-
-        // 5 ret,thresh = cv2.threshold(img,127,255,0)
-        // 6 contours,hierarchy = cv2.findContours(thresh, 1, 2)
-        // 7 
-        // 8 cnt = contours[0]
-
-        // cv::RotatedRect rect = cv::minAreaRect(points);
-        // cv::boxPoints(boundRotRect[i], box);
-
-        // printAngle(boundRotRect[i]);
-        // showImage("Rotated ROI", rotate(processROI, boundRotRect[i].angle));
-
-        // std::cout<<"Rotated rectangle "<<boundRotRect[i].center<<" "<<boundRotRect[i].size<<" "<<boundRotRect[i].angle<<std::endl;
-        // std::cout<<"Rotated rectangle bounding rect2f"<<boundRotRect[i].boundingRect2f()<<std::endl;
-        // std::cout<<"Rotated rectangle bounding rect"<<boundRotRect[i].boundingRect()<<std::endl;
-
-        // std::cout<<"Box points "<<box<<std::endl;
-
-        // showImage("Fit rotated rectangle", processROI);
-
-        // std::vector<cv::Point> points;
-
-        // //Loop over each pixel and create a point
-        // for (int x = 0; x < processROI.cols; x++)
-        //     for (int y = 0; y < processROI.rows; y++)
-        //         points.push_back(cv::Point(x, y));
-
-        // cv::Vec4f line;
-        // cv::fitLine(points, line, cv::DIST_HUBER, 0, 0.01, 0.01);
-
-        // cv::line( processROI, cv::Point(line[2],line[3]), cv::Point(line[2]+line[0]*400,line[3]+line[1]*400), cv::Scalar(255, 0, 0), 2, cv::LINE_AA, 0);
-
-        // showImage("Fit line", processROI);
-       
-        // Find the template digit with the best matching
-        // double maxScore = 0;
-        // int maxIdx = -1;
 
         //Rotate the ROI to recognize a digit
         for(int j=0;j<36;++j)
@@ -294,7 +257,9 @@ bool useTemplateMatching(cv::Mat const & map)
                 }
             }
         }
-   
+
+        index[i] = maxIdx;
+    
         std::cout << "Best fitting template: " << maxIdx << std::endl;
         //if(maxScore>0.01) return false;
         
@@ -307,17 +272,17 @@ bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::v
 {
     int index[circles.size()] = {0};
 
-    //if(!useTesseract(map, circles, index))
-    //{
-        //std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
-        //return false;
-    //}
+    // if(!useTesseract(map, circles, index))
+    // {
+    //     std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
+    //     return false;
+    // }
 
-     if(!useTemplateMatching(map))
-     {
-         std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
-         return false;
-     }
+    if(!useTemplateMatching(map, circles, index))
+    {
+        std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
+        return false;
+    }
 
     int next = 1;
 
