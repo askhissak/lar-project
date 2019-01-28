@@ -295,7 +295,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
   cv::resizeWindow(name.c_str(), 640, 512);
   cv::imshow(name.c_str(), blue_mask_temp);
-  //cv::waitKey(0);
+  cv::waitKey(0);
   cv::destroyWindow(name.c_str());    
   
   ofs.close(); //new

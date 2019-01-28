@@ -281,7 +281,7 @@ bool useTemplateMatching(cv::Mat const & map)
         for(int j=0;j<36;++j)
         {
             rotatedROI = rotate(processROI, 10*j);
-            showImage("Rotated ROI", rotatedROI);
+            //showImage("Rotated ROI", rotatedROI);
 
             for (int j=0; j<templROIs.size(); ++j) {
                 cv::Mat result;
@@ -296,7 +296,7 @@ bool useTemplateMatching(cv::Mat const & map)
         }
    
         std::cout << "Best fitting template: " << maxIdx << std::endl;
-        if(maxScore>0.01) return false;
+        //if(maxScore>0.01) return false;
         
     }
 
@@ -307,17 +307,17 @@ bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::v
 {
     int index[circles.size()] = {0};
 
-    if(!useTesseract(map, circles, index))
-    {
-        std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
-        return false;
-    }
+    //if(!useTesseract(map, circles, index))
+    //{
+        //std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
+        //return false;
+    //}
 
-    // if(!useTemplateMatching(map))
-    // {
-    //     std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
-    //     return false;
-    // }
+     if(!useTemplateMatching(map))
+     {
+         std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
+         return false;
+     }
 
     int next = 1;
 

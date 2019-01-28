@@ -122,7 +122,7 @@ cv::Mat expander(cv::Mat input)
 	cv::Mat expanded = Mat::zeros( BW_Map.size(), CV_8UC3 );
 	
 	
-	float pixels = 30; // Number of pixels expanded in respect to the original contour
+	float pixels = 50; // Number of pixels expanded in respect to the original contour
 	
 	
 	findContours(BW_Map , contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
@@ -346,7 +346,7 @@ cv::Mat create_new_path( cv::Mat original_dubins , cv::Mat new_desired_contour  
 	cv::waitKey(0);
 	//cv::destroyWindow(name.c_str());
 	
-	//EXPERIMENTAL:
+	//EXPERIMENTAL (USE CONVEXITY (CONVEXHULL) FOR SMOOTHING THE EDGES):
 	
 	
 	//filter2D(smoothed_contour_map ,smoothed_contour_map , -1, kernel, Point(-1,-1), 2.0, BORDER_REPLICATE);
