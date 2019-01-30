@@ -16,7 +16,7 @@ bool obstacleOffset(cv::Mat input, std::vector<cv::Point> & dst);
 bool planMissionOne(Map & map_object, Path & path);
 bool planMissionTwo(Map & map_object, Path & path);
 void detectCollisions();
-bool planDubins(Map & map_object, Path & path, std::vector<int> & order);
-bool planMission(cv::Mat const & map, Map & map_object, Path & path, std::vector<int> & order);
+bool planDubins(Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order);
+bool planMission(cv::Mat const & map, Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order);
 
 #endif

@@ -49,9 +49,9 @@ bool obstacleOffset(cv::Mat input, std::vector<cv::Point> & dst, double offset)
 	
 }
 
-bool planDubins(Map & map_object, Path & path, std::vector<int> & order)
+bool planDubins(Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order)
 {
-    std::vector<cv::Point> points_path;
+    // std::vector<cv::Point> points_path;
 	cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
 	
 	cv::Mat map = map_object.showMap(); //First map acquisition
@@ -171,9 +171,9 @@ bool planDubins(Map & map_object, Path & path, std::vector<int> & order)
                 
 }
 
-bool planMission(cv::Mat const & map, Map & map_object, Path & path, std::vector<int> & order)
+bool planMission(cv::Mat const & map, Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order)
 {
-	if(!planDubins(map_object, path, order))
+	if(!planDubins(map_object, points_path, path, order))
 	{
 		std::cerr << "(Critical) Failed to plan a path using Dubins curve algorithm!" << std::endl;
 		return false;
