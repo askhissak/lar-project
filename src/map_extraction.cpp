@@ -11,7 +11,7 @@
 
 #include "map_extraction.hpp"
 
-cv::Mat result, rbPlane;
+cv::Mat result, rb_plane;
 
 //Load camera matrix and distortion coefficients values from intrinsic_calibration.xml
 void loadCoefficients(const std::string& filename,
@@ -29,9 +29,9 @@ void loadCoefficients(const std::string& filename,
 }
 
 //Show an image in proper window
-void showImage(const std::string& windowName, cv::Mat const & img)
+void showImage(const std::string& window_name, cv::Mat const & img)
 {
-    std::string name = windowName;
+    std::string name = window_name;
     cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
     cv::resizeWindow(name.c_str(), 640, 512);
     cv::imshow(name.c_str(), img);
@@ -45,56 +45,56 @@ bool compareX (cv::Point pt1, cv::Point pt2)
     return (pt1.x < pt2.x); 
 }
 
-cv::Mat assignCorners(std::vector<cv::Point> sortX)
+cv::Mat assignCorners(std::vector<cv::Point> sort_x)
 {
-    if(sortX[0].y<sortX[1].y)
+    if(sort_x[0].y<sort_x[1].y)
     {
-        if(sortX[2].y<sortX[3].y)
+        if(sort_x[2].y<sort_x[3].y)
         {
-            result.at<float>(0, 0) = sortX[0].x;
-            result.at<float>(0, 1) = sortX[0].y;
-            result.at<float>(1, 0) = sortX[2].x;
-            result.at<float>(1, 1) = sortX[2].y; 
-            result.at<float>(2, 0) = sortX[3].x;
-            result.at<float>(2, 1) = sortX[3].y;                
-            result.at<float>(3, 0) = sortX[1].x;
-            result.at<float>(3, 1) = sortX[1].y; //+
+            result.at<float>(0, 0) = sort_x[0].x;
+            result.at<float>(0, 1) = sort_x[0].y;
+            result.at<float>(1, 0) = sort_x[2].x;
+            result.at<float>(1, 1) = sort_x[2].y; 
+            result.at<float>(2, 0) = sort_x[3].x;
+            result.at<float>(2, 1) = sort_x[3].y;                
+            result.at<float>(3, 0) = sort_x[1].x;
+            result.at<float>(3, 1) = sort_x[1].y; //+
         }
         else
         {
-            result.at<float>(0, 0) = sortX[0].x;
-            result.at<float>(0, 1) = sortX[0].y;
-            result.at<float>(1, 0) = sortX[3].x;
-            result.at<float>(1, 1) = sortX[3].y; 
-            result.at<float>(2, 0) = sortX[2].x;
-            result.at<float>(2, 1) = sortX[2].y;                
-            result.at<float>(3, 0) = sortX[1].x;
-            result.at<float>(3, 1) = sortX[1].y; //+   
+            result.at<float>(0, 0) = sort_x[0].x;
+            result.at<float>(0, 1) = sort_x[0].y;
+            result.at<float>(1, 0) = sort_x[3].x;
+            result.at<float>(1, 1) = sort_x[3].y; 
+            result.at<float>(2, 0) = sort_x[2].x;
+            result.at<float>(2, 1) = sort_x[2].y;                
+            result.at<float>(3, 0) = sort_x[1].x;
+            result.at<float>(3, 1) = sort_x[1].y; //+   
         }
     }    
     else
     {
-        if(sortX[2].y<sortX[3].y)
+        if(sort_x[2].y<sort_x[3].y)
         {
-            result.at<float>(0, 0) = sortX[1].x;
-            result.at<float>(0, 1) = sortX[1].y;
-            result.at<float>(1, 0) = sortX[2].x;
-            result.at<float>(1, 1) = sortX[2].y; 
-            result.at<float>(2, 0) = sortX[3].x;
-            result.at<float>(2, 1) = sortX[3].y;                
-            result.at<float>(3, 0) = sortX[0].x;
-            result.at<float>(3, 1) = sortX[0].y; //+      
+            result.at<float>(0, 0) = sort_x[1].x;
+            result.at<float>(0, 1) = sort_x[1].y;
+            result.at<float>(1, 0) = sort_x[2].x;
+            result.at<float>(1, 1) = sort_x[2].y; 
+            result.at<float>(2, 0) = sort_x[3].x;
+            result.at<float>(2, 1) = sort_x[3].y;                
+            result.at<float>(3, 0) = sort_x[0].x;
+            result.at<float>(3, 1) = sort_x[0].y; //+      
         }
         else
         {
-            result.at<float>(0, 0) = sortX[1].x;
-            result.at<float>(0, 1) = sortX[1].y;
-            result.at<float>(1, 0) = sortX[3].x;
-            result.at<float>(1, 1) = sortX[3].y; 
-            result.at<float>(2, 0) = sortX[2].x;
-            result.at<float>(2, 1) = sortX[2].y;                
-            result.at<float>(3, 0) = sortX[0].x;
-            result.at<float>(3, 1) = sortX[0].y; //+   
+            result.at<float>(0, 0) = sort_x[1].x;
+            result.at<float>(0, 1) = sort_x[1].y;
+            result.at<float>(1, 0) = sort_x[3].x;
+            result.at<float>(1, 1) = sort_x[3].y; 
+            result.at<float>(2, 0) = sort_x[2].x;
+            result.at<float>(2, 1) = sort_x[2].y;                
+            result.at<float>(3, 0) = sort_x[0].x;
+            result.at<float>(3, 1) = sort_x[0].y; //+   
         }
     }
 
@@ -154,7 +154,7 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
 
     // Find contours
     std::vector<std::vector<cv::Point>> contours, contours_approx;
-    std::vector<cv::Point> approx_curve, sortX;
+    std::vector<cv::Point> approx_curve, sort_x;
     cv::Mat contours_img;
 
     // Process black mask
@@ -170,9 +170,9 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
         
         if(approx_curve.size()!=4) continue;
 
-        sortX = approx_curve;
+        sort_x = approx_curve;
 
-        std::sort(sortX.begin(), sortX.end(), compareX);
+        std::sort(sort_x.begin(), sort_x.end(), compareX);
 
         contours_approx = {approx_curve};
         drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 5, cv::LINE_AA);
@@ -181,7 +181,7 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
 
     }
 
-    return sortX;
+    return sort_x;
 }
 
 //Picking reference points for robot plane automatically
@@ -200,33 +200,33 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
 
     showImage("White mask", white_mask);   
     
-    std::vector<cv::Point> sortHighX;
-    std::vector<cv::Vec3f> cornerCircles;
-    HoughCircles( white_mask , cornerCircles, cv::HOUGH_GRADIENT, 1, white_mask.rows/10, 40, 20, 15, 27);
+    std::vector<cv::Point> sort_high_x;
+    std::vector<cv::Vec3f> corner_circles;
+    HoughCircles( white_mask , corner_circles, cv::HOUGH_GRADIENT, 1, white_mask.rows/10, 40, 20, 15, 27);
 
-    if(cornerCircles.size()==4)
+    if(corner_circles.size()==4)
     {
         cv::Mat circles_img = img.clone();
 
-        for( int i = 0; i < cornerCircles.size(); ++i )
+        for( int i = 0; i < corner_circles.size(); ++i )
         {
             
-            cv::Point center(cvRound(cornerCircles[i][0]), cvRound(cornerCircles[i][1]));
+            cv::Point center(cvRound(corner_circles[i][0]), cvRound(corner_circles[i][1]));
             // std::cout<<"Circle Center point: "<<center<<" and radius "<<cornerCircles[i][2]<<std::endl;
                     
             // circle center
-            circle( circles_img, center, cornerCircles[i][2], cv::Scalar(0, 250 ,255), -1, 8, 0 );        
+            circle( circles_img, center, corner_circles[i][2], cv::Scalar(0, 250 ,255), -1, 8, 0 );        
 
             // showImage("Circles Detected", circles_img);
 
-            sortHighX.push_back(center);
+            sort_high_x.push_back(center);
 
-            if(i==cornerCircles.size()-1)
+            if(i==corner_circles.size()-1)
             {
-                cv::line(circles_img, cv::Point(cornerCircles[i][0],cornerCircles[i][1]) , cv::Point(cornerCircles[0][0],cornerCircles[0][1]) , cv::Scalar( 0 , 250 , 255 ), 5, 8, 0);
+                cv::line(circles_img, cv::Point(corner_circles[i][0],corner_circles[i][1]) , cv::Point(corner_circles[0][0],corner_circles[0][1]) , cv::Scalar( 0 , 250 , 255 ), 5, 8, 0);
             }else
             {
-                cv::line(circles_img, cv::Point(cornerCircles[i][0],cornerCircles[i][1]) , cv::Point(cornerCircles[i+1][0],cornerCircles[i+1][1]) , cv::Scalar( 0 , 250 , 255 ), 5, 8, 0);
+                cv::line(circles_img, cv::Point(corner_circles[i][0],corner_circles[i][1]) , cv::Point(corner_circles[i+1][0],corner_circles[i+1][1]) , cv::Scalar( 0 , 250 , 255 ), 5, 8, 0);
             }
             
         }
@@ -237,12 +237,12 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
     else
     {
         std::cout << "Detected some noise! Leaving..." << std::endl;
-        return sortHighX;
+        return sort_high_x;
     }
 
-    std::sort(sortHighX.begin(), sortHighX.end(), compareX);
+    std::sort(sort_high_x.begin(), sort_high_x.end(), compareX);
 
-    return sortHighX;
+    return sort_high_x;
 }
 
 //Calculate and return perspective transformation matrix
@@ -253,11 +253,11 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     showImage("Undistorted image", calib_image);
 
 
-    std::vector<cv::Point> sortHighX = detectRobotPlaneCorners(calib_image);
-    cv::Mat high_plane_corner_pixels = assignCorners(sortHighX);
+    std::vector<cv::Point> sort_high_x = detectRobotPlaneCorners(calib_image);
+    cv::Mat high_plane_corner_pixels = assignCorners(sort_high_x);
 
-    std::vector<cv::Point> sortX = detectMapCorners(calib_image);
-    cv::Mat corner_pixels = assignCorners(sortX);
+    std::vector<cv::Point> sort_x = detectMapCorners(calib_image);
+    cv::Mat corner_pixels = assignCorners(sort_x);
 
     corner_pixels.at<float>(0, 0) = corner_pixels.at<float>(0, 0)-15;
     corner_pixels.at<float>(0, 1) = corner_pixels.at<float>(0, 1)-15;
@@ -268,7 +268,7 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     corner_pixels.at<float>(3, 0) = corner_pixels.at<float>(3, 0)-15;
     corner_pixels.at<float>(3, 1) = corner_pixels.at<float>(3, 1)+15;
 
-    // cv::Mat h = cv::findHomography(sortHighX,sortX);
+    // cv::Mat h = cv::findHomography(sort_high_x,sort_x);
 
     // std::cout<<"Matrix h "<<h<<std::endl;
 
@@ -302,7 +302,7 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     cv::destroyWindow(name);
     cv::destroyWindow(wind2);
 
-    rbPlane = unwarped_rb_frame;
+    rb_plane = unwarped_rb_frame;
 
     return unwarped_frame;
 }
@@ -323,7 +323,7 @@ void storeAllParameters(const std::string& filename,
 }
 
 //Process the image using perspective transformation matrix
-bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robotPlane) 
+bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane) 
 {
     cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
     loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
@@ -335,7 +335,7 @@ bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robotPlane)
 
     storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
 
-    robotPlane = rbPlane;
+    robot_plane = rb_plane;
     
     return true;
 }

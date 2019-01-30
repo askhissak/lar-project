@@ -5,7 +5,7 @@
 const double MIN_AREA_SIZE = 300;
 
 //Included dependencies
-//
+#include "map_construction.hpp"
 
 //Classes
 //
@@ -13,8 +13,8 @@ const double MIN_AREA_SIZE = 300;
 //Function declarations
 cv::Mat rotate(cv::Mat src, double angle);
 // void printAngle(cv::RotatedRect calculatedRect);
-bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index);
-bool useTemplateMatching(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index);
-bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::vector<cv::Point> &orderedROI);
+bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index);
+bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* index);
+bool recognizeDigits(cv::Mat const & map, std::vector<Victim> victims, std::vector<int> & order);
 
 #endif

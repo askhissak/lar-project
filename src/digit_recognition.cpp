@@ -12,6 +12,7 @@
 
 #include "digit_recognition.hpp"
 #include "map_extraction.hpp"
+#include "map_construction.hpp"
 
 //Properly rotate an image
 cv::Mat rotate(cv::Mat src, double angle)
@@ -38,7 +39,7 @@ cv::Mat rotate(cv::Mat src, double angle)
 //     }
 // }
 
-bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index)
+bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
 {
     // Convert color space from BGR to HSV
     cv::Mat hsv_img;
@@ -65,13 +66,13 @@ bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* inde
     ocr->SetPageSegMode(tesseract::PSM_SINGLE_CHAR);
     // Only digits are valid output characters
     ocr->SetVariable("tessedit_char_whitelist", "0123456789");
-    std::cout << "Size: " << circles.size() << std::endl<<std::endl<<std::endl;
+    std::cout << "Size: " << victims.size() << std::endl<<std::endl<<std::endl;
 
     // For each green blob in the original image containing a digit
-    for (int i=0; i<circles.size(); ++i)
+    for (int i=0; i<victims.size(); ++i)
     {
         //Find bounding box for a ROI
-        cv::Rect bbox(circles[i][0]-circles[i][2],circles[i][1]-circles[i][2],2*circles[i][2],2*circles[i][2]);
+        cv::Rect bbox(victims[i].center.x-victims[i].radius,victims[i].center.y-victims[i].radius,2*victims[i].radius,2*victims[i].radius);
     
         // extract the ROI containing the digit 
         cv::Mat processROI(filtered, bbox); 
@@ -133,7 +134,7 @@ bool useTesseract(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* inde
     return true;
 }
 
-bool useTemplateMatching(cv::Mat const & map, std::vector<cv::Vec3f> circles, int* index)
+bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* index)
 {
     // Display original image
     showImage("Original", map);
@@ -193,10 +194,10 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<cv::Vec3f> circles, in
     kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((2*2) + 1, (2*2)+1));
     
     // For each green blob in the original image containing a digit
-    for (int i=0; i<circles.size(); ++i)
+    for (int i=0; i<victims.size(); ++i)
     {
         //Find bounding box for a ROI
-        cv::Rect bbox(circles[i][0]-circles[i][2],circles[i][1]-circles[i][2],2*circles[i][2],2*circles[i][2]);
+        cv::Rect bbox(victims[i].center.x-victims[i].radius,victims[i].center.y-victims[i].radius,2*victims[i].radius,2*victims[i].radius);
     
         // extract the ROI containing the digit 
         cv::Mat processROI(filtered, bbox); 
@@ -268,9 +269,9 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<cv::Vec3f> circles, in
     return true;
 }
 
-bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::vector<cv::Point> &orderedROI)
+bool recognizeDigits(cv::Mat const & map, std::vector<Victim> victims, std::vector<int> & order)
 {
-    int index[circles.size()] = {0};
+    int index[victims.size()] = {0};
 
     // if(!useTesseract(map, circles, index))
     // {
@@ -278,7 +279,7 @@ bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::v
     //     return false;
     // }
 
-    if(!useTemplateMatching(map, circles, index))
+    if(!useTemplateMatching(map, victims, index))
     {
         std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
         return false;
@@ -286,13 +287,13 @@ bool recognizeDigits(cv::Mat const & map, std::vector<cv::Vec3f> circles, std::v
 
     int next = 1;
 
-    for(int i=0;i<circles.size();++i)
+    for(int i=0;i<victims.size();++i)
     {
-         for(int j=0;j<circles.size();++j)
+         for(int j=0;j<victims.size();++j)
         {
             if(index[j]==next)
             {
-                orderedROI.push_back(cv::Point(circles[j][0],circles[j][1]));
+                order.push_back(j);
             }
         }
 
