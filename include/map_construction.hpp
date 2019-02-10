@@ -12,14 +12,8 @@
 
 //Classes
 // A general convex shape represented by corner coordinates
-class Polygon 
+struct Polygon 
 {
-private:
-//   int corner_number;
-  // cv::Scalar color;
-//   cv::Point center;
-
-public:
   std::vector<cv::Point> corners;
 
   Polygon(std::vector<cv::Point> corners):
@@ -50,12 +44,8 @@ public:
 };
 
 // A type of polygon
-class Obstacle : public Polygon
+struct Obstacle : Polygon
 {
-
-private:
-
-public:
   Obstacle(std::vector<cv::Point> corners):
     Polygon(corners)
   {}
@@ -70,13 +60,23 @@ public:
   
 };
 
-// A configuration of the robot along the path, represented by x, y, orientation and curvature
-class Gate : public Polygon
+// A type of polygon
+struct Border : Polygon
 {
-  
-private:
 
-public:
+  Border(std::vector<cv::Point> corners):
+    Polygon(corners)
+  {}
+
+  Border(): 
+    Border ({cv::Point(0,0)})
+  {}
+  
+};
+
+// A configuration of the robot along the path, represented by x, y, orientation and curvature
+struct Gate : Polygon
+{
   Gate(std::vector<cv::Point> corners):
     Polygon(corners)
   {}
@@ -88,12 +88,8 @@ public:
 };
 
 // A configuration of the robot along the path, represented by x, y, orientation and curvature
-class Robot : public Polygon
+struct Robot : Polygon
 {
-  
-private:
-
-public:
   Pose pose;
 
   Robot(std::vector<cv::Point> corners):
@@ -112,12 +108,8 @@ public:
 
 };
 
-class Circle
+struct Circle
 {
-
-private:
-
-public:
   cv::Point center;
   double radius;
 
@@ -132,12 +124,8 @@ public:
 };
 
 // A configuration of the robot along the path, represented by x, y, orientation and curvature
-class Victim : public Circle
+struct Victim : Circle
 {
-  
-private:
-
-public:
   Pose pose;
   int index;
 
@@ -169,6 +157,7 @@ private:
 
 public: 
   std::vector<Obstacle> obstacles;
+  Border border;
   std::vector<Victim> victims;
   Gate gate;
   Robot robot;
@@ -181,36 +170,14 @@ public:
     Map(cv::Point(0,0), 1500, 1000)
   {}
 
-//   void addObstacles(Obstacle obstacle)
-//   {
-//       this->obstacles.push_back(obstacle);
-//   }
   void printAll();
   cv::Mat showMap();
-  
-//   void printObstacles()
-//   {
-//     for(int i = 0; i<obstacles.size();++i)
-//     {
-//         for(int j = 0; j<obstacles[i].corners.size();++j)
-//         {   
-//             std::cout <<"Obstacle "<<i<<" "<<this->obstacles[i].corners[j]<< std::endl;
-//         }
-//     }
-//   }
-
-//   void printVictims()
-//   {
-//     for(int i = 0; i<victims.size();++i)
-//     {
-//         std::cout <<"Victim "<<i<<" "<<this->victims[i].center<< std::endl;
-//     }
-//   }
 
 };
 
 //Function declarations
 bool findObstacles(cv::Mat const & map, Map & map_object);
+bool findBorders(cv::Mat const & map, Map & map_object);
 bool findROI(cv::Mat const & map, Map & map_object);
 bool findGate(cv::Mat const & map, Map & map_object);
 bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_object);

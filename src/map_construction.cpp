@@ -80,27 +80,33 @@ cv::Point Robot::getDirectionSidePoint()
 
 void Map::printAll()
 {
-  for(int i = 0; i<obstacles.size();++i)
+  for(int i = 0; i<this->obstacles.size();++i)
   {
       std::cout <<"Obstacle "<<i;
-      for(int j = 0; j<obstacles[i].corners.size();++j)
+      for(int j = 0; j<this->obstacles[i].corners.size();++j)
       {   
           std::cout <<" "<<this->obstacles[i].corners[j];
       }
       std::cout << std::endl;
   }
-  for(int i = 0; i<victims.size();++i)
+  std::cout <<"Border ";
+  for(int j = 0; j<this->border.corners.size();++j)
+  {   
+      std::cout <<" "<<this->border.corners[j];
+  }
+  std::cout << std::endl; 
+  for(int i = 0; i<this->victims.size();++i)
   {
       std::cout <<"Victim "<<i<<" "<<this->victims[i].center<<" "<<this->victims[i].radius<<" "<<this->victims[i].index<<std::endl;
   }
   std::cout <<"Gate ";
-  for(int j = 0; j<gate.corners.size();++j)
+  for(int j = 0; j<this->gate.corners.size();++j)
   {   
       std::cout <<" "<<this->gate.corners[j];
   }
   std::cout << std::endl; 
   std::cout <<"Robot ";
-  for(int j = 0; j<robot.corners.size();++j)
+  for(int j = 0; j<this->robot.corners.size();++j)
   {   
       std::cout <<" "<<this->robot.corners[j];
   }
@@ -127,6 +133,20 @@ cv::Mat Map::showMap()
               cv::line(out, this->obstacles[i].corners[j] , this->obstacles[i].corners[0] , cv::Scalar( 0 , 0 ,150), 5);
           }
           
+      }
+  }
+
+  for(int i=0;i<this->border.corners.size();++i)
+  {
+      if((i+1)!=this->border.corners.size())
+      {
+          cv::circle(out , this->border.corners[i], 0.5 , cv::Scalar( 250 , 0 , 0 ), 5, 8, 0 );
+          cv::line(out, this->border.corners[i], this->border.corners[i+1], cv::Scalar( 0 , 0 , 250 ), 5);
+      }
+      else
+      {
+          cv::circle(out , this->border.corners[i], 0.5 , cv::Scalar( 250 , 0 , 0 ), 5, 8, 0 );
+          cv::line(out, this->border.corners[i], this->border.corners[0], cv::Scalar( 0 , 0 , 250 ), 5);
       }
   }
 
@@ -238,6 +258,81 @@ bool findObstacles(cv::Mat const & map, Map & map_object)
   
 }
 
+bool findBorders(cv::Mat const & map, Map & map_object)
+{  
+  std::cout << std::endl;
+  std::cout << "BORDERS -------------------------------------------------------------" << std::endl;
+  std::cout << std::endl;
+
+  std::vector<std::vector<cv::Point>> mc_contours, mc_contours_approx;
+  std::vector<cv::Point> approx_curve;
+  cv::Mat contours_img;
+  // cv::Mat hsv_img;
+  int bord_flag=0; //Temporal variable for controlling parameters inside the "for" loop
+
+  // Convert color space from BGR to HSV
+  cv::Mat hsv_img;
+  cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
+
+  // Find black regions (filter on saturation and value)
+  cv::Mat black_mask;
+  cv::inRange(hsv_img, cv::Scalar(0, 5, 5), cv::Scalar(180, 255, 70), black_mask);
+  cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+  cv::dilate(black_mask, black_mask, kernel);	
+  cv::erode(black_mask, black_mask, kernel);
+
+  // // Convert color space from BGR to grayscale
+  // cv::Mat gray_img;
+  // cv::cvtColor(map, gray_img, cv::COLOR_BGR2GRAY);
+
+  // // Find image filtered by adaptive threshold 
+  // cv::Mat adaptive_mask;
+  // cv::adaptiveThreshold(gray_img, adaptive_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 31, 0);
+  // cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+  // cv::dilate(adaptive_mask, adaptive_mask, kernel);
+
+  showImage("Adaptive mask", black_mask);
+
+  // Process black mask
+  cv::findContours(black_mask, mc_contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE); // find external contours of each blob
+
+  contours_img = map.clone();
+  drawContours(contours_img, mc_contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
+  for (int i=0; i<mc_contours.size(); ++i)
+  {
+      double area = cv::contourArea(mc_contours[i]);
+      if (area < MIN_MAP_AREA_SIZE) continue; // filter too small contours to remove false positives
+      
+      bord_flag++ ; // Parameter to control the format of the output in the Terminal and the file
+
+      approxPolyDP(mc_contours[i], approx_curve, 80, true); // fit a closed polygon (with less vertices) to the given contour
+      
+      if(approx_curve.size()!=4) continue;
+
+      mc_contours_approx = {approx_curve};
+      drawContours(contours_img, mc_contours_approx, -1, cv::Scalar(0,170,220), 5, cv::LINE_AA);
+
+      for ( int i = 0 ; i < approx_curve.size() ; ++i ) // Coordinates Loop
+      {
+        std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; //Listing the coordinates of the corners 
+        cv::circle( contours_img , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); // Circles Printer for the shape's corners
+      }
+
+      map_object.border = Border(approx_curve);
+  }
+
+  if (bord_flag==0) 
+  {
+    return false;
+  }
+  else
+  {
+    showImage("Border", contours_img);
+    return true;
+  }
+  
+}
+
 bool findROI(cv::Mat const & map, Map & map_object)
 {
   std::cout << std::endl;
@@ -247,6 +342,7 @@ bool findROI(cv::Mat const & map, Map & map_object)
   std::vector<cv::Vec3f> mc_circles;
   cv::Mat hsv_img;
 
+
   // Convert color space from BGR to HSV
   cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
 
@@ -254,7 +350,7 @@ bool findROI(cv::Mat const & map, Map & map_object)
   cv::Mat green_mask;
   cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(80, 255, 255), green_mask);
  
-  HoughCircles( green_mask , mc_circles, cv::HOUGH_GRADIENT, 1, green_mask.rows/10, 40, 20 ); 
+  HoughCircles( green_mask , mc_circles, cv::HOUGH_GRADIENT, 2, green_mask.rows/10, 40, 20, 85, 95 ); 
 
   cv::Mat circles_img = map.clone();
 
@@ -438,6 +534,11 @@ bool buildMap(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_object
   if(!findObstacles(map, map_object))
   {
     std::cout << "No Obstacles Detected!" << std::endl;
+  }
+
+  if(!findBorders(map, map_object))
+  {
+    std::cout << "No Borders Detected!" << std::endl;
   }
 
   if(!findROI(map, map_object))
