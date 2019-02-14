@@ -10,10 +10,16 @@
 
 #include "shape_detection.hpp"
 
+
+bool SD_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+								   // if false -> Process everything without graphical output 
+
 //SHAPE DETECTION
 std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_center)
 {
   std::vector<cv::Vec3f> circles;
+  
+  std::string name = "Windows Name";
 
   // Load image from file
   // cv::Mat img = cv::imread(filename.c_str());
@@ -22,24 +28,32 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   //   throw std::runtime_error("Failed to open the file " + filename);
   // }
   
-  // Display original image
-  std::string name = "Original";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), img);
-  //cv::waitKey(0);
-  cv::destroyWindow(name.c_str()); 
+  
+	if (SD_developer_session == true)
+	{
+	  // Display original image
+	  name = "Original";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), img);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str()); 
+	}
 
   // Convert color space from BGR to HSV
   cv::Mat hsv_img;
   cv::cvtColor(img, hsv_img, cv::COLOR_BGR2HSV);
   // Display HSV image
-  name = "HSV Transformation";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), hsv_img);
-  //cv::waitKey(0);
-  cv::destroyWindow(name.c_str());
+  
+  if (SD_developer_session == true)
+	{
+	  name = "HSV Transformation";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), hsv_img);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str());
+	}
 
   // Find contours
   std::vector<std::vector<cv::Point>> contours, contours_approx;
@@ -68,13 +82,16 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   
   cv::erode(red_mask , red_mask , kernel, cv::Point(-1, -1), 2);
   
-  name = "Obstacles";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), red_mask);
-  //cv::waitKey(0);
-  cv::destroyWindow(name.c_str());        
-
+  if (SD_developer_session == true)
+	{
+	  name = "Obstacles";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), red_mask);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str());        
+	}
+	
   // Process red mask (Obstacles)
   cv::Mat red_mask_temp = img.clone();
   cv::findContours(red_mask, contours,  cv::RETR_EXTERNAL , cv::CHAIN_APPROX_SIMPLE); //Find closed contours on the image via the defined approximation
@@ -99,54 +116,55 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
     if(red_area>500) //avoiding noise and minimal contours by dismissing smallers sizes compared with a given threshold
     {
      
-     obs_flag++ ; // Parameter to control the format of the output in the Terminal and the file
-     
-     if (obs_flag == 1) {std::cout << " "  << contours.size() << "Obstacles Detected! " << std::endl;} //Triggering the detection alert in the first event 
-     if (obs_flag >= 1 ) {std::cout << std::endl;}
-     
-     approxPolyDP(contours[i], approx_curve, 18 , true); //How Strict the Filter is to Aproximate the contour to a Polygon
-     contours_approx = {approx_curve}; 
-     drawContours(red_mask_temp, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA); //draw Polygon approximations 
-     
-     
-     switch (approx_curve.size())  
-     {
-       case 3:  std::cout << " The Obstacle number " << obs_flag << " has 3 sides so it's a triangle ! "      << std::endl; break;  //
-       case 4:  std::cout << " The Obstacle number " << obs_flag << " has 4 sides so it's a rectangle ! "     << std::endl; break;  //
-       case 5:  std::cout << " The Obstacle number " << obs_flag << " has 5 sides so it's a pentagon ! "      << std::endl; break;  //
-       case 6:  std::cout << " The Obstacle number " << obs_flag << " has 6 sides so it's an hexagon ! "      << std::endl; break;  // Layout Printer
-       case 7:  std::cout << " The Obstacle number " << obs_flag << " has 7 sides so it's an heptagon ! "     << std::endl; break;  // for Obstacle Id tag     
-       case 8:  std::cout << " The Obstacle number " << obs_flag << " has 8 sides so it's an octagon ! "      << std::endl; break;  // and sides number
-       case 9:  std::cout << " The Obstacle number " << obs_flag << " has 9 sides so it's an nonagon ! "      << std::endl; break;  // 
-       default: std::cout << " The Obstacle number " << obs_flag << " has " << approx_curve.size() << " sides" << std::endl; break;  //   
-     }
-  
-     
-     for ( int i = 0 ; i < approx_curve.size() ; ++i ) // Coordinates Loop
-     {
-   
-      std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; // Obstacle's Corners Labeler
+		 obs_flag++ ; // Parameter to control the format of the output in the Terminal and the file
+		 
+		 if (obs_flag == 1) {std::cout << " "  << contours.size() << "Obstacles Detected! " << std::endl;} //Triggering the detection alert in the first event 
+		 if (obs_flag >= 1 ) {std::cout << std::endl;}
+		 
+		 approxPolyDP(contours[i], approx_curve, 18 , true); //How Strict the Filter is to Aproximate the contour to a Polygon
+		 contours_approx = {approx_curve}; 
+		 drawContours(red_mask_temp, contours_approx, -1, cv::Scalar(0,170,220), 3, cv::LINE_AA); //draw Polygon approximations 
+		 
+		 
+		 switch (approx_curve.size())  
+		 {
+		   case 3:  std::cout << " The Obstacle number " << obs_flag << " has 3 sides so it's a triangle ! "      << std::endl; break;  //
+		   case 4:  std::cout << " The Obstacle number " << obs_flag << " has 4 sides so it's a rectangle ! "     << std::endl; break;  //
+		   case 5:  std::cout << " The Obstacle number " << obs_flag << " has 5 sides so it's a pentagon ! "      << std::endl; break;  //
+		   case 6:  std::cout << " The Obstacle number " << obs_flag << " has 6 sides so it's an hexagon ! "      << std::endl; break;  // Layout Printer
+		   case 7:  std::cout << " The Obstacle number " << obs_flag << " has 7 sides so it's an heptagon ! "     << std::endl; break;  // for Obstacle Id tag     
+		   case 8:  std::cout << " The Obstacle number " << obs_flag << " has 8 sides so it's an octagon ! "      << std::endl; break;  // and sides number
+		   case 9:  std::cout << " The Obstacle number " << obs_flag << " has 9 sides so it's an nonagon ! "      << std::endl; break;  // 
+		   default: std::cout << " The Obstacle number " << obs_flag << " has " << approx_curve.size() << " sides" << std::endl; break;  //   
+		 }
+	  
+		 
+		 for ( int i = 0 ; i < approx_curve.size() ; ++i ) // Coordinates Loop
+		 {
+	   
+			std::cout << "  Coordinates of the corner nr." << i+1  << ": " << approx_curve[i] << std::endl; // Obstacle's Corners Labeler
 
-	if (i ==0){ ofs << "0 " << obs_flag-1  << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y; } //new
+			if (i ==0){ ofs << "0 " << obs_flag-1  << " " << approx_curve.size() << " " << approx_curve[i].x << " " << approx_curve[i].y; } //new
 
-	else{ofs << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
+			else{ofs << " " << approx_curve[i].x << " " << approx_curve[i].y ;} //new
 
-      cv::circle( red_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); // Circles Printer for the shape's corners
-      
-     }
-  
-     ofs << "\n" ; //new
+			cv::circle( red_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); // Circles Printer for the shape's corners
+		  
+		 }
+	  
+		 ofs << "\n" ; //new
 
-     name = "Obstacle(s) Boundaries";
-     cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-     cv::resizeWindow(name.c_str(), 640, 512);
-     cv::imshow(name.c_str(), red_mask_temp);
-     //cv::waitKey(0);
-     cv::destroyWindow(name.c_str());   
-
-    }
+		 if (SD_developer_session == true)
+		{
+			 name = "Obstacle(s) Boundaries";
+			 cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			 cv::resizeWindow(name.c_str(), 640, 512);
+			 cv::imshow(name.c_str(), red_mask_temp);
+			 cv::waitKey(0);
+			 cv::destroyWindow(name.c_str());   
+		}
     
-    
+	}
   }
 
   if (obs_flag=0) {std::cout << "No Obstacles Detected!" << std::endl;}
@@ -163,12 +181,15 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   cv::Mat green_mask;
   cv::inRange(hsv_img, cv::Scalar(55, 70, 75), cv::Scalar(80, 255, 255), green_mask);
   
-  name = "Regions of interest";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), green_mask);
-  //cv::waitKey(0);
-  cv::destroyWindow(name.c_str());     
+  if (SD_developer_session == true)
+	{
+	  name = "Regions of interest";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), green_mask);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str()); 
+	}    
  
   HoughCircles( green_mask , circles, cv::HOUGH_GRADIENT, 1, green_mask.rows/10, 40, 20 );
     
@@ -197,13 +218,15 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
    ofs << "2 " << i  << " 2 " << round(circles[i][0]) << " " << round(circles[i][1]) <<  "\n" ; //new
 
 
-
-   name = "Circles Detected";
-   cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-   cv::resizeWindow(name.c_str(), 640, 512);
-   cv::imshow(name.c_str(), circles_img);
-   //cv::waitKey(0);
-   cv::destroyWindow(name.c_str());   
+	if (SD_developer_session == true)
+	{
+		name = "Circles Detected";
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 640, 512);
+		cv::imshow(name.c_str(), circles_img);
+		cv::waitKey(0);
+		cv::destroyWindow(name.c_str()); 
+	}  
 
   }
 
@@ -218,14 +241,15 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   // Find blue regions
   cv::Mat blue_mask;
   cv::inRange(hsv_img, cv::Scalar(100, 150, 150), cv::Scalar(130, 255, 200), blue_mask);
-
-  name = "Gate";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), blue_mask);
-  //cv::waitKey(0);
-  cv::destroyWindow(name.c_str()); 
-
+  if (SD_developer_session == true)
+  {
+	  name = "Gate";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), blue_mask);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str()); 
+  }
   // Process blue mask (Gates)
   cv::Mat blue_mask_temp;
   blue_mask_temp = img.clone();
@@ -283,7 +307,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
 	
 	      cv::circle(blue_mask_temp , cv::Point(approx_curve[i]), 0.5 , cv::Scalar( 0, 0, 255 ), 5, 8 ); //Graphical Print of the Corners
       
-     }
+		  }
 
     }
   }
@@ -291,12 +315,15 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if(gate_flag==0) {std::cout << "No Gates Detected !" << std::endl;} // "No gates Dectected" Case
   std::cout << std::endl;
   
-  name = "Gate(s) Boundaries";
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), blue_mask_temp);
-  cv::waitKey(0);
-  cv::destroyWindow(name.c_str());    
+  if (SD_developer_session == true)
+	{
+	  name = "Gate(s) Boundaries";
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), blue_mask_temp);
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str()); 
+	}   
   
   ofs.close(); //new
   

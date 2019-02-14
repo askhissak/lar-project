@@ -18,6 +18,14 @@
 
 #include "path.h"
 
+
+bool PP_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+								    // if false -> Process everything without graphical output 
+
+bool PP_demo_session      = false ;  // if true  -> Retrieves desired demo real time visualization of desired output 
+								    // if false -> Process everything without graphical output 
+
+
 std::vector<NeighborVertices> roadmap;
 cv::Mat local_map;
 
@@ -523,7 +531,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
 
     }
 
-	showImage("Roadmap", local_map+out);
+	if(PP_developer_session == true) showImage("Roadmap", local_map+out);
 
     // Our graph is now represented as an adjacency list. Return it.
     return adjList; 
@@ -638,10 +646,14 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
             }
             
         }
-		cv::namedWindow(win_dijkstra.c_str(), CV_WINDOW_NORMAL);
-		cv::resizeWindow(win_dijkstra.c_str(), 640, 512);
-		cv::imshow(win_dijkstra, local_map+out);
-		cv::waitKey(1);
+		
+		if(PP_developer_session == true)
+		{
+			cv::namedWindow(win_dijkstra.c_str(), CV_WINDOW_NORMAL);
+			cv::resizeWindow(win_dijkstra.c_str(), 640, 512);
+			cv::imshow(win_dijkstra, local_map+out);
+			cv::waitKey(1);
+		}
     }
 
     return true;
@@ -678,7 +690,7 @@ void addVertex(Map map_object, std::vector<NeighborVertices> & adjList, cv::Poin
     connectGraph(map_object, adjList, out);
 
 	cv::circle(out, adjList[index].vertex, 10 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
-	showImage("Added vertex", local_map+out);
+	if(PP_developer_session == true) showImage("Added vertex", local_map+out);
 
 }
     
@@ -745,11 +757,13 @@ void planDubins(Map & map_object, std::vector<cv::Point> & points_path, double x
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
 
-	cv::namedWindow(win_dubins.c_str(), CV_WINDOW_NORMAL);
-	cv::resizeWindow(win_dubins.c_str(), 640, 512);
-	cv::imshow(win_dubins, local_map+out);
-	cv::waitKey(0);
-                    
+	if(PP_developer_session == true)
+	{
+		cv::namedWindow(win_dubins.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(win_dubins.c_str(), 640, 512);
+		cv::imshow(win_dubins, local_map+out);
+		cv::waitKey(0);
+	}               
 }
 
 bool restorePath(std::vector<NeighborVertices> graph, std::vector<cv::Point> came_from,
@@ -1020,8 +1034,19 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
     //FINAL POSITION AND CONFIGURATION
     cv::circle(out, cv::Point(gate_xf,gate_yf), 10 , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0 );
     cv::line(out, cv::Point(gate_xf,gate_yf) , cv::Point(gate_xf+radius*cos(gate_thf), gate_yf+radius*sin(gate_thf)) , cv::Scalar( 255 , 255 , 255 ), 5, 8, 0);
+
+    std::string name = "Dubins path with roadmap vertices";
     
-    showImage("Dubins path with roadmap vertices", out+local_map);
+   
+    if(PP_developer_session == true || PP_demo_session == true ) 
+    
+	{
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 640, 512);
+		cv::imshow(name.c_str(), out+local_map);
+		cv::waitKey(0);
+		cv::destroyWindow(name.c_str());		
+	}
 
     if(!convertToPosePath(points_path, path))
     {
@@ -1348,13 +1373,13 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
 	// showImage("Roadmap", map+out);
 
     // showImage( win_delaunay, img_orig);
-    showImage( win_voronoi, img_voronoi);
+    if(PP_developer_session == true) showImage( win_voronoi, img_voronoi);
 
     // cv::namedWindow(win_voronoi.c_str(), CV_WINDOW_NORMAL);
     // cv::resizeWindow(win_voronoi.c_str(), 640, 512);
     // imshow(win_voronoi, img_voronoi);
 
-	showImage("Roadmap", out+local_map);
+	if(PP_developer_session == true) showImage("Roadmap", out+local_map);
 
     return true;
 }

@@ -10,12 +10,16 @@
 
 #include "dubins.hpp"
 
+bool DU_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
+
 double sc_th0, sc_thf, sc_Kmax, lambda;
 double sc_s1_c, sc_s2_c, sc_s3_c;
 double sc_s1, sc_s2, sc_s3;
 double s1, s2, s3;
 double cline[3];
 int pidx;
+
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 // % Auxiliary utility functions

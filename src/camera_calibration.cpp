@@ -11,6 +11,11 @@
 using namespace cv;
 using namespace std;
 
+bool CC_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
+
+
+
 //CAMERA CALIBRATION
 void Settings::write(FileStorage& fs) const                        //Write serialization for this class
 {
@@ -547,13 +552,13 @@ int calibrateCamera()
         }
         //! [pattern_found]
 
-        imshow("Image View", view);
+        if(CC_developer_session == true) imshow("Image View", view);
         char key = (char)waitKey(s.inputCapture.isOpened() ? 50 : s.delay);
         
     }
 
-    cv::waitKey(0);
-    cv::destroyWindow("Image View");
+    if(CC_developer_session == true) cv::waitKey(0);
+    if(CC_developer_session == true) cv::destroyWindow("Image View");
 
     return 0;
 }

@@ -13,6 +13,8 @@
 #include "path.h"
 #include "robot_project.h"
 
+bool RP_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+									// if false -> Process everything without graphical output 
 Map map_object;
 cv::Mat robot_plane, map;
 std::vector<int> order;
