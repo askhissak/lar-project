@@ -161,6 +161,10 @@ public:
   std::vector<Victim> victims;
   Gate gate;
   Robot robot;
+  cv::Mat toMap;
+  cv::Mat fromMap;
+  cv::Mat corners;
+  cv::Mat robot_corners;
 
   Map(cv::Point origin, int length, int width):
     origin(origin), length(length), width(width)

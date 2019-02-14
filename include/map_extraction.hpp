@@ -8,7 +8,7 @@ const int MAP_WIDTH = 1050;  //Check dimensions!
 // std::string outputFile = "data/output/corrected.jpg";
 
 //Included dependencies
-//
+#include "map_construction.hpp"
 
 //Classes
 //
@@ -26,13 +26,14 @@ std::vector<cv::Point>  detectMapCorners(const cv::Mat& img);
 std::vector<cv::Point>  detectRobotPlaneCorners(const cv::Mat& img);
 
 cv::Mat findTransform(cv::Mat const & calib_image,
-                  double& pixel_scale);
+                  double& pixel_scale, Map & map_object);
 void storeAllParameters(const std::string& filename,
                         const cv::Mat& camera_matrix,
                         const cv::Mat& dist_coeffs,
                         double pixel_scale,
                         const cv::Mat& persp_transf);
 
-bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane);
+bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object);
+bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object);
 
 #endif

@@ -47,8 +47,6 @@ cv::Point Robot::getDirectionSidePoint()
   double minSide = 1000.0, s;
   int index;
 
-  std::cout<<"Corners "<<this->corners.size()<<std::endl;
-
   for(int i=0;i<this->corners.size();++i)
   {
     if((i+1)==this->corners.size())
@@ -449,6 +447,10 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
   std::cout << "ROBOT -------------------------------------------------------------" << std::endl;
   std::cout << std::endl;
   
+  // cv::Mat ground_map;
+  // ground_map = map.clone(); 
+  // cv::warpPerspective(robot_plane, ground_map, map_object.toMap, cv::Size(MAP_LENGTH,MAP_WIDTH));
+
   std::vector<std::vector<cv::Point>> mc_contours, mc_contours_approx;
   std::vector<cv::Point> approx_curve;
   cv::Mat contours_img;  
@@ -467,8 +469,7 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
   cv::findContours(robot_mask, mc_contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
   drawContours(robot_mask_temp, mc_contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
   
-  cv::Mat robot_mask_2;
-  robot_mask_2 = robot_mask.clone(); 
+
     
   int robot_flag =0;
   int robot_count=0;
@@ -492,6 +493,9 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
     }
 
      map_object.robot = Robot(approx_curve);
+     map_object.robot.pose.x = map_object.robot.getCenter().x;
+     map_object.robot.pose.y = map_object.robot.getCenter().y;
+     map_object.robot.pose.theta = getOrientation(map_object.robot.getDirectionSidePoint(), map_object.robot.getCenter());
 
     }
   }

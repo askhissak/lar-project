@@ -3,6 +3,7 @@
 
 //Forward declared dependencies
 const int COLLISION_THRESHOLD = 100;
+const double KMAX = 0.01;
 
 //Included dependencies
 #include "map_construction.hpp"
@@ -84,6 +85,8 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
 void addVertex(std::vector<NeighborVertices> & adjList, cv::Point start);
 void printShortestPath(std::vector<double> &dist, cv::Point &start, std::vector<cv::Point> came_from);
 void printPath(std::vector<NeighborVertices> adjList, std::vector<cv::Point> came_from);
+void printPosePath(Path path);
+bool convertToPosePath(std::vector<cv::Point> & point_path, Path & path);
 bool planMissionOne(std::vector<NeighborVertices> &adjist, Map & map_object, std::vector<NeighborVertices> & adjList, std::vector<cv::Point> & points_path, std::vector<int> & order);
 
 

@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "map_extraction.hpp"
+#include "map_construction.hpp"
 
 cv::Mat result, rb_plane;
 
@@ -247,7 +248,7 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
 
 //Calculate and return perspective transformation matrix
 cv::Mat findTransform(cv::Mat const & calib_image,
-                  double& pixel_scale)
+                  double& pixel_scale, Map & map_object)
 {
    
     showImage("Undistorted image", calib_image);
@@ -268,11 +269,9 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     corner_pixels.at<float>(3, 0) = corner_pixels.at<float>(3, 0)-15;
     corner_pixels.at<float>(3, 1) = corner_pixels.at<float>(3, 1)+15;
 
-    // cv::Mat h = cv::findHomography(sort_high_x,sort_x);
-
-    // std::cout<<"Matrix h "<<h<<std::endl;
-
-    // cv::warpPerspective(high_plane_corner_pixels, corner_pixels, h, cv::Size(MAP_LENGTH,MAP_WIDTH));
+    map_object.corners = corner_pixels;
+    map_object.robot_corners = high_plane_corner_pixels;
+    map_object.toMap = cv::findHomography(high_plane_corner_pixels,corner_pixels);
 
     cv::Mat transf_rbplane_pixels = calculateTransform(calib_image, MAP_LENGTH,MAP_WIDTH,pixel_scale);
     cv::Mat transf_pixels = calculateTransform(calib_image, MAP_LENGTH,MAP_WIDTH,pixel_scale);
@@ -307,6 +306,52 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     return unwarped_frame;
 }
 
+bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object)
+{
+    cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
+    loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
+
+    undistort(img, calib_image, camera_matrix, dist_coeffs);
+
+    showImage("Undistorted image", calib_image);
+
+    double pixel_scale;
+    cv::Mat transf_rbplane_pixels = calculateTransform(calib_image, MAP_LENGTH,MAP_WIDTH,pixel_scale);
+    cv::Mat transf_pixels = calculateTransform(calib_image, MAP_LENGTH,MAP_WIDTH,pixel_scale);
+
+    cv::Mat transf_rb = cv::getPerspectiveTransform(map_object.robot_corners, transf_rbplane_pixels);
+    cv::Mat unwarped_rb_frame;    
+    
+    cv::Mat transf = cv::getPerspectiveTransform(map_object.corners, transf_pixels);
+    cv::Mat unwarped_frame;
+
+    cv::warpPerspective(calib_image, unwarped_rb_frame, transf_rb, cv::Size(MAP_LENGTH,MAP_WIDTH));
+    cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(MAP_LENGTH,MAP_WIDTH));
+
+    std::string name, wind2; 
+
+    name = "Unwarped robot plane";
+    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+    cv::resizeWindow(name.c_str(), 640, 512);
+    imshow(name.c_str(), unwarped_rb_frame);
+
+    wind2 = "Unwarped map plane";
+    cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
+    cv::resizeWindow(wind2.c_str(), 640, 512);
+    imshow(wind2.c_str(), unwarped_frame);
+
+    cv::waitKey(0);
+    cv::destroyWindow(name);
+    cv::destroyWindow(wind2);
+
+    robot_plane = unwarped_rb_frame;
+    map = unwarped_frame;
+
+    storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
+    
+    return true;
+}
+
 //Store all parameters
 void storeAllParameters(const std::string& filename,
                         const cv::Mat& camera_matrix,
@@ -323,7 +368,7 @@ void storeAllParameters(const std::string& filename,
 }
 
 //Process the image using perspective transformation matrix
-bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane) 
+bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object) 
 {
     cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
     loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
@@ -331,7 +376,7 @@ bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane)
     undistort(img, calib_image, camera_matrix, dist_coeffs);
 
     double pixel_scale;
-    map = findTransform(calib_image, pixel_scale);
+    map = findTransform(calib_image, pixel_scale, map_object);
 
     storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
 
