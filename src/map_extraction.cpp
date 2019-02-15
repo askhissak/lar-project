@@ -14,7 +14,7 @@
 
 cv::Mat result, rb_plane;
 
-bool ME_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+bool ME_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
 
 
@@ -382,8 +382,10 @@ bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & m
     cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
     loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
 
-    undistort(img, calib_image, camera_matrix, dist_coeffs);
-
+    calib_image = img;
+    //undistort(img, calib_image, camera_matrix, dist_coeffs);
+    
+    
     double pixel_scale;
     map = findTransform(calib_image, pixel_scale, map_object);
 
