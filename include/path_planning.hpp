@@ -8,6 +8,7 @@ const double KMAX = 0.01;
 //Included dependencies
 #include "map_construction.hpp"
 #include "path.h"
+#include "dubins.hpp"
 
 //Classes
 struct Neighbor
@@ -70,14 +71,15 @@ struct NeighborVertices
 //Function declarations
 
 //Dijkstra file
-void planLine(std::vector<cv::Point> & points_path, cv::Point end, cv::Point start, cv::Mat &out);
-void planDubins(Map & map_object, std::vector<cv::Point> & points_path, double x0, double y0, double th0, double xf, double yf, double thf, double Kmax, cv::Mat &out);
+// void planLine(std::vector<cv::Point> & points_path, cv::Point end, cv::Point start, cv::Mat &out);
+void planDubins(Map & map_object, std::vector<DubinsArc> & arcs, 
+                double x0, double y0, double th0, double xf, double yf, double thf, double Kmax, cv::Mat &out);
 bool restorePath(std::vector<NeighborVertices> graph, std::vector<cv::Point> came_from,
 								    std::vector<cv::Point> & sequence, cv::Point start, cv::Point end);
 bool equalPoints(cv::Point p1, cv::Point p2);
 int containsPoint(std::vector<NeighborVertices> adjList, cv::Point p);
 bool pointCollision(Map map, cv::Point p, int threshold);
-bool lineCollision(Map map, cv::Point p1, cv::Point p2, cv::Point2d &intersection);
+// bool lineCollision(Map map, cv::Point p1, cv::Point p2, cv::Point2d &intersection);
 std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> src, Map & map_object);
 // std::vector<double> shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::Point end, std::vector<cv::Point> &point_path);
 bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::Point end,     
@@ -86,8 +88,8 @@ void addVertex(std::vector<NeighborVertices> & adjList, cv::Point start);
 void printShortestPath(std::vector<double> &dist, cv::Point &start, std::vector<cv::Point> came_from);
 void printPath(std::vector<NeighborVertices> adjList, std::vector<cv::Point> came_from);
 void printPosePath(Path path);
-bool convertToPosePath(std::vector<cv::Point> & point_path, Path & path);
-bool planMissionOne(std::vector<NeighborVertices> &adjist, Map & map_object, std::vector<NeighborVertices> & adjList, std::vector<cv::Point> & points_path, std::vector<int> & order);
+bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path);
+bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, Path & path, std::vector<int> & order);
 
 
 //Voronoi file
@@ -99,11 +101,9 @@ static void drawVoronoi( cv::Mat& img, cv::Subdiv2D& subdiv, std::vector<std::ve
 bool constructRoadmap(cv::Mat const &map, Map & map_object, std::vector<NeighborVertices> & adjList);
 
 double timer();
-bool obstacleOffset(cv::Mat input, std::vector<cv::Point> & dst);
 // bool planMissionOne(Map & map_object, Path & path);
 bool planMissionTwo(Map & map_object, Path & path);
-void detectCollisions();
 // bool planDubins(Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order);
-bool planMission(cv::Mat const & map, Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order);
+bool planMission(cv::Mat const & map, Map & map_object, Path & path, std::vector<int> & order);
 
 #endif

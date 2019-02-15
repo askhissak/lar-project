@@ -60,9 +60,8 @@ bool RobotProject::preprocessMap(cv::Mat const & img)
 // Method invoked when a new path must be planned (detect initial robot position from img)
 bool RobotProject::planPath(cv::Mat const & img, Path & path)
 {
-	std::vector<cv::Point> points_path;
-	
-	if(!planMission(map, map_object, points_path, path, order))
+
+	if(!planMission(map, map_object, path, order))
 	{
 		std::cerr << "(Critical) Failed to plan a path!" << std::endl;
 		return false;

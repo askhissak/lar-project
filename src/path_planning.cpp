@@ -703,13 +703,11 @@ void printPosePath(Path path)
 {
     for(int i = 0; i < path.size(); i++)
     {
-        std::cout << "Pose " <<i<< " of the path has properties: s = " << path.points[i].s;
-        std::cout << ", x = " <<path.points[i].x << ", y = " << path.points[i].y;
-        std::cout << ", theta = " <<path.points[i].theta<< std::endl;
+        std::cout << path.points[i].s<<" "<<path.points[i].x <<" "<< path.points[i].y<<" "<<path.points[i].theta<<" "<<path.points[i].kappa<< std::endl;
     }
 }
 
-void planDubins(Map & map_object, std::vector<cv::Point> & points_path, double x0, double y0, double th0, double xf, double yf, double thf, cv::Mat &out)
+void planDubins(Map & map_object, std::vector<DubinsArc> & arcs, double x0, double y0, double th0, double xf, double yf, double thf, cv::Mat &out)
 {
 	// cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
 	// cv::Mat map = map_object.showMap(); //First map acquisition
@@ -719,31 +717,30 @@ void planDubins(Map & map_object, std::vector<cv::Point> & points_path, double x
 	int npts = 20;
 	double s1,s2,s3;
 
-	DubinsCurve curve;
-
-	curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, KMAX); 
+	DubinsCurve curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, KMAX); 
 
 	for(int j=0; j<npts;++j)
 	{
 		s1 = curve.arc1.L/npts*j;
 		circline(s1,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
-		points_path.push_back(cv::Point((int)cline[0],(int)cline[1]));
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
 	for(int j=0; j<npts;++j)
 	{
 		s2 = curve.arc2.L/npts*j;
 		circline(s2,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
-		points_path.push_back(cv::Point((int)cline[0],(int)cline[1]));
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
 	for(int j=0; j<npts;++j)
 	{	
 		s3 = curve.arc3.L/npts*j;
 		circline(s3,curve.arc3.x0,curve.arc3.y0,curve.arc3.th0,curve.arc3.k);
-		points_path.push_back(cv::Point((int)cline[0],(int)cline[1]));
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
+
+    arcs.push_back(curve.arc1);
+    arcs.push_back(curve.arc2);
+    arcs.push_back(curve.arc3);
 
 	cv::namedWindow(win_dubins.c_str(), CV_WINDOW_NORMAL);
 	cv::resizeWindow(win_dubins.c_str(), 640, 512);
@@ -788,49 +785,34 @@ bool restorePath(std::vector<NeighborVertices> graph, std::vector<cv::Point> cam
 
 }
 
-bool convertToPosePath(std::vector<cv::Point> & point_path, Path & path)
+bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path)
 {
     std::vector<Pose> new_path;
+    Pose pose;
+    double s, sum;
 
-    if(point_path.empty())
+    if(arcs.empty())
     {
         return false;
     }
 
-    for(int i=0;i<point_path.size();++i)
+    for(int i=0;i<arcs.size();++i)
     {
-        double s, x0, y0, theta;
-        if(i==0)
+        for(int j=0; j<20;++j)
         {
-            s = 0;
-            x0 = point_path[i].x/1000;
-            y0 = -point_path[i].y/1000-1.05;
-            theta = -getOrientation(point_path[i+1], point_path[i]);
+            s = arcs[i].L/20*j;
+            sum = sum + s;
+            circline(s,arcs[i].x0,arcs[i].y0,arcs[i].th0,arcs[i].k);
+            pose = Pose(sum, cline[0]/1000.0, 1.05-cline[1]/1000.0, cline[2], -arcs[i].k*1000);
+            new_path.push_back(pose);
         }
-        else if(i==(point_path.size()-1))
-        {
-            s = sqrt(pow((point_path[i].x/1000-point_path[i-1].x/1000),2)+pow((point_path[i].y/1000-point_path[i-1].y/1000),2));
-            x0 = point_path[i].x/1000;
-            y0 = -point_path[i].y/1000-1.05;
-            theta = -getOrientation(point_path[i], point_path[i-1]);
-        }
-        else
-        {
-            s = sqrt(pow((point_path[i].x/1000-point_path[i-1].x/1000),2)+pow((point_path[i].y/1000-point_path[i-1].y/1000),2));
-            x0 = point_path[i].x/1000;
-            y0 = -point_path[i].y/1000-1.05;
-            theta = -getOrientation(point_path[i+1], point_path[i]);
-        }
-        
-        Pose pose = Pose(s, x0, y0, theta, KMAX);
-        new_path.push_back(pose);
     }
 
     path.setPoints(new_path);
     return true;
 }
 
-bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order)
+bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, Path & path, std::vector<int> & order)
 {
     cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
 	std::vector<double> dist;
@@ -840,6 +822,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
 	std::vector<double> cost_so_far;
 	std::vector<cv::Point> came_from;
     std::vector<cv::Point> path_vertices;
+    std::vector<DubinsArc> arcs;
 
     // adjList = formAdjList(src, map_object, map);
 
@@ -850,28 +833,28 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
 	double robot_x0 = start.x, robot_y0 = start.y, robot_th0 = getOrientation(direction, start), 
 			gate_xf = end.x, gate_yf = end.y, gate_thf; 
 
-    if(map_object.gate.getCenter().x<70)
+    if(map_object.gate.getCenter().x<100)
     {
         gate_thf = M_PI;
     }
-    else if(map_object.gate.getCenter().y>980)
+    else if(map_object.gate.getCenter().y>950)
     {
-        gate_thf = 3*M_PI/2;        
+        gate_thf = M_PI/2;        
     }
-    else if(map_object.gate.getCenter().x>1440)
+    else if(map_object.gate.getCenter().x>1410)
     {
         gate_thf = 0;        
     }
-    else if(map_object.gate.getCenter().y<70)
+    else if(map_object.gate.getCenter().y<100)
     {
-        gate_thf = M_PI/2;        
+        gate_thf = 3*M_PI/2;        
     }
 
 	double robot_dist = sqrt(pow((end.x-robot_x0),2)+pow((end.y-robot_y0),2));
 	// double previous_distance, current_distance;
 
     double x0,y0,th0,xf,yf,thf;
-	int radius = 10;
+	int radius = 50;
 	int graph_index;
 
     addVertex(map_object, adjList, start);
@@ -998,7 +981,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
             yf = gate_yf;
             thf = gate_thf;
 
-            planDubins(map_object, points_path, x0,y0,th0,xf,yf,thf, out);
+            planDubins(map_object, arcs, x0,y0,th0,xf,yf,thf, out);
         }
         else
         {
@@ -1009,7 +992,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
             yf = path_vertices[j].y;
             thf = getOrientation(path_vertices[j+1], path_vertices[j]);
 
-            planDubins(map_object, points_path, x0,y0,th0,xf,yf,thf, out);
+            planDubins(map_object, arcs, x0,y0,th0,xf,yf,thf, out);
         }
     }     
 
@@ -1023,7 +1006,21 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, s
     
     showImage("Dubins path with roadmap vertices", out+local_map);
 
-    if(!convertToPosePath(points_path, path))
+    // double s, sum;
+    // for(int i=0;i<arcs.size();++i)
+    // {
+    //     for(int j=0; j<20;++j)
+    //     {
+    //         s = arcs[i].L/20*j;
+    //         sum = sum + s;
+    //         circline(s,arcs[i].x0,arcs[i].y0,arcs[i].th0,arcs[i].k);
+    //         cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,0,220 ), 5, 8, 0 );
+    //     }
+    // }
+
+    // showImage("Dubins", out+local_map);
+
+    if(!convertToPosePath(arcs, path))
     {
         std::cout<<"Cannot convert to Pose path!"<<std::endl;
         return false;
@@ -1139,7 +1136,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
 		}
 	}
 
-    if(map_object.gate.getCenter().x<70 && map_object.gate.getCenter().y<525)
+    if(map_object.gate.getCenter().x<100 && map_object.gate.getCenter().y<525)
     {
         // points.push_back(cv::Point2f(15, 125));
         // points.push_back(cv::Point2f(15, 375));
@@ -1158,7 +1155,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x<70 && map_object.gate.getCenter().y>=525)
+    else if(map_object.gate.getCenter().x<100 && map_object.gate.getCenter().y>=525)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1177,7 +1174,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x<755 && map_object.gate.getCenter().y>980)
+    else if(map_object.gate.getCenter().x<755 && map_object.gate.getCenter().y>950)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1196,7 +1193,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x>=755 && map_object.gate.getCenter().y>980)
+    else if(map_object.gate.getCenter().x>=755 && map_object.gate.getCenter().y>950)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1215,7 +1212,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x>1440 && map_object.gate.getCenter().y<525)
+    else if(map_object.gate.getCenter().x>1410 && map_object.gate.getCenter().y<525)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1234,7 +1231,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x>1440 && map_object.gate.getCenter().y>=525)
+    else if(map_object.gate.getCenter().x>1410 && map_object.gate.getCenter().y>=525)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1253,7 +1250,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x<755 && map_object.gate.getCenter().y<70)
+    else if(map_object.gate.getCenter().x<755 && map_object.gate.getCenter().y<100)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1272,7 +1269,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         points.push_back(cv::Point2f(940, 15));
         points.push_back(cv::Point2f(1310, 15));
     }
-    else if(map_object.gate.getCenter().x>=755 && map_object.gate.getCenter().y<70)
+    else if(map_object.gate.getCenter().x>=755 && map_object.gate.getCenter().y<100)
     {
         points.push_back(cv::Point2f(15, 125));
         points.push_back(cv::Point2f(15, 375));
@@ -1515,7 +1512,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
                 
 // }
 
-bool planMission(cv::Mat const & map, Map & map_object, std::vector<cv::Point> & points_path, Path & path, std::vector<int> & order)
+bool planMission(cv::Mat const & map, Map & map_object, Path & path, std::vector<int> & order)
 {
 	std::vector<NeighborVertices> roadmap;
 	local_map = map;
@@ -1527,7 +1524,7 @@ bool planMission(cv::Mat const & map, Map & map_object, std::vector<cv::Point> &
 		return false;
 	}
 
-	if(!planMissionOne(map_object, roadmap, points_path, path, order))
+	if(!planMissionOne(map_object, roadmap, path, order))
 	{
 		std::cerr << "(Critical) Failed to plan a mission one using Dijkstra and Dubins algorithms!" << std::endl;
 		return false;
