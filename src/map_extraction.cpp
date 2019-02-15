@@ -14,6 +14,10 @@
 
 cv::Mat result, rb_plane;
 
+bool ME_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
+
+
 //Load camera matrix and distortion coefficients values from intrinsic_calibration.xml
 void loadCoefficients(const std::string& filename,
                       cv::Mat& camera_matrix,
@@ -151,7 +155,7 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
     //Try out black filter because adaptive fails when robot close to the border. Maybe make it an option
 
     //Show filtered image
-    showImage("Adaptive mask", adaptive_mask);
+    if(ME_developer_session == true) showImage("Adaptive mask", adaptive_mask);
 
     // Find contours
     std::vector<std::vector<cv::Point>> contours, contours_approx;
@@ -178,7 +182,7 @@ std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
         contours_approx = {approx_curve};
         drawContours(contours_img, contours_approx, -1, cv::Scalar(0,170,220), 5, cv::LINE_AA);
 
-        showImage("Map Boundary", contours_img);
+        if(ME_developer_session == true) showImage("Map Boundary", contours_img);
 
     }
 
@@ -199,7 +203,7 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
     cv::Mat white_mask;
     cv::inRange(hsv_img, cv::Scalar(60, 10, 180), cv::Scalar(160, 100, 255), white_mask);
 
-    showImage("White mask", white_mask);   
+    if(ME_developer_session == true) showImage("White mask", white_mask);   
     
     std::vector<cv::Point> sort_high_x;
     std::vector<cv::Vec3f> corner_circles;
@@ -232,7 +236,7 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
             
         }
 
-        showImage("Higher plane", circles_img);
+        if(ME_developer_session == true) showImage("Higher plane", circles_img);
 
     }
     else
@@ -251,7 +255,7 @@ cv::Mat findTransform(cv::Mat const & calib_image,
                   double& pixel_scale, Map & map_object)
 {
    
-    showImage("Undistorted image", calib_image);
+    if(ME_developer_session == true) showImage("Undistorted image", calib_image);
 
 
     std::vector<cv::Point> sort_high_x = detectRobotPlaneCorners(calib_image);
@@ -286,21 +290,23 @@ cv::Mat findTransform(cv::Mat const & calib_image,
     cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(MAP_LENGTH,MAP_WIDTH));
 
     std::string name, wind2; 
+	
+	if(ME_developer_session == true) 
+    {
+		name = "Unwarped robot plane";
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 640, 512);
+		imshow(name.c_str(), unwarped_rb_frame);
 
-    name = "Unwarped robot plane";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 640, 512);
-    imshow(name.c_str(), unwarped_rb_frame);
+		wind2 = "Unwarped map plane";
+		cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(wind2.c_str(), 640, 512);
+		imshow(wind2.c_str(), unwarped_frame);
 
-    wind2 = "Unwarped map plane";
-    cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(wind2.c_str(), 640, 512);
-    imshow(wind2.c_str(), unwarped_frame);
-
-    cv::waitKey(0);
-    cv::destroyWindow(name);
-    cv::destroyWindow(wind2);
-
+		cv::waitKey(0);
+		cv::destroyWindow(name);
+		cv::destroyWindow(wind2);
+	}
     rb_plane = unwarped_rb_frame;
 
     return unwarped_frame;
@@ -313,7 +319,7 @@ bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane,
 
     undistort(img, calib_image, camera_matrix, dist_coeffs);
 
-    showImage("Undistorted image", calib_image);
+    if(ME_developer_session == true) showImage("Undistorted image", calib_image);
 
     double pixel_scale;
     cv::Mat transf_rbplane_pixels = calculateTransform(calib_image, MAP_LENGTH,MAP_WIDTH,pixel_scale);
@@ -329,21 +335,24 @@ bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane,
     cv::warpPerspective(calib_image, unwarped_frame, transf, cv::Size(MAP_LENGTH,MAP_WIDTH));
 
     std::string name, wind2; 
+	
+	if(ME_developer_session == true)
+	{
+		name = "Unwarped robot plane";
+		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(name.c_str(), 640, 512);
+		imshow(name.c_str(), unwarped_rb_frame);
 
-    name = "Unwarped robot plane";
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(name.c_str(), 640, 512);
-    imshow(name.c_str(), unwarped_rb_frame);
+		wind2 = "Unwarped map plane";
+		cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
+		cv::resizeWindow(wind2.c_str(), 640, 512);
+		imshow(wind2.c_str(), unwarped_frame);
 
-    wind2 = "Unwarped map plane";
-    cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
-    cv::resizeWindow(wind2.c_str(), 640, 512);
-    imshow(wind2.c_str(), unwarped_frame);
+		cv::waitKey(0);
+		cv::destroyWindow(name);
+		cv::destroyWindow(wind2);
 
-    cv::waitKey(0);
-    cv::destroyWindow(name);
-    cv::destroyWindow(wind2);
-
+	}
     robot_plane = unwarped_rb_frame;
     map = unwarped_frame;
 

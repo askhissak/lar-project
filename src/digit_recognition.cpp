@@ -14,6 +14,11 @@
 #include "map_extraction.hpp"
 #include "map_construction.hpp"
 
+
+bool DR_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
+
+
 //Properly rotate an image
 cv::Mat rotate(cv::Mat src, double angle)
 {
@@ -91,7 +96,7 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
         // cv::erode(processROI, processROI, kernel);
 
         // Show the actual image passed to the ocr engine
-        cv::imshow("ROI", processROI);
+        if (DR_developer_session == true) cv::imshow("ROI", processROI);
         rotatedProcessROI = processROI;
         std::vector<char *> recognizedDigits(36);
         std::vector<int> confidences(36);
@@ -114,16 +119,17 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
 
             if(confidences[k]>maxConfidence)
             {
-                maxConfidence = confidences[k];
+                maxConfidence = confidences[k]; 
                 maxIndex = k;
             }
         }
 
         if(*recognizedDigits[maxIndex] == ' ' || !isdigit(*recognizedDigits[maxIndex])) continue;
-        std::cout << "Recognized digit: " << std::string(recognizedDigits[maxIndex]);
-        std::cout << "Confidence: " << maxConfidence << std::endl<<std::endl<<std::endl;
-        index[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
-
+        std::cout << " Recognized digit: " << std::string(recognizedDigits[maxIndex]);
+        std::cout << " Confidence: " << maxConfidence ;
+        if(std::string(recognizedDigits[maxIndex]) == "7" ) index[i] = std::stoi("1"); 
+        else index[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
+		std::cout << " Saved: " << index[i] << std::endl<<std::endl<<std::endl;
         // if(maxConfidence<75) return false;
         
         cv::waitKey(0);
@@ -137,7 +143,7 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
 bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* index)
 {
     // Display original image
-    showImage("Original", map);
+    if (DR_developer_session == true) showImage("Original", map);
   
     // Convert color space from BGR to HSV
     cv::Mat hsv_img;
@@ -154,7 +160,7 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
     cv::erode(green_mask, green_mask, kernel);
     
     // Display image
-    showImage("GREEN_filter", green_mask);  
+    if (DR_developer_session == true) showImage("GREEN_filter", green_mask);  
     
     // Find contours
     std::vector<std::vector<cv::Point>> contours, contours_approx;
@@ -176,12 +182,12 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
         boundRect[i] = boundingRect(cv::Mat(approx_curve)); // find bounding box for each green blob
         // boundRotRect[i] = minAreaRect(approx_curve);
     }
-    showImage("Original", contours_img);        
+    if (DR_developer_session == true) showImage("Original", contours_img);        
     
     cv::Mat green_mask_inv, filtered(map.rows, map.cols, CV_8UC3, cv::Scalar(255,255,255));
     cv::bitwise_not(green_mask, green_mask_inv); // generate binary mask with inverted pixels w.r.t. green mask -> black numbers are part of this mask
     
-    showImage("Numbers", green_mask_inv);
+    if (DR_developer_session == true) showImage("Numbers", green_mask_inv);
     
     // Load digits template images
     std::vector<cv::Mat> templROIs;
@@ -217,7 +223,7 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
         cv::erode(processROI, processROI, kernel);
         
         // Show the actual image used for the template matching
-        showImage("ROI", processROI);
+        if (DR_developer_session == true) showImage("ROI", processROI);
 
         // Convert color space from BGR to grayscale
         cv::Mat grayROI, grayTemplROI;
@@ -258,7 +264,9 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
                 }
             }
         }
-
+		
+		if (maxIdx == 7) maxIdx = 1;
+		
         index[i] = maxIdx;
     
         std::cout << "Best fitting template: " << maxIdx << std::endl;

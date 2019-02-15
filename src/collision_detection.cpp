@@ -16,6 +16,8 @@ int polyflag = 0;
 
 int output_trigger =0;
 
+bool CD_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
 
 
 //NEW ADDED THE DESIRED_CONTOUR AREA

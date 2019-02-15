@@ -13,6 +13,9 @@
 #include "map_extraction.hpp"
 #include "path.h"
 
+bool MC_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								 // if false -> Process everything without graphical output 
+
 std::vector<cv::Point> Polygon::getContours(cv::Mat map)
 {
   std::vector<cv::Point> contours;
@@ -181,7 +184,7 @@ cv::Mat Map::showMap()
       }
   }
 
-  showImage("Generated Map", out);
+  if(MC_developer_session == true) showImage("Generated Map", out);
 
   return out;
 
@@ -250,7 +253,7 @@ bool findObstacles(cv::Mat const & map, Map & map_object)
   }
   else
   {
-    showImage("Obstacles", red_mask_temp);
+    if(MC_developer_session == true) showImage("Obstacles", red_mask_temp);
     return true;
   }
   
@@ -289,7 +292,7 @@ bool findBorders(cv::Mat const & map, Map & map_object)
   // cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
   // cv::dilate(adaptive_mask, adaptive_mask, kernel);
 
-  showImage("Adaptive mask", black_mask);
+  if(MC_developer_session == true) showImage("Adaptive mask", black_mask);
 
   // Process black mask
   cv::findContours(black_mask, mc_contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE); // find external contours of each blob
@@ -325,7 +328,7 @@ bool findBorders(cv::Mat const & map, Map & map_object)
   }
   else
   {
-    showImage("Border", contours_img);
+    if(MC_developer_session == true) showImage("Border", contours_img);
     return true;
   }
   
@@ -370,7 +373,7 @@ bool findROI(cv::Mat const & map, Map & map_object)
   }
   else
   {
-    showImage("Circles Detected", circles_img);
+    if(MC_developer_session == true) showImage("Circles Detected", circles_img);
     return true;
 
   }
@@ -435,7 +438,7 @@ bool findGate(cv::Mat const & map, Map & map_object)
   }
   else
   {
-    showImage("Gate(s) Boundaries", blue_mask_temp);
+    if(MC_developer_session == true) showImage("Gate(s) Boundaries", blue_mask_temp);
     return true;
   }
 
@@ -506,7 +509,7 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
   }
   else
   {
-    showImage("Robot Outline", robot_mask_temp);
+    if(MC_developer_session == true) showImage("Robot Outline", robot_mask_temp);
     return true; 
   }
 }
@@ -533,7 +536,7 @@ bool buildMap(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_object
   // cv::warpPerspective(robotPlane, map, transform, cv::Size(MAP_LENGTH,MAP_WIDTH));
   
   // Display original image
-  showImage("Original map", map);
+  if(MC_developer_session == true) showImage("Original map", map);
 
   if(!findObstacles(map, map_object))
   {

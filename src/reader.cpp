@@ -10,6 +10,10 @@
 using namespace std;
 using namespace cv;
 
+
+bool RD_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+								   // if false -> Process everything without graphical output 
+
 std::vector<std::vector<cv::Point>> contours, contours_approx;
 
 
@@ -26,12 +30,16 @@ cv::Mat readData(const std::string filename)
 
   cv::Mat out(1050, 1510, CV_8UC3, Scalar(0,0,0));
   cv::Mat complete_map (1050, 1510, CV_8UC3, Scalar(0,0,0));
-  std::string outName = "Output Data";
-  cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(outName.c_str(), 640, 512);
-  cv::imshow(outName.c_str(), complete_map);
-  //cv::waitKey(0);
-  cv::destroyWindow(outName.c_str());
+  
+  if (RD_developer_session == true)
+  {
+	  std::string outName = "Output Data";
+	  cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(outName.c_str(), 640, 512);
+	  cv::imshow(outName.c_str(), complete_map);
+	  //cv::waitKey(0);
+	  cv::destroyWindow(outName.c_str());
+  }
 	
   	
 	
@@ -76,11 +84,14 @@ while (!file.eof())
             cv::line(out, cv::Point(x1,y1) , cv::Point(x2,y2) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x2,y2) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());
+			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());
+			}
  		break; 
 
 		case 4:  
@@ -98,12 +109,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x2,y2) , cv::Point(x3,y3) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x3,y3) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
-                        
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());
+            if (RD_developer_session == true)
+			{            
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());
+			}
  		break; 
 
 		case 5:  
@@ -123,11 +136,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x3,y3) , cv::Point(x4,y4) , cv::Scalar( 0 , 0 ,150), 5);
             cv::line(out, cv::Point(x4,y4) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
  		break; 
 
 		case 6:  
@@ -149,11 +165,14 @@ while (!file.eof())
             cv::line(out, cv::Point(x4,y4) , cv::Point(x5,y5) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x5,y5) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
 		
 		break; 
 
@@ -178,11 +197,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x5,y5) , cv::Point(x6,y6) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x6,y6) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
 		break;
 
 		case 8:  
@@ -208,11 +230,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x6,y6) , cv::Point(x7,y7) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x7,y7) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
 		break;
 
 		case 9:  
@@ -240,11 +265,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x7,y7) , cv::Point(x8,y8) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);				
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str()); 
+			}  		
 		break;
 		
 		
@@ -276,12 +304,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x9,y9)   , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
   			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());  		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());  		
+			}
 		break;
 		
 		case 11:  
@@ -314,13 +344,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x10,y10) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
   			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());   		
+			}
 		break;
 		
 		case 12:  
@@ -354,12 +385,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x10,y10) , cv::Point(x11,y11) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x11,y11) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str()); 
+			}  		
 		
 		break;
 		
@@ -398,11 +431,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x11,y11) , cv::Point(x12,y12) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x12,y12) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());   
+			}		
 		
 		break;
 		
@@ -441,12 +477,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x12,y12) , cv::Point(x13,y13) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x13,y13) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 				
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);  
-            cv::destroyWindow(name.c_str()); 		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);  
+				cv::destroyWindow(name.c_str());
+			} 		
 		
 		break;
 		
@@ -488,12 +526,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x13,y13) , cv::Point(x14,y14) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x14,y14) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				//cv::waitKey(0);
+				cv::destroyWindow(name.c_str());   		
+			}
 		break;
 		
 		case 16:  
@@ -535,12 +575,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x14,y14) , cv::Point(x15,y15) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x15,y15) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
 			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());  		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				//cv::waitKey(0); 
+				cv::destroyWindow(name.c_str()); 
+			} 		
 		
 		break;
 		
@@ -586,12 +628,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x16,y16) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);				
 
   			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);   
-            cv::destroyWindow(name.c_str());		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);   
+				cv::destroyWindow(name.c_str());	
+			}		
 		
 		break;
 		
@@ -638,12 +682,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x16,y16) , cv::Point(x17,y17) , cv::Scalar( 0 , 0 ,150), 5);				
 			cv::line(out, cv::Point(x17,y17) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());   		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());   		
+			}		
 		break;
 		
 		
@@ -692,13 +738,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x17,y17) , cv::Point(x18,y18) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line(out, cv::Point(x18,y18) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());  		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());  		
+			}
 		break;
 		
 		
@@ -750,13 +797,14 @@ while (!file.eof())
 			cv::line(out, cv::Point(x19,y19) , cv::Point(x0,y0)   , cv::Scalar( 0 , 0 ,150), 5);
   			
   			
-  			
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());  		
-		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());  		
+			}
 		break;
 		
     		
@@ -783,11 +831,14 @@ while (!file.eof())
             cv::line( complete_map, cv::Point(x1,y1) , cv::Point(x2,y2) , cv::Scalar( 0 , 0 ,150), 5);
 			cv::line( complete_map, cv::Point(x2,y2) , cv::Point(x0,y0) , cv::Scalar( 0 , 0 ,150), 5);
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out +  complete_map); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out +  complete_map); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());
+			}
  		break; 
 
 		case 4:  
@@ -805,13 +856,15 @@ while (!file.eof())
 			cv::line(complete_map  , cv::Point(x2,y2) , cv::Point(x3,y3) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line(complete_map  , cv::Point(x3,y3) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 
-                        
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out + complete_map); 
-             //cv::waitKey(0);
-             cv::destroyWindow(name.c_str());
- 		break; 
+            if (RD_developer_session == true)
+			{            
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out + complete_map); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());
+			}
+		break; 
 
 		case 5:  
 			std::cout << " Pentagon Gate " << endl; 
@@ -830,11 +883,14 @@ while (!file.eof())
 			cv::line( complete_map, cv::Point(x3,y3) , cv::Point(x4,y4) , cv::Scalar( 200 , 0 , 0 ), 5);
             cv::line( complete_map, cv::Point(x4,y4) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out +  complete_map); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out +  complete_map); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
  		break; 
 
 		case 6:  
@@ -856,11 +912,14 @@ while (!file.eof())
             cv::line( complete_map, cv::Point(x4,y4) , cv::Point(x5,y5) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line( complete_map, cv::Point(x5,y5) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out + complete_map); 
-            //cv::waitKey(0);
-            cv::destroyWindow(name.c_str()); 
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out + complete_map); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str()); 
+			}
 		
 		break; 
 
@@ -885,11 +944,14 @@ while (!file.eof())
 			cv::line(complete_map  , cv::Point(x5,y5) , cv::Point(x6,y6) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line(complete_map  , cv::Point(x6,y6) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out + complete_map); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out + complete_map); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
 		break;
 
 		case 8:  
@@ -915,11 +977,14 @@ while (!file.eof())
 			cv::line(complete_map, cv::Point(x6,y6) , cv::Point(x7,y7) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line(complete_map, cv::Point(x7,y7) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);
 		
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out + complete_map); 
-            //cv::waitKey(0); 
-            cv::destroyWindow(name.c_str());
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out + complete_map); 
+				cv::waitKey(0); 
+				cv::destroyWindow(name.c_str());
+			}
 		break;
 
 			cv::circle( complete_map , cv::Point(x0,y0), 0.5 , cv::Scalar( 200 , 0 , 0 ), 5, 8, 0 );
@@ -942,11 +1007,14 @@ while (!file.eof())
 			cv::line(complete_map, cv::Point(x7,y7) , cv::Point(x8,y8) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line(complete_map, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);				
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out+complete_map); 
-            ////cv::waitKey(0);
-            cv::destroyWindow(name.c_str());  		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out+complete_map); 
+				cv::waitKey(0);
+				cv::destroyWindow(name.c_str());  		
+			}
 		break;
 		
 		case 10:  
@@ -976,11 +1044,14 @@ while (!file.eof())
 			cv::line( complete_map, cv::Point(x8,y8) , cv::Point(x9,y9) , cv::Scalar( 200 , 0 , 0 ), 5);
 			cv::line( complete_map, cv::Point(x8,y8) , cv::Point(x0,y0) , cv::Scalar( 200 , 0 , 0 ), 5);				
 
-  			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  			cv::resizeWindow(name.c_str(), 640, 512);
-			cv::imshow(name.c_str(), out + complete_map ); 
-            //cv::waitKey(0);  
-            cv::destroyWindow(name.c_str());		
+  			if (RD_developer_session == true)
+			{
+				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::resizeWindow(name.c_str(), 640, 512);
+				cv::imshow(name.c_str(), out + complete_map ); 
+				cv::waitKey(0);  
+				cv::destroyWindow(name.c_str());
+			}		
 		break;
 
     		
@@ -999,12 +1070,15 @@ while (!file.eof())
 		cv::circle( complete_map , cv::Point(x0,y0), 8 , cv::Scalar( 0 , 200 , 0 ), 5, 8, 0 );
 		
 		
-		cv::imshow("Corners", out); 
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-		cv::resizeWindow(name.c_str(), 640, 512);
-		cv::imshow(name.c_str(), out + complete_map); 
-		////cv::waitKey(0);  
-		cv::destroyWindow(name.c_str()); 		
+		if (RD_developer_session == true)
+		{
+			cv::imshow("Corners", out); 
+			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			cv::resizeWindow(name.c_str(), 640, 512);
+			cv::imshow(name.c_str(), out + complete_map); 
+			cv::waitKey(0);  
+			cv::destroyWindow(name.c_str()); 
+		}		
      }
      
 
@@ -1014,20 +1088,22 @@ while (!file.eof())
 
   }
   
-   
-  name = "Just Obstacles" ;
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), out); 
-  cv::waitKey(0);
-  cv::destroyWindow(name.c_str());
-  
-  name = "Complete Map " ;
-  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-  cv::resizeWindow(name.c_str(), 640, 512);
-  cv::imshow(name.c_str(), out + complete_map ); 
-  cv::waitKey(0);   		   		
-  cv::destroyWindow(name.c_str());
+  if (RD_developer_session == true)
+  { 
+	  name = "Just Obstacles" ;
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), out); 
+	  cv::waitKey(0);
+	  cv::destroyWindow(name.c_str());
+	  
+	  name = "Complete Map " ;
+	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::resizeWindow(name.c_str(), 640, 512);
+	  cv::imshow(name.c_str(), out + complete_map ); 
+	  cv::waitKey(0);   		   		
+	  cv::destroyWindow(name.c_str());
+  }
   
   return out;
 

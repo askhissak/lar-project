@@ -11,6 +11,9 @@
 // using namespace cv;
 // using namespace std;
 
+bool OR_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+								    // if false -> Process everything without graphical output 
+
 //ROI ORDERING
 void orderROI(cv::Mat const & img, std::vector<cv::Vec3f> circles, int* pointer)
 {
@@ -34,13 +37,14 @@ void orderROI(cv::Mat const & img, std::vector<cv::Vec3f> circles, int* pointer)
                 cv::Point center(cvRound(circles[j][0]), cvRound(circles[j][1]));             
                 cv::circle( circles_img, center, 10, cv::Scalar(0, 250 ,255), -1, 8, 0 );
                 std::cout << "  Point number " << (next) << " is at coordinates : [" <<  round(circles[j][0])  <<  ", " << round(circles[j][1]) << "] " <<std::endl;
-                std::string name = "Ordered Circles";
-                cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
-                cv::resizeWindow(name.c_str(), 640, 512);
-                cv::imshow(name.c_str(), circles_img);
-
-                cv::waitKey(0);
-
+                if (OR_developer_session == true)
+                {
+					std::string name = "Ordered Circles";
+					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::resizeWindow(name.c_str(), 640, 512);
+					cv::imshow(name.c_str(), circles_img);
+					cv::waitKey(0);
+				}
                 next++;
             }
         }
