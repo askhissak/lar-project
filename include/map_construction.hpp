@@ -32,6 +32,9 @@ struct Polygon
   }
 
   std::vector<cv::Point> getContours(cv::Mat map);
+  
+  int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int red_mask_high1 , int red_mask_low2 , int red_mask_high2 , int greenmask_low , int greenmask_high , int blue_mask_low , int blue_mask_high);
+	
 
 //   double getLengthOfSide(cv::Point start_corner, cv::Point end_corner)
 //   {

@@ -16,6 +16,81 @@
 bool MC_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
 
+
+const int max_value_H = 360/2;
+const int max_value = 255;
+int low_H = 0, low_S = 0, low_V = 0;
+int high_H = max_value_H, high_S = max_value, high_V = max_value;
+
+const cv::String original_image = "Original Name";
+const cv::String filtered_image = "Filtered Image";
+
+static void on_low_H_thresh_trackbar(int, void *)
+{
+    low_H = cv::min(high_H-1, low_H);
+    setTrackbarPos("Low H", filtered_image, low_H);
+}
+static void on_high_H_thresh_trackbar(int, void *)
+{
+    high_H = cv::max(high_H, low_H+1);
+    setTrackbarPos("High H", filtered_image, high_H);
+}
+static void on_low_S_thresh_trackbar(int, void *)
+{
+    low_S = cv::min(high_S-1, low_S);
+    setTrackbarPos("Low S", filtered_image, low_S);
+}
+static void on_high_S_thresh_trackbar(int, void *)
+{
+    high_S = cv::max(high_S, low_S+1);
+    setTrackbarPos("High S", filtered_image, high_S);
+}
+static void on_low_V_thresh_trackbar(int, void *)
+{
+    low_V = cv::min(high_V-1, low_V);
+    setTrackbarPos("Low V",filtered_image, low_V);
+}
+static void on_high_V_thresh_trackbar(int, void *)
+{
+    high_V = cv::max(high_V, low_V+1);
+    setTrackbarPos("High V", filtered_image, high_V);
+}
+
+int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int red_mask_high1 , int red_mask_low2 , int red_mask_high2 , int greenmask_low , int greenmask_high , int blue_mask_low , int blue_mask_high)
+{
+	
+    
+    cv::namedWindow(original_image);
+    cv::namedWindow(filtered_image);
+    // Trackbars to set thresholds for HSV values
+    createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+    createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+    createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+    createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+    createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+    createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+    
+    cv::Mat hsv_filtered;
+    //cv::Mat original_RGB;
+    
+    while (true) 
+    { 
+        // Detect the object based on HSV Range Values
+        inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+        // Show the frames
+   
+        cv::imshow(original_image, original_img);
+        
+        cv::imshow(filtered_image, hsv_filtered);
+        char key = (char) cv::waitKey(30);
+        if (key == 'q' || key == 27) break;
+    }
+    return 0;
+}
+
+
+
+
 std::vector<cv::Point> Polygon::getContours(cv::Mat map)
 {
   std::vector<cv::Point> contours;
@@ -201,9 +276,24 @@ bool findObstacles(cv::Mat const & map, Map & map_object)
   cv::Mat contours_img;
   cv::Mat hsv_img;
 
+  int red_mask_low1;
+  int red_mask_high1; 
+  int red_mask_low2; 
+  int red_mask_high2;
+  int greenmask_low;
+  int greenmask_high;
+  int blue_mask_low; 
+  int blue_mask_high;
+	
+  
+  
+  
   // Convert color space from BGR to HSV
   cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
 
+	
+  HSV_Calib(map , hsv_img , red_mask_low1 , red_mask_high1 , red_mask_low2 , red_mask_high2 , greenmask_low , greenmask_high , blue_mask_low , blue_mask_high);
+	
   // Find red regions: h values around 0 (positive and negative angles)
   cv::Mat red_mask_low, red_mask_high, red_mask;
                               // 0  30 30             20
@@ -446,6 +536,7 @@ bool findGate(cv::Mat const & map, Map & map_object)
 
 bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_object)
 {
+  
   std::cout << std::endl;
   std::cout << "ROBOT -------------------------------------------------------------" << std::endl;
   std::cout << std::endl;
@@ -568,3 +659,11 @@ bool buildMap(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_object
   return true;
 
 }
+
+
+
+
+
+
+
+
