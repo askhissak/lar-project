@@ -664,7 +664,7 @@ bool findObstacles(cv::Mat const & map, Map & map_object)
   cv::cvtColor(map, hsv_img, cv::COLOR_BGR2HSV);
 
 	
-  HSV_Calib(map , hsv_img , red_mask_low1 , red_mask_high1 , red_mask_low2 , red_mask_high2 , greenmask_low , greenmask_high , blue_mask_low , blue_mask_high);
+  if(MC_developer_session == true) HSV_Calib(map , hsv_img , red_mask_low1 , red_mask_high1 , red_mask_low2 , red_mask_high2 , greenmask_low , greenmask_high , blue_mask_low , blue_mask_high);
 	
   // Find red regions: h values around 0 (positive and negative angles)
   cv::Mat red_mask_low, red_mask_high, red_mask;
