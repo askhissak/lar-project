@@ -19,7 +19,12 @@
 
 bool DR_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
-
+								 
+int approximation = 3 ;  // if 1  -> Use just Tesseract 
+						 // if 2  -> Use just Template Matching   
+						 // if 3  -> Use Tesseract and if there's no useful results use Template Matching 
+						 // if 4  -> Use Template Matching and if there's no useful results use Tesseract 
+								 
 using namespace std::chrono;
 
 //Properly rotate an image
@@ -73,7 +78,7 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
     // Set Page segmentation mode to PSM_SINGLE_CHAR (10)
     ocr->SetPageSegMode(tesseract::PSM_SINGLE_CHAR);
     // Only digits are valid output characters
-    ocr->SetVariable("tessedit_char_whitelist", "0123456789");
+    ocr->SetVariable("tessedit_char_whitelist", "012345");
     std::cout << "Size: " << victims.size() << std::endl<<std::endl<<std::endl;
 
     // For each green blob in the original image containing a digit
@@ -124,18 +129,24 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
             {
                 maxConfidence = confidences[k]; 
                 maxIndex = k;
+                
             }
+            
+           
         }
-
+        
         if(*recognizedDigits[maxIndex] == ' ' || !isdigit(*recognizedDigits[maxIndex])) continue;
-        std::cout << " Recognized digit: " << std::string(recognizedDigits[maxIndex]);
-        std::cout << " Confidence: " << maxConfidence ;
-        if(std::string(recognizedDigits[maxIndex]) == "7" ) index[i] = std::stoi("1"); 
+        
+        std::cout << " Recognized digit: " << std::string(recognizedDigits[maxIndex]) << std::endl ;
+        std::cout << " Confidence: " << maxConfidence << std::endl ;
+        
+        
+        if ( *recognizedDigits[maxIndex] == '7' ) {index[i] = std::stoi("1");std::cout << " Saved: " << index[i] << "\n\n " <<std::endl;}
         else index[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
-		std::cout << " Saved: " << index[i] << std::endl<<std::endl<<std::endl;
+		
+		
         // if(maxConfidence<75) return false;
         
-        cv::waitKey(0);
     }
 
     ocr->End(); // destroy the ocr object (release resources)
@@ -290,35 +301,84 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
 
 bool recognizeDigits(cv::Mat const & map, std::vector<Victim> victims, std::vector<int> & order)
 {
-    int index[victims.size()] = {0};
-
-    // if(!useTesseract(map, circles, index))
-    // {
-    //     std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
-    //     return false;
-    // }
-
-    if(!useTemplateMatching(map, victims, index))
+	int index[victims.size()] = {0};
+    
+    bool change_approach = false;
+    
+    int next = 1 ;
+    
+    switch(approximation)
+    
     {
-        std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
-        return false;
-    }
+		case 1 : //Just Tesseract
+		
+			if(!useTesseract(map, victims , index))
+     		{
+				std::cerr << "(Critical) Failed to recognize the digits using Tesseract!" << std::endl;
+				return false;
+			}
+			
+		break;
+		
+		case 2 : //Just Template Matching
+		
+			if(!useTemplateMatching(map, victims, index))
+			{
+				std::cerr << "(Critical) Failed to recognize the digits using template matching!" << std::endl;         
+				return false;
+			}
+		
+		break;
+		
+		case 3 : //Tesseract and if not succeed then Template Matching
+		
+			if(!useTesseract(map, victims , index))
+     		{
+				std::cerr << "(Critical) Failed to recognize the digits using Tesseract, changing to Template Matching!" << std::endl;
+				change_approach = true;
+			}
+			
+			if (change_approach == true)
+			{
+				if(!useTemplateMatching(map, victims, index))
+				{
+					std::cerr << "(Critical) Failed to recognize the digits using Tesseract and also Template Matching!" << std::endl;         
+					return false;
+				}
+			} 
+			
+		break;
+		
+		case 4 : //Template Matching and if not succeed then Tesseract
+		
+			if(!useTemplateMatching(map, victims, index))
+			{
+				std::cerr << "(Critical) Failed to recognize the digits using template matching, changing to Tesseract!" << std::endl;         
+				change_approach = true ;
+			}
+			
+			if (change_approach == true)
+			{
+				if(!useTesseract(map, victims , index))
+				{
+					std::cerr << "(Critical) Failed to recognize the digits using Template Matching and also Tesseract!" << std::endl;
+					return false;
+				}
+			
+			}
+			
+		break;
+	}
 
-    int next = 1;
-
-    for(int i=0;i<victims.size();++i)
-    {
-         for(int j=0;j<victims.size();++j)
-        {
-            if(index[j]==next)
-            {
-                order.push_back(j);
-            }
-        }
-
-        next++;
-    }
-
+	for(int i=0;i<victims.size();++i)
+	{
+		for(int j=0;j<victims.size();++j)
+		{ 
+			if(index[j]==next) order.push_back(j); 
+		}
+		next++;
+	}
+    
 
     return true;
                 
