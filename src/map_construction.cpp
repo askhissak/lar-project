@@ -13,62 +13,64 @@
 #include "map_extraction.hpp"
 #include "path.h"
 
-bool MC_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
-								 // if false -> Process everything without graphical output 
+bool MC_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+								    // if false -> Process everything without graphical output 
 
 
 const int max_value_H = 360/2;
 const int max_value = 255;
 int low_H = 0, low_S = 0, low_V = 0;
+int track_low_H = 0, track_low_S = 0, track_low_V = 0;
 int high_H = max_value_H, high_S = max_value, high_V = max_value;
+int track_high_H = max_value_H, track_high_S = max_value, track_high_V = max_value;
 
-cv::String original_image = "Original Name";
+cv::String original_image = "Original Image";
 cv::String filtered_image = "Filtered Image";
 
 int color = 0 ;
 
-int Obs_H_Low_1  = 0; int Obs_H_High_1 = 0;
+int Obs_H_Low_1  = 0;   int Obs_H_High_1 = 18;
     
-int Obs_S_Low_1  = 0; int Obs_S_High_1 = 0;
+int Obs_S_Low_1  = 0;   int Obs_S_High_1 = 255;
 
-int Obs_V_Low_1  = 0; int Obs_V_High_1 = 0;
-
-
-int Obs_H_Low_2  = 0; int Obs_H_High_2 = 0;
-
-int Obs_S_Low_2  = 0; int Obs_S_High_2 = 0;
-
-int Obs_V_Low_2  = 0; int Obs_V_High_2 = 0;
+int Obs_V_Low_1  = 0;   int Obs_V_High_1 = 255;
 
 
-int Gate_H_Low  = 0; int Gate_H_High = 0;
+int Obs_H_Low_2  = 150; int Obs_H_High_2 = 200;
 
-int Gate_S_Low  = 0; int Gate_S_High = 0;
+int Obs_S_Low_2  = 0;   int Obs_S_High_2 = 255;
 
-int Gate_V_Low  = 0; int Gate_V_High = 0;
+int Obs_V_Low_2  = 0;   int Obs_V_High_2 = 255;
 
 
+int Gate_H_Low  = 100; 	int Gate_H_High = 130;
 
-int ROI_H_Low  = 0; int ROI_H_High = 0;
+int Gate_S_Low  = 150; 	int Gate_S_High = 255;
 
-int ROI_S_Low  = 0; int ROI_S_High = 0;
-
-int ROI_V_Low  = 0; int ROI_V_High = 0;
+int Gate_V_Low  = 111; 	int Gate_V_High = 200;
 
 
 
-int Robot_H_Low  = 0; int Robot_H_High = 0;
+int ROI_H_Low  = 55; 	int ROI_H_High = 80;
 
-int Robot_S_Low  = 0; int Robot_S_High = 0;
+int ROI_S_Low  = 70; 	int ROI_S_High = 255;
 
-int Robot_V_Low  = 0; int Robot_V_High = 0;
+int ROI_V_Low  = 75; 	int ROI_V_High = 255;
 
 
-int Black_H_Low  = 0; int Black_H_High = 0;
 
-int Black_S_Low  = 0; int Black_S_High = 0;
+int Robot_H_Low  = 80; 	int Robot_H_High = 100;
 
-int Black_V_Low  = 0; int Black_V_High = 0;
+int Robot_S_Low  = 150; int Robot_S_High = 200;
+
+int Robot_V_Low  = 119; int Robot_V_High = 200;
+
+
+int Black_H_Low  = 0; 	int Black_H_High = 180;
+
+int Black_S_Low  = 5; 	int Black_S_High = 255;
+
+int Black_V_Low  = 5; 	int Black_V_High = 70;
 
 
 static void on_low_H_thresh_trackbar(int, void *)
@@ -104,6 +106,11 @@ static void on_high_V_thresh_trackbar(int, void *)
 
 int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int red_mask_high1 , int red_mask_low2 , int red_mask_high2 , int greenmask_low , int greenmask_high , int blue_mask_low , int blue_mask_high)
 {
+    
+    cv::resize(original_img, original_img , cv::Size(640, 400));
+    cv::resize(hsv_img, hsv_img , cv::Size(640, 400));
+    
+    
     while(color < 6)
     {
 		low_H = 0, low_S = 0, low_V = 0;
@@ -119,7 +126,6 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			case 5 : filtered_image = " BLACK REGIONS "              ; break;
 		}
     
-		
 			
 		cv::namedWindow(original_image);
 		cv::namedWindow(filtered_image);
@@ -127,24 +133,29 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 	
 		
 		cv::Mat hsv_filtered;
-		//cv::Mat original_RGB;
 		
 		bool first_values = true ;
 		
-  
 		
 		while (color == 5) // Black Regions
 		{  
 			
 			if(first_values == true)
 			{
-				low_H = 0 ;
-				low_S = 5 ;
-				low_V = 5 ;
+				
+				
+				low_H = Black_H_Low ;
+				low_S = Black_S_Low ;
+				low_V = Black_V_Low ;
 		
-				high_H = 180;
-				high_S = 255;
-				high_V = 70;
+				high_H = Black_H_High;
+				high_S = Black_S_High;
+				high_V = Black_V_High;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
 				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
@@ -154,12 +165,19 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
 				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
+				
+				
 				first_values = false ;
 			}
 		
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+
+			
 			cv::imshow(original_image, original_img);
+					
 			cv::imshow(filtered_image, hsv_filtered);
+			
+			
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -185,20 +203,24 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}
 		}
 		
-		
-		
 		while (color == 4) // ROBOT 
 		{  
 			
 			if(first_values == true)
 			{
-				low_H = 80 ;
-				low_S = 150 ;
-				low_V = 119 ;
+				
+				low_H = Robot_H_Low ;
+				low_S = Robot_S_Low ;
+				low_V = Robot_V_Low ;
 		
-				high_H = 100;
-				high_S = 200;
-				high_V = 200;
+				high_H = Robot_H_High;
+				high_S = Robot_S_High;
+				high_V = Robot_V_High;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
 				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
@@ -212,8 +234,12 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}
 		
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+			
+			
 			cv::imshow(original_image, original_img);
+			
 			cv::imshow(filtered_image, hsv_filtered);
+
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -245,13 +271,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			
 			if(first_values == true)
 			{
-				low_H = 55 ;
-				low_S = 70 ;
-				low_V = 75 ;
+				low_H = ROI_H_Low ;
+				low_S = ROI_S_Low ;
+				low_V = ROI_V_Low ;
 		
-				high_H = 80;
-				high_S = 255;
-				high_V = 255;
+				high_H = ROI_H_High;
+				high_S = ROI_S_High;
+				high_V = ROI_V_High;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
 				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
@@ -265,8 +296,12 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}
 		
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+			
+			
 			cv::imshow(original_image, original_img);
+			
 			cv::imshow(filtered_image, hsv_filtered);
+			
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -299,13 +334,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			if(first_values == true)
 			{
 				
-				low_H = 100 ;
-				low_S = 150 ;
-				low_V = 150 ;
+				low_H = Gate_H_Low ;
+				low_S = Gate_S_Low ;
+				low_V = Gate_V_Low ;
 		
-				high_H = 130;
-				high_S = 255;
-				high_V = 200;
+				high_H = Gate_H_High;
+				high_S = Gate_S_High;
+				high_V = Gate_V_High;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
 				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
@@ -319,8 +359,12 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}
 		
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+			
+			
 			cv::imshow(original_image, original_img);
+			
 			cv::imshow(filtered_image, hsv_filtered);
+			
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -353,13 +397,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			
 			if(first_values == true)
 			{
-				low_H = 150 ;
-				low_S = 0 ;
-				low_V = 0 ;
+				low_H = Obs_H_Low_2 ;
+				low_S = Obs_S_Low_2 ;
+				low_V = Obs_V_Low_2 ;
 		
-				high_H = 200;
-				high_S = 255;
-				high_V = 255;
+				high_H = Obs_H_High_2;
+				high_S = Obs_S_High_2;
+				high_V = Obs_V_High_2;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
 				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
@@ -373,8 +422,13 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}
 		
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+			
+			
 			cv::imshow(original_image, original_img);
+
 			cv::imshow(filtered_image, hsv_filtered);
+		
+			
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -413,9 +467,14 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			
 			if(first_values == true)
 			{
-				high_H = 18;
-				high_S = 255;
-				high_V = 255;
+				high_H = Obs_H_High_1;
+				high_S = Obs_S_High_1;
+				high_V = Obs_V_High_1;
+				
+				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(filtered_image, 700,0);
 				
 				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
 				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
@@ -425,8 +484,12 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 			}	 
 				
 			inRange(hsv_img, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), hsv_filtered);
+		
+			
 			cv::imshow(original_image, original_img);
+			
 			cv::imshow(filtered_image, hsv_filtered);
+			
 			
 			char key = (char) cv::waitKey(30);
 			
@@ -647,7 +710,7 @@ bool findObstacles(cv::Mat const & map, Map & map_object)
   std::vector<cv::Point> approx_curve;
   cv::Mat contours_img;
   cv::Mat hsv_img;
-
+	
   int red_mask_low1;
   int red_mask_high1; 
   int red_mask_low2; 
