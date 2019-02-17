@@ -107,8 +107,8 @@ static void on_high_V_thresh_trackbar(int, void *)
 int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int red_mask_high1 , int red_mask_low2 , int red_mask_high2 , int greenmask_low , int greenmask_high , int blue_mask_low , int blue_mask_high)
 {
     
-    cv::resize(original_img, original_img , cv::Size(640, 400));
-    cv::resize(hsv_img, hsv_img , cv::Size(640, 400));
+    cv::resize(original_img, original_img , cv::Size(640, 430));
+    cv::resize(hsv_img, hsv_img , cv::Size(640, 430));
     
     
     while(color < 6)
