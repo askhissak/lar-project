@@ -80,7 +80,11 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 bool RobotProject::localize(cv::Mat const & img, 
             std::vector<double> & state)
 {
-	extractMapLocalize(img, map, robot_plane, map_object);
+	if(!extractMapLocalize(img, map, robot_plane, map_object))
+	{
+		std::cerr << "(Critical) Failed to extract the map!" << std::endl;
+		return false;
+	}
 
 	findRobot(map, robot_plane, map_object);
 

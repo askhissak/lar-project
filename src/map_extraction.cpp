@@ -14,9 +14,10 @@
 
 cv::Mat result, rb_plane;
 
-bool ME_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+bool ME_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
 
+bool undistort_flag = false;
 
 //Load camera matrix and distortion coefficients values from intrinsic_calibration.xml
 void loadCoefficients(const std::string& filename,
@@ -314,10 +315,19 @@ cv::Mat findTransform(cv::Mat const & calib_image,
 
 bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object)
 {
-    cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
-    loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
+    cv::Mat calib_image;
+    cv::Mat camera_matrix, dist_coeffs, persp_transf;
+    if(undistort_flag)
+    {
+        loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
 
-    undistort(img, calib_image, camera_matrix, dist_coeffs);
+        calib_image = img;
+        undistort(img, calib_image, camera_matrix, dist_coeffs);
+    }
+    else
+    {
+        calib_image = img;
+    }
 
     if(ME_developer_session == true) showImage("Undistorted image", calib_image);
 
@@ -356,7 +366,16 @@ bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane,
     robot_plane = unwarped_rb_frame;
     map = unwarped_frame;
 
-    storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
+    if(undistort_flag)
+    {
+        storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
+    }
+
+    if(map.empty())
+    {
+        std::cout<<"Map is empty!"<<std::endl;
+        return false;
+    }
     
     return true;
 }
@@ -379,19 +398,35 @@ void storeAllParameters(const std::string& filename,
 //Process the image using perspective transformation matrix
 bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object) 
 {
-    cv::Mat camera_matrix, dist_coeffs, persp_transf, calib_image;
-    loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
+    cv::Mat calib_image;
+    cv::Mat camera_matrix, dist_coeffs, persp_transf;
+    if(undistort_flag)
+    {
+        loadCoefficients("config/intrinsic_calibration.xml", camera_matrix, dist_coeffs);
 
-    calib_image = img;
-    //undistort(img, calib_image, camera_matrix, dist_coeffs);
-    
-    
+        calib_image = img;
+        undistort(img, calib_image, camera_matrix, dist_coeffs);
+    }
+    else
+    {
+        calib_image = img;
+    }
+
     double pixel_scale;
     map = findTransform(calib_image, pixel_scale, map_object);
 
-    storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);
+    if(undistort_flag)
+    {
+        storeAllParameters("config/fullCalibration.yml", camera_matrix, dist_coeffs, pixel_scale, persp_transf);        
+    }
 
     robot_plane = rb_plane;
+
+    if(map.empty())
+    {
+        std::cout<<"Map is empty!"<<std::endl;
+        return false;
+    }
     
     return true;
 }

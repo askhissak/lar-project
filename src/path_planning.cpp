@@ -803,7 +803,8 @@ bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path)
 {
     std::vector<Pose> new_path;
     Pose pose;
-    double s, sum;
+    double s, sum = 0;
+    int npts = 0;
 
     if(arcs.empty())
     {
@@ -812,13 +813,20 @@ bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path)
 
     for(int i=0;i<arcs.size();++i)
     {
+        // for(int k=1;k<100;++k)
+        // {
+        //     if(arcs[i].L/k>1.9 && arcs[i].L/k<2.1)
+        //     {
+        //         npts = k;
+        //     }
+        // }
         for(int j=0; j<20;++j)
         {
             s = arcs[i].L/20*j;
-            sum = sum + s;
             circline(s,arcs[i].x0,arcs[i].y0,arcs[i].th0,arcs[i].k);
-            pose = Pose(sum, cline[0]/1000.0, 1.05-cline[1]/1000.0, cline[2], -arcs[i].k*1000);
-            new_path.push_back(pose);
+            sum = sum + arcs[i].L/20;
+            pose = Pose(sum/1000.0, cline[0]/1000.0, 1.05-cline[1]/1000.0, -cline[2], -arcs[i].k*1000);
+            new_path.push_back(pose);                
         }
     }
 

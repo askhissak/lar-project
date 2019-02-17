@@ -99,8 +99,8 @@ bool check(double s1, double k0, double s2, double k1, double s3, double k2, dou
 // % given arc-length s
 void circline(double s, double x0, double y0, double th0, double k)
 {
-    double x = x0 + s*sinc(k*s/2.0)*cos(th0+k*s/2);
-    double y = y0 + s*sinc(k*s/2.0)*sin(th0+k*s/2);
+    double x = x0 + s*sinc(k*s/2.0)*cos(th0+k*s/2.0);
+    double y = y0 + s*sinc(k*s/2.0)*sin(th0+k*s/2.0);
     double th = mod2pi(th0+k*s);
     cline[0] = x;
     cline[1] = y;
