@@ -14,10 +14,13 @@
 #include "map_extraction.hpp"
 #include "map_construction.hpp"
 
+#include <chrono>
+
 
 bool DR_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
 
+using namespace std::chrono;
 
 //Properly rotate an image
 cv::Mat rotate(cv::Mat src, double angle)
@@ -142,6 +145,8 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
 
 bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* index)
 {
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+	
     // Display original image
     if (DR_developer_session == true) showImage("Original", map);
   
@@ -271,8 +276,14 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
     
         std::cout << "Best fitting template: " << maxIdx << std::endl;
         //if(maxScore>0.01) return false;
-        
+     
     }
+    
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+	auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+
+	std::cout << "\n\n PROCESSING TIME : " << duration/1000 << "MILISECONDS \n\n " ;
 
     return true;
 }

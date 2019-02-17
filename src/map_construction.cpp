@@ -113,6 +113,8 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
     
     while(color < 6)
     {
+		std::cout <<"\n Adjust the Values and press 'q' to set the Values and go to the next color \n " << std::endl ;
+		
 		low_H = 0, low_S = 0, low_V = 0;
 		high_H = max_value_H, high_S = max_value, high_V = max_value;
 		

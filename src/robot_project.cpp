@@ -12,8 +12,12 @@
 
 #include "path.h"
 #include "robot_project.h"
+#include <chrono>
 
-bool RP_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+using namespace std::chrono;
+
+
+bool RP_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 									// if false -> Process everything without graphical output 
 Map map_object;
 cv::Mat robot_plane, map;
@@ -80,6 +84,10 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 bool RobotProject::localize(cv::Mat const & img, 
             std::vector<double> & state)
 {
+	
+	
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+   
 	if(!extractMapLocalize(img, map, robot_plane, map_object))
 	{
 		std::cerr << "(Critical) Failed to extract the map!" << std::endl;
@@ -91,6 +99,12 @@ bool RobotProject::localize(cv::Mat const & img,
 	state.push_back(map_object.robot.pose.x);
 	state.push_back(map_object.robot.pose.y);
 	state.push_back(map_object.robot.pose.theta);
+    
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+
+    std::cout << "\n\n PROCESSING TIME : " << duration/1000 << "MILISECONDS \n\n " ;
     
 	return true;
 }
