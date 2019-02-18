@@ -19,9 +19,17 @@ using namespace std::chrono;
 
 bool RP_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 									// if false -> Process everything without graphical output 
+									
+int Path_Planning_Mode = 2 ;  //if 1 -> The approximation is made throught the Voronoi Diagram Implementation
+							  //if 2 -> The approximation is made through a Collision Detection Implementation				
+									
 Map map_object;
 cv::Mat robot_plane, map;
 std::vector<int> order;
+
+std::vector<cv::Point> points_path;
+std::vector<cv::Point> new_path;
+std::vector<std::vector<cv::Point>> inflated_contours;
 
 // Constructor taking as argument the command line parameters
 RobotProject::RobotProject(int argc, char * argv[])
@@ -66,14 +74,27 @@ bool RobotProject::preprocessMap(cv::Mat const & img)
 // Method invoked when a new path must be planned (detect initial robot position from img)
 bool RobotProject::planPath(cv::Mat const & img, Path & path)
 {
-
-	if(!planMission(map, map_object, path, order))
+	if (Path_Planning_Mode == 1)
 	{
-		std::cerr << "(Critical) Failed to plan a path!" << std::endl;
-		return false;
-	}
+		if(!planMission(map, map_object, path, order))
+		{
+			std::cerr << "(Critical) Failed to plan a path!" << std::endl;
+			return false;
+		}
 
-	printPosePath(path);
+		printPosePath(path);
+	
+	}
+	
+	else if (Path_Planning_Mode == 2)
+	{	
+		if(!run_collision_detection( map , points_path , new_path , inflated_contours ))
+		{
+			std::cerr << "(Critical) Failed to create a new path!" << std::endl;
+			return false;
+		}
+		
+	}
 
     return true;
 
@@ -86,7 +107,7 @@ bool RobotProject::localize(cv::Mat const & img,
 {
 	
 	
-	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();  // <- initial Process Time Measurement 
    
 	if(!extractMapLocalize(img, map, robot_plane, map_object))
 	{
@@ -105,9 +126,9 @@ bool RobotProject::localize(cv::Mat const & img,
 	state.push_back(-map_object.robot.pose.theta);
 	std::cout<<"x = "<<map_object.robot.pose.x/1000.0<<" y = "<<1.05-map_object.robot.pose.y/1000.0<<" theta = "<<-map_object.robot.pose.theta<<std::endl;
     
-    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    high_resolution_clock::time_point t2 = high_resolution_clock::now(); // <- Final Process Time Measurement 
 
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count(); // Process Time Calculation 
 
     std::cout << "\n\n PROCESSING TIME : " << duration/1000 << "MILISECONDS \n\n " ;
     
