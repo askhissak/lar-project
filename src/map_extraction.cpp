@@ -37,7 +37,7 @@ int Black_h_Low  = 0; 	int Black_h_High = 180;
 
 int Black_s_Low  = 5; 	int Black_s_High = 255;
 
-int Black_v_Low  = 5; 	int Black_v_High = 40;
+int Black_v_Low  = 5; 	int Black_v_High = 70;
 
 
 static void on_low_h_thresh_trackbar(int, void *)
@@ -470,6 +470,9 @@ cv::Mat findTransform(cv::Mat const & calib_image,
 		cv::waitKey(0);
 		cv::destroyWindow(name);
 		cv::destroyWindow(wind2);
+		
+		ME_developer_session = false;
+		
 	}
     rb_plane = unwarped_rb_frame;
 

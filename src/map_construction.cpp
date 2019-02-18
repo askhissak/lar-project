@@ -61,7 +61,7 @@ int ROI_V_Low  = 75; 	int ROI_V_High = 255;
 
 int Robot_H_Low  = 80; 	int Robot_H_High = 100;
 
-int Robot_S_Low  = 150; int Robot_S_High = 200;
+int Robot_S_Low  = 100; int Robot_S_High = 200;
 
 int Robot_V_Low  = 119; int Robot_V_High = 200;
 
@@ -1049,7 +1049,11 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
   }
   else
   {
-    if(MC_developer_session == true) showImage("Robot Outline", robot_mask_temp);
+    if(MC_developer_session == true) 
+    {
+		showImage("Robot Outline", robot_mask_temp);
+		MC_developer_session = false;
+	}
     return true; 
   }
 }

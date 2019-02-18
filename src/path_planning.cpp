@@ -19,12 +19,8 @@
 #include "path.h"
 
 
-bool PP_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+bool PP_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								    // if false -> Process everything without graphical output 
-
-bool PP_demo_session      = false ;  // if true  -> Retrieves desired demo real time visualization of desired output 
-								    // if false -> Process everything without graphical output 
-
 
 std::vector<NeighborVertices> roadmap;
 cv::Mat local_map;
@@ -186,7 +182,7 @@ void connectGraph(Map map_object, std::vector<NeighborVertices> & graph, cv::Mat
                     double dist = sqrt(pow((graph[j].vertex.x-graph[i].vertex.x),2)+pow((graph[j].vertex.y-graph[i].vertex.y),2));
                     if(dist<1000)
                     {
-                        std::cout<<"Adding vertex "<<graph[j].vertex<<" to the list of neighbors of vertex "<<graph[i].vertex<<std::endl;
+                        if(PP_developer_session == true)std::cout<<"Adding vertex "<<graph[j].vertex<<" to the list of neighbors of vertex "<<graph[i].vertex<<std::endl;
                         Neighbor n = Neighbor(graph[j].vertex, dist);
                         graph[i].neighbors.push_back(n);
                     }
@@ -219,7 +215,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
     {
         for(int j=0;j<src[i].size();++j)
         {
-            std::cout<<"Facet "<<i<<", element "<<j<<". Vertex "<<src[i][j]<<std::endl;
+            if(PP_developer_session == true)std::cout<<"Facet "<<i<<", element "<<j<<". Vertex "<<src[i][j]<<std::endl;
             collision_flag = pointCollision(map_object, src[i][j], COLLISION_THRESHOLD);
             // std::cout<<"Collision flag "<<collision_flag<<std::endl;
             if(!collision_flag)
@@ -234,7 +230,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
                     vert = NeighborVertices(src[i][j]);
                     adjList.push_back(vert);
                     insertIndex = 0;
-                    std::cout<<"Added "<<adjList[insertIndex].vertex<<" to the Adjacency list."<<std::endl;
+                    if(PP_developer_session == true)std::cout<<"Added "<<adjList[insertIndex].vertex<<" to the Adjacency list."<<std::endl;
                     if(j==0)
                     {
                         previous = src[i].size()-1;
@@ -312,7 +308,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
                     vert = NeighborVertices(src[i][j]);
                     adjList.push_back(vert);
                     insertIndex = adjList.size()-1;
-                    std::cout<<"Added "<<adjList[insertIndex].vertex<<" to the Adjacency list."<<std::endl;
+                    if(PP_developer_session == true)std::cout<<"Added "<<adjList[insertIndex].vertex<<" to the Adjacency list."<<std::endl;
                     if(j==0)
                     {
                         previous = src[i].size()-1;
@@ -385,8 +381,8 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
                 }
                 else if(idx>=0)
                 {
-                    std::cout<<"Vertex "<<src[i][j]<<" is already in the Adjacency list!"<<std::endl;
-                    std::cout<<"Adding its neighbors to an existing element in the Adjacency list..."<<std::endl;
+                    if(PP_developer_session == true)std::cout<<"Vertex "<<src[i][j]<<" is already in the Adjacency list!"<<std::endl;
+                    if(PP_developer_session == true)std::cout<<"Adding its neighbors to an existing element in the Adjacency list..."<<std::endl;
                     // std::cout<<"Facet "<<i<<", element "<<j<<std::endl;
                     if(j==0)
                     {
@@ -461,7 +457,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
             }
             else 
             {
-                std::cout<<"Collision detected! Discarding the vertex "<<src[i][j]<<std::endl;
+                if(PP_developer_session == true)std::cout<<"Collision detected! Discarding the vertex "<<src[i][j]<<std::endl;
                 continue;
             }
         }
@@ -541,7 +537,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
 bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::Point end,     
 								std::vector<double> &cost_so_far, std::vector<cv::Point> &came_from)
 {
-    std::cout << "\nGetting the shortest path from " << start << " to "<<end<<std::endl;
+    if(PP_developer_session == true)std::cout << "\nGetting the shortest path from " << start << " to "<<end<<std::endl;
 
 	cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
 	std::string win_dijkstra = "Dijkstra path";
@@ -612,7 +608,7 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
             double new_cost = current_weight + weight + heuristic;
 
             // std::cout<<"Current index "<<current_graph_index<<std::endl;
-            std::cout<<"Current vertex "<<current_vertex<<std::endl;
+            if(PP_developer_session == true) std::cout<<"Current vertex "<<current_vertex<<std::endl;
 
             // for(int k=0;k<adjList.size();++k)
             // {
@@ -625,12 +621,12 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
             //     }
             // }
             // std::cout<<"Current frontier cost "<<current_weight<<std::endl;
-            std::cout<<"Cost of current "<<cost_so_far[current_graph_index]<<std::endl;            
+            if(PP_developer_session == true)std::cout<<"Cost of current "<<cost_so_far[current_graph_index]<<std::endl;            
 
             // std::cout<<"Next index "<<next_graph_index<<std::endl;
-            std::cout<<"Next vertex "<<next_vertex<<std::endl;
-            std::cout<<"New cost "<<new_cost<<std::endl;
-            std::cout<<"Cost of next "<<cost_so_far[next_graph_index]<<std::endl;
+            if(PP_developer_session == true)std::cout<<"Next vertex "<<next_vertex<<std::endl;
+            if(PP_developer_session == true)std::cout<<"New cost "<<new_cost<<std::endl;
+            if(PP_developer_session == true)std::cout<<"Cost of next "<<cost_so_far[next_graph_index]<<std::endl;
 
             if(new_cost < cost_so_far[next_graph_index])
             {
@@ -638,7 +634,7 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
                 cost_so_far[next_graph_index] = new_cost;
             	priority = new_cost;
 				// std::cout<<"Heuristics "<<heuristics<<std::endl;
-				std::cout<<"Priority order of frontier "<<priority<<std::endl<<std::endl;
+				if(PP_developer_session == true)std::cout<<"Priority order of frontier "<<priority<<std::endl<<std::endl;
                 frontier.push(Neighbor(next_vertex, priority));
                 came_from[next_graph_index] = current_vertex;
             	// std::cout<<"Current vertex "<<current_vertex<<std::endl;
@@ -668,7 +664,7 @@ void addVertex(Map map_object, std::vector<NeighborVertices> & adjList, cv::Poin
     {
         if(equalPoints(adjList[i].vertex, start))
         {
-            std::cout<<"Graph already contains this vertex "<<start<<std::endl;
+            if(PP_developer_session == true)std::cout<<"Graph already contains this vertex "<<start<<std::endl;
             return;
         }
         dist = sqrt(pow((adjList[i].vertex.x-start.x),2)+pow((adjList[i].vertex.y-start.y),2));
@@ -696,10 +692,10 @@ void addVertex(Map map_object, std::vector<NeighborVertices> & adjList, cv::Poin
     
 void printShortestPath(std::vector<double> &dist, cv::Point &start, std::vector<cv::Point> came_from)
 {
-    std::cout << "\nPrinting the shortest paths for node " << start << ".\n";
+    if(PP_developer_session == true)std::cout << "\nPrinting the shortest paths for node " << start << ".\n";
     for(int i = 0; i < dist.size(); i++)
     {
-     std::cout << "The distance from node " << start << " to node " << came_from[i] << " is: " << dist[i] << std::endl;
+     if(PP_developer_session == true)std::cout << "The distance from node " << start << " to node " << came_from[i] << " is: " << dist[i] << std::endl;
     }
 }
 
@@ -707,7 +703,7 @@ void printPath(std::vector<NeighborVertices> adjList, std::vector<cv::Point> cam
 {
     for(int i = 0; i < adjList.size(); i++)
     {
-     std::cout << "We came to the node " << adjList[i].vertex << " from node " << came_from[i] << std::endl;
+     if(PP_developer_session == true)std::cout << "We came to the node " << adjList[i].vertex << " from node " << came_from[i] << std::endl;
     }
 }
 
@@ -715,7 +711,7 @@ void printPosePath(Path path)
 {
     for(int i = 0; i < path.size(); i++)
     {
-        std::cout << path.points[i].s<<" "<<path.points[i].x <<" "<< path.points[i].y<<" "<<path.points[i].theta<<" "<<path.points[i].kappa<< std::endl;
+      if(PP_developer_session == true)std::cout << path.points[i].s<<" "<<path.points[i].x <<" "<< path.points[i].y<<" "<<path.points[i].theta<<" "<<path.points[i].kappa<< std::endl;
     }
 }
 
@@ -863,7 +859,7 @@ bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path)
             }
             
         }
-        std::cout<<"Sampling distance "<<npts<<std::endl;
+        if(PP_developer_session == true)std::cout<<"Sampling distance "<<npts<<std::endl;
         for(int j=0; j<npts;++j)
         {
             s = arcs[i].L/npts*j;
@@ -883,7 +879,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
     cv::Mat out(1050, 1510, CV_8UC3, cv::Scalar(0,0,0));
 	std::vector<double> dist;
 	bool animate = true;
-	std::string win_dubins = "Dubins path";
+	if(PP_developer_session == true)std::string win_dubins = "Dubins path";
 
 	std::vector<double> cost_so_far;
 	std::vector<cv::Point> came_from;
@@ -930,7 +926,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
 		if(k==0)
 		{
 			addVertex(map_object, adjList, map_object.victims[order[k]].center);
-			std::cout<<"Added point "<<adjList[adjList.size()-1].vertex<<std::endl;
+			if(PP_developer_session == true)std::cout<<"Added point "<<adjList[adjList.size()-1].vertex<<std::endl;
 
             // x0 = robot_x0;
             // y0 = robot_y0;
@@ -972,7 +968,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
 		else
 		{
 			addVertex(map_object, adjList, map_object.victims[order[k]].center);
-			std::cout<<"Added point "<<adjList[adjList.size()-1].vertex<<std::endl;
+			if(PP_developer_session == true)std::cout<<"Added point "<<adjList[adjList.size()-1].vertex<<std::endl;
 			if(!shortestPath(adjList, map_object.victims[order[k-1]].center, map_object.victims[order[k]].center, cost_so_far, came_from))
 			{
 				std::cout<<"Can't find a path!"<<std::endl;
@@ -1009,7 +1005,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
     }
 
     addVertex(map_object, adjList, cv::Point(gate_xf, gate_yf));
-    std::cout<<"Added gate "<<adjList[adjList.size()-1].vertex<<std::endl;
+    if(PP_developer_session == true)std::cout<<"Added gate "<<adjList[adjList.size()-1].vertex<<std::endl;
     if(!shortestPath(adjList, map_object.victims[order[order.size()-1]].center, cv::Point(gate_xf,gate_yf), cost_so_far, came_from))
     {
         std::cout<<"Can't find a path!"<<std::endl;
@@ -1073,7 +1069,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
     std::string name = "Dubins path with roadmap vertices";
     
    
-    if(PP_developer_session == true || PP_demo_session == true ) 
+    if(PP_developer_session == true) 
     
 	{
 		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);

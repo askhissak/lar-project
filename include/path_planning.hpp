@@ -2,7 +2,7 @@
 #define LAR_PATHPLANNING_HPP
 
 //Forward declared dependencies
-const int COLLISION_THRESHOLD = 100;
+const int COLLISION_THRESHOLD = 150;
 const double KMAX = 0.01;
 
 //Included dependencies
