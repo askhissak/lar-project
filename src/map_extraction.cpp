@@ -40,6 +40,16 @@ int Black_s_Low  = 5; 	int Black_s_High = 255;
 int Black_v_Low  = 5; 	int Black_v_High = 70;
 
 
+int White_h_Low  = 60; 	int White_h_High = 160;
+
+int White_s_Low  = 10; 	int White_s_High = 100;
+
+int White_v_Low  = 180; int White_v_High = 255;
+
+int current_color =0 ; 
+
+
+
 static void on_low_h_thresh_trackbar(int, void *)
 {
     low_h = cv::min(high_h-1, low_h);
@@ -77,76 +87,147 @@ void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img )
     cv::resize(original_img, original_img , cv::Size(640, 430));
     cv::resize(hsv_img, hsv_img , cv::Size(640, 430));
     
-    std::cout <<"\n Adjust the Values and press 'q' to set the Values and finish the Calibration \n " << std::endl ;
     
-    low_h = 0, low_s = 0, low_v = 0;
-	high_h = max_value_H, high_s = max_value, high_v = max_value;
-	
-		
-	cv::namedWindow(source_image);
-	cv::namedWindow(masked_image);
-	// Trackbars to set thresholds for HSV values
-
-	
-	cv::Mat hsv_filtered;
-	
-	bool first_values = true ;
-	
-    while(1)
+    while( current_color < 2 )
     {
-		if(first_values == true)
-		{	
-			low_h = Black_h_Low ;
-			low_s = Black_s_Low ;
-			low_v = Black_v_Low ;
+		std::cout <<"\n Adjust the Values and press 'q' to set the Values and finish the Calibration \n " << std::endl ;
+    
+	    low_h = 0, low_s = 0, low_v = 0;
+		high_h = max_value_H, high_s = max_value, high_v = max_value;
+	    
+	    switch(current_color)
+		{
+			case 0 : masked_image = " White Filter " ; break;
+			case 1 : masked_image = " Black Filter " ; break;
+		}
+	    	
+		cv::namedWindow(source_image);
+		cv::namedWindow(masked_image);
+		// Trackbars to set thresholds for HSV values
 	
-			high_h = Black_h_High;
-			high_s = Black_s_High;
-			high_v = Black_v_High;
-			
-			cv::namedWindow(source_image, CV_WINDOW_NORMAL);
-			cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
-			
-			cv::moveWindow(masked_image, 700,0);
-			
-			createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
-			createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
-			createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
-	
-			createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
-			createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
-			createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+		cv::Mat hsv_filtered;
+		
+		bool first_values = true ;
+		
+		
+		
+	    while(current_color == 1) //Black Filter 
+	    {
+			if(first_values == true)
+			{	
+				low_h = Black_h_Low ;
+				low_s = Black_s_Low ;
+				low_v = Black_v_Low ;
+		
+				high_h = Black_h_High;
+				high_s = Black_s_High;
+				high_v = Black_v_High;
 				
-			first_values = false ;
+				cv::namedWindow(source_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
+				
+				cv::moveWindow(masked_image, 700,0);
+				
+				createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
+				createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
+				createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
+		
+				createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
+				createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
+				createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+					
+				first_values = false ;
+			}
+			
+			inRange(hsv_img, cv::Scalar(low_h, low_s, low_v), cv::Scalar(high_h, high_s, high_v), hsv_filtered);
+	
+			
+			cv::imshow(source_image, original_img);
+					
+			cv::imshow(masked_image, hsv_filtered);
+			
+			
+			char key = (char) cv::waitKey(30);
+			
+			if (key == 'q' || key == 27)
+			{
+				Black_h_Low  = low_h ;  Black_h_High = high_h;
+		
+				Black_s_Low  = low_s ;  Black_s_High = high_s;
+		
+				Black_v_Low  = low_v ;  Black_v_High = high_v;
+				
+				cv::destroyWindow(source_image);
+				cv::destroyWindow(masked_image);
+				
+				std::cout <<"\n Values of Filters for the Black Mask : " << " H_LOW: " << Black_h_Low <<  " H_HIGH : " << Black_h_High << std::endl ;
+				std::cout <<"                                 " << " S_LOW: " << Black_s_Low <<  " S_HIGH : " << Black_s_High << std::endl ;
+				std::cout <<"                                 " << " V_LOW: " << Black_v_Low <<  " V_HIGH : " << Black_v_High << std::endl ;
+				
+				current_color++;
+				
+				break;
+					
+			}
 		}
 		
-		inRange(hsv_img, cv::Scalar(low_h, low_s, low_v), cv::Scalar(high_h, high_s, high_v), hsv_filtered);
-
+		while(current_color == 0) //White Filter 
+	    {
+			if(first_values == true)
+			{	
+				low_h = White_h_Low ;
+				low_s = White_s_Low ;
+				low_v = White_v_Low ;
 		
-		cv::imshow(source_image, original_img);
+				high_h = White_h_High;
+				high_s = White_s_High;
+				high_v = White_v_High;
 				
-		cv::imshow(masked_image, hsv_filtered);
-		
-		
-		char key = (char) cv::waitKey(30);
-		
-		if (key == 'q' || key == 27)
-		{
-			Black_h_Low  = low_h ;  Black_h_High = high_h;
-	
-			Black_s_Low  = low_s ;  Black_s_High = high_s;
-	
-			Black_v_Low  = low_v ;  Black_v_High = high_v;
-			
-			cv::destroyWindow(source_image);
-			cv::destroyWindow(masked_image);
-			
-			std::cout <<"\n Values of Filters for the Robot : " << " H_LOW: " << Black_h_Low <<  " H_HIGH : " << Black_h_High << std::endl ;
-			std::cout <<"                                 " << " S_LOW: " << Black_s_Low <<  " S_HIGH : " << Black_s_High << std::endl ;
-			std::cout <<"                                 " << " V_LOW: " << Black_v_Low <<  " V_HIGH : " << Black_v_High << std::endl ;
-			
-			break;
+				cv::namedWindow(source_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
 				
+				cv::moveWindow(masked_image, 700,0);
+				
+				createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
+				createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
+				createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
+		
+				createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
+				createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
+				createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+					
+				first_values = false ;
+			}
+			
+			inRange(hsv_img, cv::Scalar(low_h, low_s, low_v), cv::Scalar(high_h, high_s, high_v), hsv_filtered);
+	
+			
+			cv::imshow(source_image, original_img);
+					
+			cv::imshow(masked_image, hsv_filtered);
+			
+			
+			char key = (char) cv::waitKey(30);
+			
+			if (key == 'q' || key == 27)
+			{
+				White_h_Low  = low_h ;  White_h_High = high_h;
+		
+				White_s_Low  = low_s ;  White_s_High = high_s;
+		
+				White_v_Low  = low_v ;  White_v_High = high_v;
+				
+				cv::destroyWindow(source_image);
+				cv::destroyWindow(masked_image);
+				
+				std::cout <<"\n Values of Filters for the White Mask : " << " H_LOW: " << White_h_Low <<  " H_HIGH : " << White_h_High << std::endl ;
+				std::cout <<"                                 " << " S_LOW: " << White_s_Low <<  " S_HIGH : " << White_s_High << std::endl ;
+				std::cout <<"                                 " << " V_LOW: " << White_v_Low <<  " V_HIGH : " << White_v_High << std::endl ;
+				
+				current_color++;
+				
+				break;	
+			 }
 		}
 	}
 }
@@ -363,12 +444,14 @@ std::vector<cv::Point> detectRobotPlaneCorners(const cv::Mat& img)
     cv::Mat hsv_img;
     cv::cvtColor(bg_img, hsv_img, cv::COLOR_BGR2HSV);
 
+
+    //Change here the values of the calib
+
+
     // Find white regions
     cv::Mat white_mask;
-    cv::inRange(hsv_img, cv::Scalar(60, 10, 180), cv::Scalar(160, 100, 255), white_mask);
-
-    if(ME_developer_session == true) showImage("White mask", white_mask);   
-    
+    cv::inRange(hsv_img, cv::Scalar(White_h_Low, White_s_Low, White_v_Low), cv::Scalar(White_h_High, White_s_High, White_v_High), white_mask);
+		
     std::vector<cv::Point> sort_high_x;
     std::vector<cv::Vec3f> corner_circles;
     HoughCircles( white_mask , corner_circles, cv::HOUGH_GRADIENT, 1, white_mask.rows/10, 40, 20, 15, 27);
