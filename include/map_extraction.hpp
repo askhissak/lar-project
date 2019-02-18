@@ -36,4 +36,7 @@ void storeAllParameters(const std::string& filename,
 bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object);
 bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & map_object);
 
+void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img );
+
+
 #endif

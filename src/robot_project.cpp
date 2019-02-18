@@ -20,7 +20,7 @@ using namespace std::chrono;
 bool RP_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 									// if false -> Process everything without graphical output 
 									
-int Path_Planning_Mode = 2 ;  //if 1 -> The approximation is made throught the Voronoi Diagram Implementation
+int Path_Planning_Mode = 1 ;  //if 1 -> The approximation is made throught the Voronoi Diagram Implementation
 							  //if 2 -> The approximation is made through a Collision Detection Implementation				
 									
 Map map_object;
@@ -88,6 +88,14 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 	
 	else if (Path_Planning_Mode == 2)
 	{	
+		std::cout << "Checking Path" << std::endl;
+		
+		for (int i=0 ; i>path.size() ; i++)
+		{
+			std::cout << i << std::endl;
+			//points_path.push_back(cv::Point(path[i].points.x , path[i].points.y));
+		}
+		
 		if(!run_collision_detection( map , points_path , new_path , inflated_contours ))
 		{
 			std::cerr << "(Critical) Failed to create a new path!" << std::endl;

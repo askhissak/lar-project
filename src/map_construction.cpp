@@ -1020,7 +1020,7 @@ bool findRobot(cv::Mat const & map, cv::Mat const & robot_plane, Map & map_objec
   {
     int robot_area = cv::contourArea(mc_contours[i]); //Area variable for current selection
       
-    if (robot_area >100) //Area Threshold
+    if (robot_area >500) //Area Threshold
     {  
 	    robot_flag++;//Local variable for controlling the "Gates detected trigger"
 	     	

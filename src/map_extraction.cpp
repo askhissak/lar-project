@@ -14,10 +14,143 @@
 
 cv::Mat result, rb_plane;
 
-bool ME_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
-								 // if false -> Process everything without graphical output 
+bool ME_developer_session = true ; // if true  -> Retrieves desired debugging and log content and show the Color Calibrating Trackbars
+								 // if false -> Process everything without graphical outputs 
 
-bool undistort_flag = false;
+
+int filtering_mode = 2 ;    // if 1 -> Filtering Mode set to Adaptive Threshold
+							// if 2 -> Filtering Mode set to Black Mask Filtering 
+
+bool undistort_flag = false;              
+
+const int max_value_H = 360/2;
+const int max_value = 255;
+int low_h = 0, low_s = 0, low_v = 0;
+int track_low_h = 0, track_low_s = 0, track_low_v = 0;
+int high_h = max_value_H, high_s = max_value, high_v = max_value;
+int track_high_h = max_value_H, track_high_s = max_value, track_high_v = max_value;
+
+cv::String source_image = "Original Image";
+cv::String masked_image = "Filtered Image";
+
+int Black_h_Low  = 0; 	int Black_h_High = 180;
+
+int Black_s_Low  = 5; 	int Black_s_High = 255;
+
+int Black_v_Low  = 5; 	int Black_v_High = 40;
+
+
+static void on_low_h_thresh_trackbar(int, void *)
+{
+    low_h = cv::min(high_h-1, low_h);
+    setTrackbarPos("Low H", masked_image, low_h);
+}
+static void on_high_h_thresh_trackbar(int, void *)
+{
+    high_h = cv::max(high_h, low_h+1);
+    setTrackbarPos("High H", masked_image, high_h);
+}
+static void on_low_s_thresh_trackbar(int, void *)
+{
+    low_s = cv::min(high_s-1, low_s);
+    setTrackbarPos("Low S", masked_image, low_s);
+}
+static void on_high_s_thresh_trackbar(int, void *)
+{
+    high_s = cv::max(high_s, low_s+1);
+    setTrackbarPos("High S", masked_image, high_s);
+}
+static void on_low_v_thresh_trackbar(int, void *)
+{
+    low_v = cv::min(high_v-1, low_v);
+    setTrackbarPos("Low V",masked_image, low_v);
+}
+static void on_high_v_thresh_trackbar(int, void *)
+{
+    high_v = cv::max(high_v, low_v+1);
+    setTrackbarPos("High V", masked_image, high_v);
+}
+
+void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img )
+{
+    
+    cv::resize(original_img, original_img , cv::Size(640, 430));
+    cv::resize(hsv_img, hsv_img , cv::Size(640, 430));
+    
+    std::cout <<"\n Adjust the Values and press 'q' to set the Values and finish the Calibration \n " << std::endl ;
+    
+    low_h = 0, low_s = 0, low_v = 0;
+	high_h = max_value_H, high_s = max_value, high_v = max_value;
+	
+		
+	cv::namedWindow(source_image);
+	cv::namedWindow(masked_image);
+	// Trackbars to set thresholds for HSV values
+
+	
+	cv::Mat hsv_filtered;
+	
+	bool first_values = true ;
+	
+    while(1)
+    {
+		if(first_values == true)
+		{	
+			low_h = Black_h_Low ;
+			low_s = Black_s_Low ;
+			low_v = Black_v_Low ;
+	
+			high_h = Black_h_High;
+			high_s = Black_s_High;
+			high_v = Black_v_High;
+			
+			cv::namedWindow(source_image, CV_WINDOW_NORMAL);
+			cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
+			
+			cv::moveWindow(masked_image, 700,0);
+			
+			createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
+			createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
+			createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
+	
+			createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
+			createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
+			createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+				
+			first_values = false ;
+		}
+		
+		inRange(hsv_img, cv::Scalar(low_h, low_s, low_v), cv::Scalar(high_h, high_s, high_v), hsv_filtered);
+
+		
+		cv::imshow(source_image, original_img);
+				
+		cv::imshow(masked_image, hsv_filtered);
+		
+		
+		char key = (char) cv::waitKey(30);
+		
+		if (key == 'q' || key == 27)
+		{
+			Black_h_Low  = low_h ;  Black_h_High = high_h;
+	
+			Black_s_Low  = low_s ;  Black_s_High = high_s;
+	
+			Black_v_Low  = low_v ;  Black_v_High = high_v;
+			
+			cv::destroyWindow(source_image);
+			cv::destroyWindow(masked_image);
+			
+			std::cout <<"\n Values of Filters for the Robot : " << " H_LOW: " << Black_h_Low <<  " H_HIGH : " << Black_h_High << std::endl ;
+			std::cout <<"                                 " << " S_LOW: " << Black_s_Low <<  " S_HIGH : " << Black_s_High << std::endl ;
+			std::cout <<"                                 " << " V_LOW: " << Black_v_Low <<  " V_HIGH : " << Black_v_High << std::endl ;
+			
+			break;
+				
+		}
+	}
+}
+
 
 //Load camera matrix and distortion coefficients values from intrinsic_calibration.xml
 void loadCoefficients(const std::string& filename,
@@ -140,31 +273,61 @@ cv::Mat calculateTransform(cv::Mat calib_image, int length,int width,double& pix
 //Picking reference points for map plane automatically
 std::vector<cv::Point> detectMapCorners(const cv::Mat& img)
 {
-    result = cv::Mat(4, 2, CV_32F);
-    cv::Mat bg_img = img.clone();
-
-    // Convert color space from BGR to grayscale
+	
+	
+	result = cv::Mat(4, 2, CV_32F);
+    
+    
+    cv::Mat filtered_mask;
     cv::Mat gray_img;
-    cv::cvtColor(bg_img, gray_img, cv::COLOR_BGR2GRAY);
 
-    // Find image filtered by adaptive threshold 
-    cv::Mat adaptive_mask;
-    cv::adaptiveThreshold(gray_img, adaptive_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 31, 0);
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
-    cv::dilate(adaptive_mask, adaptive_mask, kernel);
+    // ----- Variable for the First Filtering mode  -------------
+	cv::Mat bg_img = img.clone();
 
-    //Try out black filter because adaptive fails when robot close to the border. Maybe make it an option
-
-    //Show filtered image
-    if(ME_developer_session == true) showImage("Adaptive mask", adaptive_mask);
-
+	// ----- Variables for the Second Filtering mode ------------ 
+	cv::Mat hsv_img;
+    
+    
+	if (filtering_mode == 1) // <- Adaptive Threshold
+	{
+		//Converting the Image to Grayscale to work on the filtering
+		cv::cvtColor(bg_img, gray_img, cv::COLOR_BGR2GRAY);
+		
+		// Find image filtered by adaptive threshold 	
+		
+		cv::adaptiveThreshold(gray_img, filtered_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 31, 0);
+		cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+		cv::dilate(filtered_mask, filtered_mask, kernel);
+		
+		//Show filtered image
+		if(ME_developer_session == true) showImage("Adaptive mask", filtered_mask);
+		
+	}
+	
+	else if( filtering_mode == 2)
+	{
+		//Converting the Image to HSV Color Space to work with the respective color filtered masks
+		cv::cvtColor(bg_img, hsv_img, cv::COLOR_BGR2HSV);
+		
+		
+		if (ME_developer_session == true) Calibrate_HSV(bg_img , hsv_img);
+		
+		
+		// Find black regions (filter on saturation and value)
+		cv::inRange(hsv_img, cv::Scalar(Black_h_Low, Black_s_Low, Black_v_Low), cv::Scalar(Black_h_High, Black_s_High, Black_v_High), filtered_mask);
+		cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size((1*2) + 1, (1*2)+1));
+		cv::dilate(filtered_mask, filtered_mask, kernel);	
+		cv::erode(filtered_mask, filtered_mask, kernel);
+		
+	} 
+	
     // Find contours
     std::vector<std::vector<cv::Point>> contours, contours_approx;
     std::vector<cv::Point> approx_curve, sort_x;
     cv::Mat contours_img;
 
     // Process black mask
-    cv::findContours(adaptive_mask, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE); // find external contours of each blob
+    cv::findContours(filtered_mask, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE); // find external contours of each blob
 
     contours_img = img.clone();
     drawContours(contours_img, contours, -1, cv::Scalar(40,190,40), 1, cv::LINE_AA);
@@ -430,3 +593,4 @@ bool extractMap(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane, Map & m
     
     return true;
 }
+
