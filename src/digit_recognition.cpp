@@ -20,7 +20,7 @@
 bool DR_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								 // if false -> Process everything without graphical output 
 								 
-int approximation = 3 ;  // if 1  -> Use just Tesseract 
+int approximation = 4 ;  // if 1  -> Use just Tesseract 
 						 // if 2  -> Use just Template Matching   
 						 // if 3  -> Use Tesseract and if there's no useful results use Template Matching 
 						 // if 4  -> Use Template Matching and if there's no useful results use Tesseract 
