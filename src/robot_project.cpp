@@ -88,12 +88,10 @@ bool RobotProject::planPath(cv::Mat const & img, Path & path)
 	
 	else if (Path_Planning_Mode == 2)
 	{	
-		std::cout << "Checking Path" << std::endl;
 		
-		for (int i=0 ; i>path.size() ; i++)
+		for (int i=0 ; i<path.size() ; i++)
 		{
-			std::cout << i << std::endl;
-			//points_path.push_back(cv::Point(path[i].points.x , path[i].points.y));
+			points_path.push_back(cv::Point(path.points[i].x , path.points[i].y));
 		}
 		
 		if(!run_collision_detection( map , points_path , new_path , inflated_contours ))

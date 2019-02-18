@@ -1013,7 +1013,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
     else
     {
         std::vector<cv::Point> path_vertices_temp;
-        std::cout<<"Found a path!"<<std::endl;
+         if(PP_developer_session == true)std::cout<<"Found a path!"<<std::endl;
         printPath(adjList, came_from);
         if(restorePath(adjList, came_from, path_vertices_temp, map_object.victims[order[order.size()-1]].center, cv::Point(gate_xf,gate_yf)))
         {
