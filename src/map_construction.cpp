@@ -13,7 +13,7 @@
 #include "map_extraction.hpp"
 #include "path.h"
 
-bool MC_developer_session = true ; // if true  -> Retrieves desired debugging and log content 
+bool MC_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
 								    // if false -> Process everything without graphical output 
 
 

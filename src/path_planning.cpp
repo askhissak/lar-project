@@ -731,18 +731,55 @@ void planDubins(Map & map_object, std::vector<DubinsArc> & arcs, double x0, doub
 
 	DubinsCurve curve = dubins_shortest_path(x0, y0, th0, xf, yf, thf, KMAX); 
 
+    for(int k=1;k<100;++k)
+    {
+        if(curve.arc1.L/k>5 && curve.arc1.L/k<15)
+        {
+            npts = k;
+            break;
+        }
+        else
+        {
+            npts = 20;
+        }
+    }
 	for(int j=0; j<npts;++j)
 	{
 		s1 = curve.arc1.L/npts*j;
 		circline(s1,curve.arc1.x0,curve.arc1.y0,curve.arc1.th0,curve.arc1.k);
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
+    for(int k=1;k<100;++k)
+    {
+        if(curve.arc2.L/k>5 && curve.arc2.L/k<15)
+        {
+            npts = k;
+            break;
+        }
+        else
+        {
+            npts = 20;
+        }
+        
+    }
 	for(int j=0; j<npts;++j)
 	{
 		s2 = curve.arc2.L/npts*j;
 		circline(s2,curve.arc2.x0,curve.arc2.y0,curve.arc2.th0,curve.arc2.k);
 		cv::circle(out, cv::Point(cline[0],cline[1]), 0.5 , cv::Scalar( 0,170,220 ), 5, 8, 0 );
 	}
+    for(int k=1;k<100;++k)
+    {
+        if(curve.arc3.L/k>5 && curve.arc3.L/k<15)
+        {
+            npts = k;
+            break;
+        }
+        else
+        {
+            npts = 20;
+        }
+    }
 	for(int j=0; j<npts;++j)
 	{	
 		s3 = curve.arc3.L/npts*j;
@@ -813,18 +850,25 @@ bool convertToPosePath(std::vector<DubinsArc> arcs, Path & path)
 
     for(int i=0;i<arcs.size();++i)
     {
-        // for(int k=1;k<100;++k)
-        // {
-        //     if(arcs[i].L/k>1.9 && arcs[i].L/k<2.1)
-        //     {
-        //         npts = k;
-        //     }
-        // }
-        for(int j=0; j<20;++j)
+        for(int k=1;k<100;++k)
         {
-            s = arcs[i].L/20*j;
+            if(arcs[i].L/k>5 && arcs[i].L/k<15)
+            {
+                npts = k;
+                break;
+            }
+            else
+            {
+                npts = 20;
+            }
+            
+        }
+        std::cout<<"Sampling distance "<<npts<<std::endl;
+        for(int j=0; j<npts;++j)
+        {
+            s = arcs[i].L/npts*j;
             circline(s,arcs[i].x0,arcs[i].y0,arcs[i].th0,arcs[i].k);
-            sum = sum + arcs[i].L/20;
+            sum = sum + arcs[i].L/npts;
             pose = Pose(sum/1000.0, cline[0]/1000.0, 1.05-cline[1]/1000.0, -cline[2], -arcs[i].k*1000);
             new_path.push_back(pose);                
         }

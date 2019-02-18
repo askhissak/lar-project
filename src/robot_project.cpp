@@ -94,11 +94,16 @@ bool RobotProject::localize(cv::Mat const & img,
 		return false;
 	}
 
-	findRobot(map, robot_plane, map_object);
+	if(!findRobot(map, robot_plane, map_object))
+	{
+		std::cerr << "(Critical) Failed to find the robot!" << std::endl;
+		return false;
+	}
 
-	state.push_back(map_object.robot.pose.x);
-	state.push_back(map_object.robot.pose.y);
-	state.push_back(map_object.robot.pose.theta);
+	state.push_back(map_object.robot.pose.x/1000.0);
+	state.push_back(1.05-map_object.robot.pose.y/1000.0);
+	state.push_back(-map_object.robot.pose.theta);
+	std::cout<<"x = "<<map_object.robot.pose.x/1000.0<<" y = "<<1.05-map_object.robot.pose.y/1000.0<<" theta = "<<-map_object.robot.pose.theta<<std::endl;
     
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
