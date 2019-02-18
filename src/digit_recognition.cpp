@@ -100,30 +100,49 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
         cv::threshold( processROI, processROI, 60, 255, cv::THRESH_BINARY_INV ); // threshold and binarize the image, to suppress some noise
 
         cv::erode(processROI, processROI, kernel);
-        // cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
-        // cv::erode(processROI, processROI, kernel);
+        cv::GaussianBlur(processROI, processROI, cv::Size(5, 5), 2, 2);
+        cv::erode(processROI, processROI, kernel);
 
         // Show the actual image passed to the ocr engine
         if (DR_developer_session == true) cv::imshow("ROI", processROI);
         rotatedProcessROI = processROI;
-        std::vector<char *> recognizedDigits(36);
-        std::vector<int> confidences(36);
+        std::vector<char *> recognizedDigits;
+        std::vector<int> confidences;
         int maxConfidence = 0, maxIndex;
 
         //Rotate the ROI to recognize a digit
         for(int j=0;j<36;++j)
         {
             ocr->SetImage(rotatedProcessROI.data, rotatedProcessROI.cols, rotatedProcessROI.rows, 3, rotatedProcessROI.step);
-            recognizedDigits[j] = ocr->GetUTF8Text();
-            confidences[j] = ocr->MeanTextConf();
+            // std::cout<<"OCR "<<ocr->GetUTF8Text()<<std::endl;
+            // std::cout<<"OCR confidence "<<ocr->MeanTextConf()<<std::endl;
+            if(*ocr->GetUTF8Text() == ' ' || !isdigit(*ocr->GetUTF8Text()) || ocr->MeanTextConf()<10 || *ocr->GetUTF8Text() == '0')
+            {
+                std::cout<<"Did not recognize the digit!"<<std::endl;
+                continue;
+            }
+            recognizedDigits.push_back(ocr->GetUTF8Text());
+            confidences.push_back(ocr->MeanTextConf());
             rotatedProcessROI = rotate(processROI, 10*j);
 
+        }
+
+        std::cout<<"Size "<<recognizedDigits.size()<<std::endl;
+
+        if(recognizedDigits.empty())
+        {
+            std::cout<<"A list of recognize digits is empty. Trying template matching..."<<std::endl;
+            return false;
         }
 
         //Find the digit with the highest confidence
         for(int k=0;k<recognizedDigits.size();++k)
         {
-            if(*recognizedDigits[k] == ' ' || !isdigit(*recognizedDigits[k])) continue;
+            if(k == (recognizedDigits.size()-1) && maxConfidence < 70) 
+            {
+                std::cout<<"Confidence level is too low. Trying template matching..."<<std::endl;
+                return false;
+            }
 
             if(confidences[k]>maxConfidence)
             {
@@ -132,10 +151,7 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
                 
             }
             
-           
         }
-        
-        if(*recognizedDigits[maxIndex] == ' ' || !isdigit(*recognizedDigits[maxIndex])) continue;
         
         std::cout << " Recognized digit: " << std::string(recognizedDigits[maxIndex]) << std::endl ;
         std::cout << " Confidence: " << maxConfidence << std::endl ;
@@ -143,10 +159,7 @@ bool useTesseract(cv::Mat const & map, std::vector<Victim> victims, int* index)
         
         if ( *recognizedDigits[maxIndex] == '7' ) {index[i] = std::stoi("1");std::cout << " Saved: " << index[i] << "\n\n " <<std::endl;}
         else index[i] = std::stoi(std::string(recognizedDigits[maxIndex]));
-		
-		
-        // if(maxConfidence<75) return false;
-        
+		        
     }
 
     ocr->End(); // destroy the ocr object (release resources)
@@ -248,20 +261,19 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
         double maxScore = 1;
         int maxIdx = -1;
 
-        for (int j=0; j<templROIs.size(); ++j) 
-        {
-            cv::cvtColor(templROIs[j], grayTemplROI, cv::COLOR_BGR2GRAY);
-            double score = cv::matchShapes(grayROI,grayTemplROI,2,0.0);
-            // cv::Mat result;
-            // cv::matchTemplate(rotatedROI, templROIs[j], result, cv::TM_CCOEFF);
-            // double score;
-            // cv::minMaxLoc(result, nullptr, &score); 
-            std::cout<<"Score "<<score<<std::endl;
-            if (score < maxScore) {
-                maxScore = score;
-                maxIdx = j;
-            }
-        }
+        // for (int j=0; j<templROIs.size(); ++j) 
+        // {
+        //     cv::cvtColor(templROIs[j], grayTemplROI, cv::COLOR_BGR2GRAY);
+        //     double score = cv::matchShapes(grayROI,grayTemplROI,2,0.0);
+        //     // cv::Mat result;
+        //     // cv::matchTemplate(rotatedROI, templROIs[j], result, cv::TM_CCOEFF);
+        //     // double score;
+        //     // cv::minMaxLoc(result, nullptr, &score); 
+        //     if (score < maxScore) {
+        //         maxScore = score;
+        //         maxIdx = j;
+        //     }
+        // }
 
         //Rotate the ROI to recognize a digit
         for(int j=0;j<36;++j)
@@ -282,12 +294,17 @@ bool useTemplateMatching(cv::Mat const & map, std::vector<Victim> victims, int* 
         }
 		
 		if (maxIdx == 7) maxIdx = 1;
+
+        std::cout<<"Max score "<<maxScore<<std::endl;
 		
         index[i] = maxIdx;
     
         std::cout << "Best fitting template: " << maxIdx << std::endl;
-        //if(maxScore>0.01) return false;
-     
+        if(maxScore<3) 
+        {
+            std::cout<<"Score is too low. Quitting ..."<<std::endl;
+            return false;
+        }
     }
     
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
