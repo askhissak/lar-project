@@ -34,7 +34,7 @@ cv::Mat readData(const std::string filename)
   if (RD_developer_session == true)
   {
 	  std::string outName = "Output Data";
-	  cv::namedWindow(outName.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(outName.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(outName.c_str(), 640, 512);
 	  cv::imshow(outName.c_str(), complete_map);
 	  //cv::waitKey(0);
@@ -86,7 +86,7 @@ while (!file.eof())
 
 			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -111,7 +111,7 @@ while (!file.eof())
 
             if (RD_developer_session == true)
 			{            
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -138,7 +138,7 @@ while (!file.eof())
 
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -167,7 +167,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -199,7 +199,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -232,7 +232,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -267,7 +267,7 @@ while (!file.eof())
 
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -306,7 +306,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -346,7 +346,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -387,7 +387,7 @@ while (!file.eof())
 			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -433,7 +433,7 @@ while (!file.eof())
 			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -479,7 +479,7 @@ while (!file.eof())
 				
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);  
@@ -528,7 +528,7 @@ while (!file.eof())
 			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				//cv::waitKey(0);
@@ -577,7 +577,7 @@ while (!file.eof())
 			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				//cv::waitKey(0); 
@@ -630,7 +630,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);   
@@ -684,7 +684,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0);
@@ -740,7 +740,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -799,7 +799,7 @@ while (!file.eof())
   			
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out); 
 				cv::waitKey(0); 
@@ -833,7 +833,7 @@ while (!file.eof())
 
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out +  complete_map); 
 				cv::waitKey(0);
@@ -858,7 +858,7 @@ while (!file.eof())
 
             if (RD_developer_session == true)
 			{            
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out + complete_map); 
 				cv::waitKey(0);
@@ -885,7 +885,7 @@ while (!file.eof())
 
 			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out +  complete_map); 
 				cv::waitKey(0); 
@@ -914,7 +914,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out + complete_map); 
 				cv::waitKey(0);
@@ -946,7 +946,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out + complete_map); 
 				cv::waitKey(0); 
@@ -979,7 +979,7 @@ while (!file.eof())
 		
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out + complete_map); 
 				cv::waitKey(0); 
@@ -1009,7 +1009,7 @@ while (!file.eof())
 
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out+complete_map); 
 				cv::waitKey(0);
@@ -1046,7 +1046,7 @@ while (!file.eof())
 
   			if (RD_developer_session == true)
 			{
-				cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+				cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 				cv::resizeWindow(name.c_str(), 640, 512);
 				cv::imshow(name.c_str(), out + complete_map ); 
 				cv::waitKey(0);  
@@ -1073,7 +1073,7 @@ while (!file.eof())
 		if (RD_developer_session == true)
 		{
 			cv::imshow("Corners", out); 
-			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 			cv::resizeWindow(name.c_str(), 640, 512);
 			cv::imshow(name.c_str(), out + complete_map); 
 			cv::waitKey(0);  
@@ -1091,14 +1091,14 @@ while (!file.eof())
   if (RD_developer_session == true)
   { 
 	  name = "Just Obstacles" ;
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), out); 
 	  cv::waitKey(0);
 	  cv::destroyWindow(name.c_str());
 	  
 	  name = "Complete Map " ;
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), out + complete_map ); 
 	  cv::waitKey(0);   		   		

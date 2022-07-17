@@ -1,7 +1,7 @@
 TARGET=program
 CXX=g++
-CXXFLAGS=`pkg-config --cflags tesseract opencv` -std=c++11
-LDLIBS=`pkg-config --libs tesseract opencv`
+CXXFLAGS=`pkg-config --cflags tesseract opencv4` -std=c++11
+LDLIBS=`pkg-config --libs tesseract opencv4`
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps

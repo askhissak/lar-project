@@ -1,6 +1,7 @@
 // shape_detection.cpp:
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -33,7 +34,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
 	{
 	  // Display original image
 	  name = "Original";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), img);
 	  cv::waitKey(0);
@@ -48,7 +49,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if (SD_developer_session == true)
 	{
 	  name = "HSV Transformation";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), hsv_img);
 	  cv::waitKey(0);
@@ -85,7 +86,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if (SD_developer_session == true)
 	{
 	  name = "Obstacles";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), red_mask);
 	  cv::waitKey(0);
@@ -157,7 +158,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
 		 if (SD_developer_session == true)
 		{
 			 name = "Obstacle(s) Boundaries";
-			 cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			 cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 			 cv::resizeWindow(name.c_str(), 640, 512);
 			 cv::imshow(name.c_str(), red_mask_temp);
 			 cv::waitKey(0);
@@ -184,7 +185,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if (SD_developer_session == true)
 	{
 	  name = "Regions of interest";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), green_mask);
 	  cv::waitKey(0);
@@ -221,7 +222,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
 	if (SD_developer_session == true)
 	{
 		name = "Circles Detected";
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 640, 512);
 		cv::imshow(name.c_str(), circles_img);
 		cv::waitKey(0);
@@ -244,7 +245,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if (SD_developer_session == true)
   {
 	  name = "Gate";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), blue_mask);
 	  cv::waitKey(0);
@@ -318,7 +319,7 @@ std::vector<cv::Vec3f> processImage(cv::Mat const & img , cv::Point & gate_cente
   if (SD_developer_session == true)
 	{
 	  name = "Gate(s) Boundaries";
-	  cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	  cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	  cv::resizeWindow(name.c_str(), 640, 512);
 	  cv::imshow(name.c_str(), blue_mask_temp);
 	  cv::waitKey(0);

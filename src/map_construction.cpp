@@ -76,32 +76,32 @@ int Black_V_Low  = 5; 	int Black_V_High = 70;
 static void on_low_H_thresh_trackbar(int, void *)
 {
     low_H = cv::min(high_H-1, low_H);
-    setTrackbarPos("Low H", filtered_image, low_H);
+    cv::setTrackbarPos("Low H", filtered_image, low_H);
 }
 static void on_high_H_thresh_trackbar(int, void *)
 {
     high_H = cv::max(high_H, low_H+1);
-    setTrackbarPos("High H", filtered_image, high_H);
+    cv::setTrackbarPos("High H", filtered_image, high_H);
 }
 static void on_low_S_thresh_trackbar(int, void *)
 {
     low_S = cv::min(high_S-1, low_S);
-    setTrackbarPos("Low S", filtered_image, low_S);
+    cv::setTrackbarPos("Low S", filtered_image, low_S);
 }
 static void on_high_S_thresh_trackbar(int, void *)
 {
     high_S = cv::max(high_S, low_S+1);
-    setTrackbarPos("High S", filtered_image, high_S);
+    cv::setTrackbarPos("High S", filtered_image, high_S);
 }
 static void on_low_V_thresh_trackbar(int, void *)
 {
     low_V = cv::min(high_V-1, low_V);
-    setTrackbarPos("Low V",filtered_image, low_V);
+    cv::setTrackbarPos("Low V",filtered_image, low_V);
 }
 static void on_high_V_thresh_trackbar(int, void *)
 {
     high_V = cv::max(high_V, low_V+1);
-    setTrackbarPos("High V", filtered_image, high_V);
+    cv::setTrackbarPos("High V", filtered_image, high_V);
 }
 
 int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int red_mask_high1 , int red_mask_low2 , int red_mask_high2 , int greenmask_low , int greenmask_high , int blue_mask_low , int blue_mask_high)
@@ -154,18 +154,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = Black_S_High;
 				high_V = Black_V_High;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
-				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
-				createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+				cv::createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+				cv::createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+				cv::createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
 		
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				
 				
@@ -219,18 +219,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = Robot_S_High;
 				high_V = Robot_V_High;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
-				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
-				createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+				cv::createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+				cv::createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+				cv::createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
 		
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				first_values = false ;
 			}
@@ -281,18 +281,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = ROI_S_High;
 				high_V = ROI_V_High;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
-				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
-				createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+				cv::createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+				cv::createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+				cv::createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
 		
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				first_values = false ;
 			}
@@ -344,18 +344,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = Gate_S_High;
 				high_V = Gate_V_High;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
-				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
-				createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+				cv::createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+				cv::createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+				cv::createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
 		
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				first_values = false ;
 			}
@@ -407,18 +407,18 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = Obs_S_High_2;
 				high_V = Obs_V_High_2;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
-				createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
-				createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
+				cv::createTrackbar("Low H", filtered_image, &low_H, max_value_H, on_low_H_thresh_trackbar);
+				cv::createTrackbar("Low S", filtered_image, &low_S, max_value, on_low_S_thresh_trackbar);
+				cv::createTrackbar("Low V", filtered_image, &low_V, max_value, on_low_V_thresh_trackbar);
 		
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				first_values = false ;
 			}
@@ -473,14 +473,14 @@ int HSV_Calib(cv::Mat original_img , cv::Mat hsv_img , int red_mask_low1 , int r
 				high_S = Obs_S_High_1;
 				high_V = Obs_V_High_1;
 				
-				cv::namedWindow(original_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(filtered_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(original_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(filtered_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(filtered_image, 700,0);
 				
-				createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
-				createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
-				createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
+				cv::createTrackbar("High H", filtered_image, &high_H, max_value_H, on_high_H_thresh_trackbar);
+				cv::createTrackbar("High S", filtered_image, &high_S, max_value, on_high_S_thresh_trackbar);
+				cv::createTrackbar("High V", filtered_image, &high_V, max_value, on_high_V_thresh_trackbar);
 				
 				first_values=false;
 			}	 
