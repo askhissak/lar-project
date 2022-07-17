@@ -53,17 +53,17 @@ bool first_collision_detection (cv::Mat original_img ,
 	  
 	cv::erode(red_mask , red_mask , kernel, cv::Point(-1, -1), 2);
 
-	findContours(red_mask, original_contours, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	findContours(red_mask, original_contours, RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 	
 	cv::Mat temp = cv::Mat::zeros( original_map.size(), original_map.type());
 	
 	
 	
-	drawContours(temp , original_contours, -1, cv::Scalar(255 , 255 ,255), CV_FILLED);  //Draw the found contours
+	drawContours(temp , original_contours, -1, cv::Scalar(255 , 255 ,255), cv::FILLED);  //Draw the found contours
 	
 	
 	name = "Contours";
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 640, 512);
 	cv::imshow(name.c_str(), temp);
 	cv::waitKey(0);
@@ -119,7 +119,7 @@ bool first_collision_detection (cv::Mat original_img ,
 	
 	
 	name = " COLLIDING OBSTACLES " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 512, 640);   		
 	cv::imshow(name.c_str(), temp ); 
 	cv::waitKey(0);
@@ -154,7 +154,7 @@ cv::Mat inflate_contours( cv::Mat original_map ,
 	
 	cv::Mat expanded  = cv::Mat::zeros(original_map.size() , original_map.type() );
 	
-	cv::cvtColor(original_map , expanded , CV_BGR2GRAY);
+	cv::cvtColor(original_map , expanded , cv::COLOR_BGRA2GRAY);
 	
 	cv::Mat temp  = expanded.clone();
 	
@@ -167,7 +167,7 @@ cv::Mat inflate_contours( cv::Mat original_map ,
 	
 	for( int i = 0; i < original_contours.size(); i++ ) { drawContours(expanded, original_contours, i, cv::Scalar(255,255,255), 40 * 2); }
 	
-	for( int i = 0; i < original_contours.size(); i++ ) { drawContours(original_map_temp , original_contours, i, cv::Scalar(100,100,100), CV_FILLED); }
+	for( int i = 0; i < original_contours.size(); i++ ) { drawContours(original_map_temp , original_contours, i, cv::Scalar(100,100,100), cv::FILLED); }
 	
 	
 	GaussianBlur(expanded, expanded , cv::Size(203, 203), 181 );
@@ -175,14 +175,14 @@ cv::Mat inflate_contours( cv::Mat original_map ,
 	cv::threshold(expanded,expanded , 20 , 255 , THRESH_BINARY) ;
 		
 	string name = "EXPANDED AND MERGED MAP " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 512, 640);   		
     cv::imshow(name.c_str(),  expanded - original_map_temp  ); //expanded
 	cv::waitKey(0);
 	cv::destroyWindow(name.c_str());
 	
 	
-	findContours( expanded , inflated_contours , RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	findContours( expanded , inflated_contours , RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 	
 	std::cout << " ---- \n Found " << inflated_contours.size() << " Inflated Contours \n" <<std::endl;
 	
@@ -244,7 +244,7 @@ cv::Mat inflate_contours( cv::Mat original_map ,
 	for(int i=0 ; i< pointPath.size() ; i++ ) {cv::circle( temp , pointPath[i] , 2 , cv::Scalar(50,50,50) , 5, 8, 0 );}
 
 	name = "COLLISIONS ON THE INFLATED MAP " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 512, 640);   		
     cv::imshow(name.c_str(), expanded + temp ); 
 	cv::waitKey(0);
@@ -375,7 +375,7 @@ cv::Mat create_new_path( std::vector<cv::Point> pointPath ,
 			}	
 			
 			name = "FIRST SEGMENT" ;
-			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 			cv::resizeWindow(name.c_str(), 512, 640);   		
 		    
 		    cv::imshow(name.c_str(), test_map ); 
@@ -421,7 +421,7 @@ cv::Mat create_new_path( std::vector<cv::Point> pointPath ,
 			}	
 			
 			name = "Accumulated Path after the collision Nr." + std::to_string( current_contour-1 ) ;
-			cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+			cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 			cv::resizeWindow(name.c_str(), 512, 640);   		
 		    
 		    cv::imshow(name.c_str(), test_map ); 
@@ -509,7 +509,7 @@ cv::Mat create_new_path( std::vector<cv::Point> pointPath ,
 		}
 			
 		name = "FIRST REGION " ;
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 512, 640);   		
 	    
 	    cv::imshow(name.c_str(), test_map ); 
@@ -530,7 +530,7 @@ cv::Mat create_new_path( std::vector<cv::Point> pointPath ,
 		}
 			
 		name = "SECOND REGION " ;
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 512, 640);   		
 	    
 	    cv::imshow(name.c_str(), test_map ); 
@@ -572,7 +572,7 @@ cv::Mat create_new_path( std::vector<cv::Point> pointPath ,
 	}
 		
 	name = "Complete Path " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 512, 640);   		
     
     cv::imshow(name.c_str(), test_map ); 
@@ -645,7 +645,7 @@ bool collision_detection( std::vector<cv::Point> new_path ,
 		cv::circle( test_map , cv::Point(new_x , new_y ) , 10 , random_color , 5, 8, 0 ); //Printing Second Region
 			
 		string name = "Collision_Point " ;
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 512, 640);   		
 	    
 	    cv::imshow(name.c_str(), test_map ); 
@@ -741,7 +741,7 @@ bool run_collision_detection( cv::Mat map ,
 	//Working Image + 
 	
 	name = "Processed Image " ;
-	cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+	cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 	cv::resizeWindow(name.c_str(), 512, 640);   		
     
     cv::imshow(name.c_str(), map ); 

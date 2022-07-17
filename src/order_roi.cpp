@@ -40,7 +40,7 @@ void orderROI(cv::Mat const & img, std::vector<cv::Vec3f> circles, int* pointer)
                 if (OR_developer_session == true)
                 {
 					std::string name = "Ordered Circles";
-					cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+					cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 					cv::resizeWindow(name.c_str(), 640, 512);
 					cv::imshow(name.c_str(), circles_img);
 					cv::waitKey(0);
