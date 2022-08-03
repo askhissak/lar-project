@@ -19,7 +19,7 @@
 #include "path.h"
 
 
-bool PP_developer_session = false ; // if true  -> Retrieves desired debugging and log content 
+bool PP_developer_session = true ; // if true  -> Retrieves desired debugging and log content
 								    // if false -> Process everything without graphical output 
 
 std::vector<NeighborVertices> roadmap;
@@ -463,7 +463,7 @@ std::vector<NeighborVertices> formAdjList(std::vector<std::vector<cv::Point>> sr
         }
             
 
-        cv::polylines(out, src[i], true, cv::Scalar(250,0,0), 1, CV_AA, 0);
+        cv::polylines(out, src[i], true, cv::Scalar(250,0,0), 1, cv::LINE_AA, 0);
     }
 
     connectGraph(map_object, adjList, out);
@@ -645,7 +645,7 @@ bool shortestPath(std::vector<NeighborVertices> &adjList, cv::Point start, cv::P
 		
 		if(PP_developer_session == true)
 		{
-			cv::namedWindow(win_dijkstra.c_str(), CV_WINDOW_NORMAL);
+			cv::namedWindow(win_dijkstra.c_str(), cv::WINDOW_NORMAL);
 			cv::resizeWindow(win_dijkstra.c_str(), 640, 512);
 			cv::imshow(win_dijkstra, local_map+out);
 			cv::waitKey(1);
@@ -789,7 +789,7 @@ void planDubins(Map & map_object, std::vector<DubinsArc> & arcs, double x0, doub
 
 	if(PP_developer_session == true)
 	{
-		cv::namedWindow(win_dubins.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(win_dubins.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(win_dubins.c_str(), 640, 512);
 		cv::imshow(win_dubins, local_map+out);
 		cv::waitKey(0);
@@ -993,7 +993,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
 		// 	// if (animate)
 		// 	// {
 		// 	// 	// cv::Mat img_copy = map.clone();
-		// 	// 	cv::namedWindow(win_dubins.c_str(), CV_WINDOW_NORMAL);
+		// 	// 	cv::namedWindow(win_dubins.c_str(), cv::WINDOW_NORMAL);
 		// 	// 	cv::resizeWindow(win_dubins.c_str(), 640, 512);
 		// 	// 	cv::imshow(win_dubins, map+out);
 		// 	// 	cv::waitKey(0);
@@ -1072,7 +1072,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
     if(PP_developer_session == true) 
     
 	{
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 640, 512);
 		cv::imshow(name.c_str(), out+local_map);
 		cv::waitKey(0);
@@ -1117,7 +1117,7 @@ bool planMissionOne(Map & map_object, std::vector<NeighborVertices> & adjList, P
  
 // static void drawPoint( Mat& img, Point2f fp, Scalar color )
 // {
-//     circle( img, fp, 2, color, CV_FILLED, CV_AA, 0 );
+//     circle( img, fp, 2, color, CV_FILLED, cv::LINE_AA, 0 );
 // }
  
 static void drawDelaunay( cv::Mat& img, cv::Subdiv2D& subdiv, cv::Scalar delaunay_color )
@@ -1139,9 +1139,9 @@ static void drawDelaunay( cv::Mat& img, cv::Subdiv2D& subdiv, cv::Scalar delauna
         // Draw rectangles completely inside the image.
         if ( rect.contains(pt[0]) && rect.contains(pt[1]) && rect.contains(pt[2]))
         {
-            line(img, pt[0], pt[1], delaunay_color, 1, CV_AA, 0);
-            line(img, pt[1], pt[2], delaunay_color, 1, CV_AA, 0);
-            line(img, pt[2], pt[0], delaunay_color, 1, CV_AA, 0);
+            line(img, pt[0], pt[1], delaunay_color, 1, cv::LINE_AA, 0);
+            line(img, pt[1], pt[2], delaunay_color, 1, cv::LINE_AA, 0);
+            line(img, pt[2], pt[0], delaunay_color, 1, cv::LINE_AA, 0);
         }
     }
 }
@@ -1178,8 +1178,8 @@ static void drawVoronoi( cv::Mat& img, cv::Subdiv2D& subdiv, std::vector<std::ve
         cv::fillConvexPoly(img, ifacet, color, 8, 0);
  
         ifacets[0] = ifacet;
-        polylines(img, ifacets, true, cv::Scalar(), 1, CV_AA, 0);
-        circle(img, centers[i], 3, cv::Scalar(), CV_FILLED, CV_AA, 0);
+        polylines(img, ifacets, true, cv::Scalar(), 1, cv::LINE_AA, 0);
+        circle(img, centers[i], 3, cv::Scalar(), cv::FILLED, cv::LINE_AA, 0);
 
     }
 }
@@ -1387,7 +1387,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
         // {
         //     cv::Mat img_copy = img_orig.clone();
         //     drawDelaunay( img_copy, subdiv, delaunay_color );
-		// 	cv::namedWindow(win_delaunay.c_str(), CV_WINDOW_NORMAL);
+		// 	cv::namedWindow(win_delaunay.c_str(), cv::WINDOW_NORMAL);
     	// 	cv::resizeWindow(win_delaunay.c_str(), 640, 512);
         //     cv::imshow(win_delaunay, img_copy);
         //     cv::waitKey(5);
@@ -1412,7 +1412,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
 	
     for(int i=0;i<facets.size();++i)
     {
-        cv::polylines(out, facets[i], true, cv::Scalar(250,0,0), 1, CV_AA, 0);
+        cv::polylines(out, facets[i], true, cv::Scalar(250,0,0), 1, cv::LINE_AA, 0);
     }
 
 	// showImage("Roadmap", map+out);
@@ -1420,7 +1420,7 @@ bool constructRoadmap(Map & map_object, std::vector<NeighborVertices> & adjList)
     // showImage( win_delaunay, img_orig);
     if(PP_developer_session == true) showImage( win_voronoi, img_voronoi);
 
-    // cv::namedWindow(win_voronoi.c_str(), CV_WINDOW_NORMAL);
+    // cv::namedWindow(win_voronoi.c_str(), cv::WINDOW_NORMAL);
     // cv::resizeWindow(win_voronoi.c_str(), 640, 512);
     // imshow(win_voronoi, img_voronoi);
 
