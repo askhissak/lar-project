@@ -53,32 +53,32 @@ int current_color =0 ;
 static void on_low_h_thresh_trackbar(int, void *)
 {
     low_h = cv::min(high_h-1, low_h);
-    setTrackbarPos("Low H", masked_image, low_h);
+    cv::setTrackbarPos("Low H", masked_image, low_h);
 }
 static void on_high_h_thresh_trackbar(int, void *)
 {
     high_h = cv::max(high_h, low_h+1);
-    setTrackbarPos("High H", masked_image, high_h);
+    cv::setTrackbarPos("High H", masked_image, high_h);
 }
 static void on_low_s_thresh_trackbar(int, void *)
 {
     low_s = cv::min(high_s-1, low_s);
-    setTrackbarPos("Low S", masked_image, low_s);
+    cv::setTrackbarPos("Low S", masked_image, low_s);
 }
 static void on_high_s_thresh_trackbar(int, void *)
 {
     high_s = cv::max(high_s, low_s+1);
-    setTrackbarPos("High S", masked_image, high_s);
+    cv::setTrackbarPos("High S", masked_image, high_s);
 }
 static void on_low_v_thresh_trackbar(int, void *)
 {
     low_v = cv::min(high_v-1, low_v);
-    setTrackbarPos("Low V",masked_image, low_v);
+    cv::setTrackbarPos("Low V",masked_image, low_v);
 }
 static void on_high_v_thresh_trackbar(int, void *)
 {
     high_v = cv::max(high_v, low_v+1);
-    setTrackbarPos("High V", masked_image, high_v);
+    cv::setTrackbarPos("High V", masked_image, high_v);
 }
 
 void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img )
@@ -123,18 +123,18 @@ void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img )
 				high_s = Black_s_High;
 				high_v = Black_v_High;
 				
-				cv::namedWindow(source_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(source_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(masked_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(masked_image, 700,0);
 				
-				createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
-				createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
-				createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
+				cv::createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
+				cv::createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
+				cv::createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
 		
-				createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
-				createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
-				createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+				cv::createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
+				cv::createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
+				cv::createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
 					
 				first_values = false ;
 			}
@@ -183,18 +183,18 @@ void Calibrate_HSV(cv::Mat original_img , cv::Mat hsv_img )
 				high_s = White_s_High;
 				high_v = White_v_High;
 				
-				cv::namedWindow(source_image, CV_WINDOW_NORMAL);
-				cv::namedWindow(masked_image, CV_WINDOW_NORMAL);
+				cv::namedWindow(source_image, cv::WINDOW_NORMAL);
+				cv::namedWindow(masked_image, cv::WINDOW_NORMAL);
 				
 				cv::moveWindow(masked_image, 700,0);
 				
-				createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
-				createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
-				createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
+				cv::createTrackbar("Low H", masked_image, &low_h, max_value_H, on_low_h_thresh_trackbar);
+				cv::createTrackbar("Low S", masked_image, &low_s, max_value, on_low_s_thresh_trackbar);
+				cv::createTrackbar("Low V", masked_image, &low_v, max_value, on_low_v_thresh_trackbar);
 		
-				createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
-				createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
-				createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
+				cv::createTrackbar("High H", masked_image, &high_h, max_value_H, on_high_h_thresh_trackbar);
+				cv::createTrackbar("High S", masked_image, &high_s, max_value, on_high_s_thresh_trackbar);
+				cv::createTrackbar("High V", masked_image, &high_v, max_value, on_high_v_thresh_trackbar);
 					
 				first_values = false ;
 			}
@@ -252,7 +252,7 @@ void loadCoefficients(const std::string& filename,
 void showImage(const std::string& window_name, cv::Mat const & img)
 {
     std::string name = window_name;
-    cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+    cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
     cv::resizeWindow(name.c_str(), 640, 512);
     cv::imshow(name.c_str(), img);
     cv::waitKey(0);
@@ -541,12 +541,12 @@ cv::Mat findTransform(cv::Mat const & calib_image,
 	if(ME_developer_session == true) 
     {
 		name = "Unwarped robot plane";
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 640, 512);
 		imshow(name.c_str(), unwarped_rb_frame);
 
 		wind2 = "Unwarped map plane";
-		cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(wind2.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(wind2.c_str(), 640, 512);
 		imshow(wind2.c_str(), unwarped_frame);
 
@@ -598,12 +598,12 @@ bool extractMapLocalize(cv::Mat const & img, cv::Mat &map, cv::Mat &robot_plane,
 	if(ME_developer_session == true)
 	{
 		name = "Unwarped robot plane";
-		cv::namedWindow(name.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(name.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(name.c_str(), 640, 512);
 		imshow(name.c_str(), unwarped_rb_frame);
 
 		wind2 = "Unwarped map plane";
-		cv::namedWindow(wind2.c_str(), CV_WINDOW_NORMAL);
+		cv::namedWindow(wind2.c_str(), cv::WINDOW_NORMAL);
 		cv::resizeWindow(wind2.c_str(), 640, 512);
 		imshow(wind2.c_str(), unwarped_frame);
 
